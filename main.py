@@ -5,7 +5,6 @@ Thesis by Muhammad Arbi Minanda (23220344)
 """
 
 #libraries
-from re import L
 from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
@@ -13,12 +12,31 @@ from PyQt5 import uic
 import sys 
 import time; 
 import json
-import paho.mqtt.client as mqtt
 import requests
 import cv2
 import os.path
 import subprocess
 import os
+
+# thread to read data from API
+class Worker(QThread):
+    data_json = QtCore.pyqtSignal(dict)
+    def __init__(self, endpoint):
+        super().__init__()
+        self.endpoint = endpoint
+        
+    def run(self) :
+        url = self.endpoint
+        messages = sseclient.SSEClient(url)
+        for msg in messages:
+            try:
+                data = json.loads(msg.data)
+                if (data == {}) :
+                    pass
+                else :
+                    self.data_json.emit(data)
+            except json.JSONDecodeError:
+                pass
 
 class UI(QMainWindow):
     def __init__(self):
@@ -72,8 +90,13 @@ class UI(QMainWindow):
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-3f980000.usb-1.2.3):'
 
         #variable for chamber identifier
-        self.cameraURL = "https://smartfarm-staging.ganesalens.id/api/camera_image/"
-        self.chamberKey = "chamber2"
+        self.baseUrl = 'http://52.221.208.114'
+        self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.userKey
+        self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.userKey
+        self.urlPostCondToDB = self.baseUrl + '/api/condition/create'
+        self.urlPostPhoto = self.baseUrl + '/api/file/create'
+        self.userKey = "1"
+        self.chamberKey = "2"
 
         #waiting till internet connection exist for initialize app
         while (self.connected == False):
@@ -82,19 +105,6 @@ class UI(QMainWindow):
                 self.connected = True
             except:
                 self.connected = False
-        
-        #mqtt setting
-        self.MQTT_SERVER = "hairdresser.cloudmqtt.com"
-        self.port=15630
-        self.mqtt_server_connected=0
-        self.MQTT_USERNAME = "zxpyjlhs"
-        self.MQTT_PASSWORD = "2cerp9-n4K2y"
-        self.client = mqtt.Client()
-        self.client.username_pw_set(self.MQTT_USERNAME, self.MQTT_PASSWORD)
-        self.client.connect(self.MQTT_SERVER, self.port, 60)
-        self.client.loop_start()
-        self.client.on_connect = self.on_connect_mqtt
-        self.client.on_message = self.on_message_mqtt
         
         #pages
         self.stackedWidget = self.findChild(QStackedWidget, "stackedWidget")
@@ -194,14 +204,8 @@ class UI(QMainWindow):
         self.commaButtonLight = self.findChild(QPushButton, "buttonCommaLight")
         self.backFromLight = self.findChild(QPushButton, "goDashboardFromLight")
 
-        #display initial value
-        #self.setpointTemp.setText(self.SPTemp)
-        #self.setpointHum.setText(self.SPHum)
-        #self.setpointLight.setText(self.SPLight)
-
         #camera page element
         self.cameraTop = self.findChild(QLabel, "cameraTop")
-        #self.cameraMiddle = self.findChild(QLabel, "cameraMiddle")
         self.cameraBottom = self.findChild(QLabel, "cameraBottom")
         self.cameraUser = self.findChild(QLabel, "cameraUser")
         self.subTakePhoto = self.findChild(QPushButton, "subTakePhoto")
@@ -213,7 +217,6 @@ class UI(QMainWindow):
         self.showFullScreen()
         self.fullscreenButton.setText("↙")
         self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        #self.cameraMiddle.setPixmap(QPixmap(self.pathMiddlePhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
@@ -326,6 +329,11 @@ class UI(QMainWindow):
         self.sendDataCloudTimer.timeout.connect(lambda:self.sendDataCloud())
         self.sendDataCloudTimer.start(10010)
         
+        #send data to DB in cloud scheduling
+        self.sendDataToDBcloudTimer = QtCore.QTimer()
+        self.sendDataToDBcloudTimer.timeout.connect(lambda:self.sendDataToDBcloud())
+        self.sendDataToDBcloudTimer.start(1800000)
+        
         #send data to mcu scheduling
         self.sendDataMCUTimer = QtCore.QTimer()
         self.sendDataMCUTimer.timeout.connect(lambda:self.sendDataMCU())
@@ -353,9 +361,11 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer = QtCore.QTimer()
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
-        #self.sendPhotoMiddleTimer = QtCore.QTimer()
-        #self.sendPhotoMiddleTimer.timeout.connect(lambda:self.sendPhotoMiddle())
-        #self.sendPhotoMiddleTimer.start(3600000)
+        
+        #create thread to get/subscribe live setpoint
+        self.thread = Worker(self.urlGetLiveSetpoint)
+        self.thread.data_json.connect(self.readLiveSetPointFromCloud)
+        self.thread.start()
         
         #wired serial to hardware
         self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
@@ -408,9 +418,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(True)
             self.humidifierButton.setEnabled(True)
             self.lightSlider.setEnabled(True)
-            #self.setpointTemp.setDisabled(True)
-            #self.setpointHum.setDisabled(True)
-            #self.setpointLight.setDisabled(True)
             self.tempButton.setEnabled(False)
             self.humButton.setEnabled(False)
             self.lightButton.setEnabled(False)
@@ -448,9 +455,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(False)
             self.humidifierButton.setEnabled(False)
             self.lightSlider.setEnabled(False)
-            #self.setpointTemp.setDisabled(False)
-            #self.setpointHum.setDisabled(False)
-            #self.setpointLight.setDisabled(False)
             self.tempButton.setEnabled(True)
             self.humButton.setEnabled(True)
             self.lightButton.setEnabled(True)
@@ -504,9 +508,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(True)
             self.humidifierButton.setEnabled(True)
             self.lightSlider.setEnabled(True)
-            #self.setpointTemp.setDisabled(True)
-            #self.setpointHum.setDisabled(True)
-            #self.setpointLight.setDisabled(True)
             self.tempButton.setEnabled(False)
             self.humButton.setEnabled(False)
             self.lightButton.setEnabled(False)
@@ -600,10 +601,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(True)
             self.humidifierButton.setEnabled(True)
             self.lightSlider.setEnabled(True)
-            #self.setpointTemp.setDisabled(True)
-            #self.setpointHum.setDisabled(True)
-            #self.setpointLight.setDisabled(True)
-            #self.tempButton.setEnabled(False)
             self.humButton.setEnabled(False)
             self.lightButton.setEnabled(False)
             self.oneButtonTemp.setEnabled(False)
@@ -640,9 +637,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(False)
             self.humidifierButton.setEnabled(False)
             self.lightSlider.setEnabled(False)
-            #self.setpointTemp.setDisabled(False)
-            #self.setpointHum.setDisabled(False)
-            #self.setpointLight.setDisabled(False)
             self.tempButton.setEnabled(True)
             self.humButton.setEnabled(True)
             self.lightButton.setEnabled(True)
@@ -1106,85 +1100,6 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text()
             self.setpointLightNight.setText(self.SPLightNight[:-1])
     
-    #function if receive message from subscribing to cloud mqtt
-    def on_message_mqtt(self,client, userdata, msg):
-        print(msg.topic+" "+str(msg.payload))
-        print(str(msg.payload.decode("utf-8")))
-        if (msg.topic == 'update_chamber2'):
-            self.receiveCloud = True
-            json_obj = json.loads(msg.payload)
-            if ("chamberKey" in json_obj):
-                if (json_obj["chamberKey"] == "chamber2"):
-                    if ("mode" in json_obj):		
-                        self.mode = json_obj["mode"]
-                        if self.mode == "manual":
-                            self.manualTempButton.setChecked(True)
-                            self.manualHumButton.setChecked(True)
-                            self.manualLightButton.setChecked(True)
-                            self.actualMode.setText("Current Mode: Manual")
-                        else:
-                            self.manualTempButton.setChecked(False)
-                            self.manualHumButton.setChecked(False)
-                            self.manualLightButton.setChecked(False)
-                            self.actualMode.setText("Current Mode: Auto")
-                    if ("SPTemp" in json_obj):
-                        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                            self.SPTempDay = json_obj["SPTemp"]
-                            self.setpointTempDay.setText(self.SPTempDay)
-                        else:
-                            self.SPTempNight = json_obj["SPTemp"]
-                            self.setpointTempNight.setText(self.SPTempNight)
-                    if ("SPHum" in json_obj):
-                        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                            self.SPHumDay = json_obj["SPHum"]
-                            self.setpointHumDay.setText(self.SPHumDay)
-                        else:
-                            self.SPHumNight = json_obj["SPHum"]
-                            self.setpointHumNight.setText(self.SPHumNight)
-                    if ("SPLight" in json_obj):
-                        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                            self.SPLightDay = json_obj["SPLight"]
-                            self.setpointLightDay.setText(self.SPLightDay)
-                        else:
-                            self.SPLightNight = json_obj["SPLight"]
-                            self.setpointLightNight.setText(self.SPLightNight)
-                    if ("sHeater" in json_obj):
-                        self.manHeater = json_obj["sHeater"]
-                        if self.manHeater == True:
-                            self.heaterButton.setChecked(True)
-                        else:
-                            self.heaterButton.setChecked(False)
-                    if ("sComp" in json_obj):		
-                        self.manComp = json_obj["sComp"]
-                        if self.manComp == True:
-                            self.coolerButton.setChecked(True)
-                        else:
-                            self.coolerButton.setChecked(False)
-                    if ("sLight" in json_obj):		
-                        self.manLight = json_obj["sLight"]/4
-                        self.lampSlider.setValue(json_obj["sLight"])
-                    if ("sHum" in json_obj):		
-                        self.manHum = json_obj["sHum"]
-                        if self.manHum == True:
-                            self.humidifierButton.setChecked(True)
-                        else:
-                            self.humidifierButton.setChecked(False)
-#         elif (msg.topic == 'request_chamber2'):
-#             self.receiveCloud = True
-#             json_obj = json.loads(msg.payload)
-#             if ("chamberKey" in json_obj):
-#                 if (json_obj["chamberKey"] == "chamber2"):
-#                     self.sendDataCloud()
-        else:
-            print("Different Topic")
-
-    #function for subscribing to cloud mqtt
-    def on_connect_mqtt(self,client, userdata, flags, rc):
-        print("Connected with result code "+str(rc))
-        self.client.subscribe('update_chamber2')
-        self.client.subscribe('request_chamber2')
-        self.mqtt_server_connected=1
-    
     #function to update time on display
     def updateTime(self):
         gmt = time.localtime()
@@ -1222,35 +1137,6 @@ class UI(QMainWindow):
             self.actualPosition.setText("Top")
         self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
 
-    #function for sending data to cloud
-    def sendDataCloud(self):
-        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.SPTemp = self.SPTempDay
-            self.SPHum = self.SPHumDay
-            self.SPLight = self.SPLightDay
-        else:
-            self.SPTemp = self.SPTempNight
-            self.SPHum = self.SPHumNight
-            self.SPLight = self.SPLightNight
-        data_json ={
-            "chamberKey": self.chamberKey,
-            "mode"        : self.mode,
-            "SPTemp"    : self.SPTemp,
-            "SPHum"        : self.SPHum,
-            "SPLight"    : self.SPLight,
-            "actTemp"    : self.actTemp,
-            "actHum"    : self.actHum,
-            "actLight"    : self.actLight,
-            "sHeater"    : self.manHeater,
-            "sComp"        : self.manComp,
-            "sLight"    : self.manLight*4,
-            "sHum"        : self.manHum,
-        }
-        payloadCloud = str.encode(json.dumps(data_json)+'\n')
-        print(payloadCloud)
-        self.client.publish("hardware-data",payloadCloud)
-        print("Data sent to Cloud")
-        
     #function for save data to local file
     def saveDataToLocalFile(self):
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
@@ -1283,6 +1169,109 @@ class UI(QMainWindow):
             self.sendPhotoUser()
             print("New User Detected, Photo User sent to Cloud")
         self.lastMinuteTouch = currentTouch 
+
+    #send current live data in hardware to cloud
+    def sendDataCloud(self) :
+        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+            self.SPTemp = self.SPTempDay
+            self.SPHum = self.SPHumDay
+            self.SPLight = self.SPLightDay
+        else:
+            self.SPTemp = self.SPTempNight
+            self.SPHum = self.SPHumNight
+            self.SPLight = self.SPLightNight
+        data_json ={
+            "device_id" : self.chamberKey,
+            "mode" : self.mode,
+            "SPTemp" : self.SPTemp,
+            "SPHum" : self.SPHum,
+            "SPLight" : self.SPLight,
+            "temperature" : float(self.actTemp),
+            "humidity" : float(self.actHum),
+            "intensity" : float(self.actLight),
+            "sHeater" : self.manHeater,
+            "sComp" : self.manComp,
+            "sLight" : self.manLight*4,
+            "sHum" : self.manHum,
+        }
+        header = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
+        print("Live Data sent to Cloud")
+
+    #send current live data in hardware to be saved in DB cloud
+    def sendDataToDBcloud(self) :
+        data = {
+            "temperature" : float(self.actTemp),
+            "humidity" : float(self.actHum),
+            "intensity" : float(self.actLight),
+            "device_id" : int(self.chamberKey)
+        }
+        header = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
+
+    #function to read live setpoint data from cloud
+    def readLiveSetPointFromCloud(self, data_json):
+        self.receiveCloud = True
+        if ("chamberKey" in data_json):
+            if (str(data_json.get("device_id")) == self.chamberKey):
+                if ("mode" in data_json):		
+                    self.mode = str(data_json.get("mode"))
+                    if self.mode == "manual":
+                        self.manualTempButton.setChecked(True)
+                        self.manualHumButton.setChecked(True)
+                        self.manualLightButton.setChecked(True)
+                        self.actualMode.setText("Current Mode: Manual")
+                    else:
+                        self.manualTempButton.setChecked(False)
+                        self.manualHumButton.setChecked(False)
+                        self.manualLightButton.setChecked(False)
+                        self.actualMode.setText("Current Mode: Auto")
+                if ("temperature" in data_json):
+                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                        self.SPTempDay = str(data_json.get("temperature"))
+                        self.setpointTempDay.setText(self.SPTempDay)
+                    else:
+                        self.SPTempNight = str(data_json.get("temperature"))
+                        self.setpointTempNight.setText(self.SPTempNight)
+                if ("humidity" in data_json):
+                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                        self.SPHumDay = str(data_json.get("humidity"))
+                        self.setpointHumDay.setText(self.SPHumDay)
+                    else:
+                        self.SPHumNight = str(data_json.get("humidity"))
+                        self.setpointHumNight.setText(self.SPHumNight)
+                if ("intensity" in data_json):
+                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                        self.SPLightDay = str(data_json.get("intensity"))
+                        self.setpointLightDay.setText(self.SPLightDay)
+                    else:
+                        self.SPLightNight = str(data_json.get("intensity"))
+                        self.setpointLightNight.setText(self.SPLightNight)
+                if ("sHeater" in data_json):
+                    self.manHeater = data_json.get("sHeater")
+                    if self.manHeater == True:
+                        self.heaterButton.setChecked(True)
+                    else:
+                        self.heaterButton.setChecked(False)
+                if ("sComp" in data_json):		
+                    self.manComp = data_json.get("sComp")
+                    if self.manComp == True:
+                        self.coolerButton.setChecked(True)
+                    else:
+                        self.coolerButton.setChecked(False)
+                if ("sLight" in data_json):		
+                    self.manLight = data_json.get("sLight")/4
+                    self.lampSlider.setValue(data_json["sLight"])
+                if ("sHum" in data_json):		
+                    self.manHum = data_json.get("sHum")
+                    if self.manHum == True:
+                        self.humidifierButton.setChecked(True)
+                    else:
+                        self.humidifierButton.setChecked(False)
 
     #function for sending data to hardware
     def sendDataMCU(self):
@@ -1324,30 +1313,9 @@ class UI(QMainWindow):
                     print("Top Image Captured and Saved")
                 cam.release()
             self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            data = {"position" : "top",}
-            files = {'image_blob': self.pathTopPhoto}
-            multi_part = QtNetwork.QHttpMultiPart(QtNetwork.QHttpMultiPart.FormDataType)
-            for key, value in data.items():
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"".format(key))
-                post_part.setBody(str(value).encode())
-                multi_part.append(post_part)
-            for field, filepath in  files.items():
-                file = QtCore.QFile(filepath)
-                if not file.open(QtCore.QIODevice.ReadOnly):
-                    break
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"; filename=\"{}\"".format(field, file.fileName()))
-                post_part.setBodyDevice(file)
-                file.setParent(multi_part)
-                multi_part.append(post_part)
-            if multi_part:
-                print("Sending top image..")
-                url = QtCore.QUrl(self.cameraURL)
-                request = QtNetwork.QNetworkRequest(url)
-                request.setRawHeader("CHAMBER_KEY".encode(), self.chamberKey.encode())
-                reply = self._manager.post(request, multi_part)
-                multi_part.setParent(reply)
+            files = {'files': open(self.pathTopPhoto,'rb')}
+            values = {'device_id': int(self.chamberKey)}
+            response = requests.post(self.urlPostPhoto, files=files, data=values)
         except:
             print("Top Camera not found")
     
@@ -1359,78 +1327,20 @@ class UI(QMainWindow):
             indexBottomCam = df2Byte.index(self.bottomCameraDevice)
             indexBottomVideo = df2Byte[indexBottomCam+1][-1]
             cam2 = cv2.VideoCapture(int(indexBottomVideo))
-            ret, image = cam2.read()
-            cv2.imwrite(self.pathBottomPhoto, image)
-            print("Bottom Image Captured and Saved")
-            cam2.release()
+            if cam2.isOpened():
+                ret, image = cam2.read()
+                if ret:
+                    cv2.imwrite(self.pathBottomPhoto, image)
+                    print("Bottom Image Captured and Saved")
+                cam2.release()
             self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            data = {"position" : "back",}
-            files = {'image_blob': self.pathBottomPhoto}
-            multi_part = QtNetwork.QHttpMultiPart(QtNetwork.QHttpMultiPart.FormDataType)
-            for key, value in data.items():
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"".format(key))
-                post_part.setBody(str(value).encode())
-                multi_part.append(post_part)
-            for field, filepath in  files.items():
-                file = QtCore.QFile(filepath)
-                if not file.open(QtCore.QIODevice.ReadOnly):
-                    break
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"; filename=\"{}\"".format(field, file.fileName()))
-                post_part.setBodyDevice(file)
-                file.setParent(multi_part)
-                multi_part.append(post_part)
-            if multi_part:
-                print("Sending bottom image..")
-                url = QtCore.QUrl(self.cameraURL)
-                request = QtNetwork.QNetworkRequest(url)
-                request.setRawHeader("CHAMBER_KEY".encode(), self.chamberKey.encode())
-                reply = self._manager.post(request, multi_part)
-                multi_part.setParent(reply)
+            files = {'files': open(self.pathBottomPhoto,'rb')}
+            values = {'device_id': int(self.chamberKey)}
+            response = requests.post(self.urlPostPhoto, files=files, data=values)
+
         except:
             print("Bottom Camera not found")
     
-    #function for sending middle photo to cloud
-    def sendPhotoMiddle(self):
-        try:
-            df2 = subprocess.check_output("v4l2-ctl --list-devices", shell=True)
-            df2Byte = df2.decode('utf8').split('\n')
-            indexMiddleCam = df2Byte.index(self.middleCameraDevice)
-            indexMiddleVideo = df2Byte[indexMiddleCam+1][-1]
-            cam3 = cv2.VideoCapture(int(indexMiddleVideo))
-            ret, image = cam3.read()
-            cv2.imwrite(self.pathMiddlePhoto, image)
-            print("Middle Image Captured and Saved")
-            cam3.release()
-            self.cameraMiddle.setPixmap(QPixmap(self.pathMiddlePhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            data = {"position" : "side",}
-            files = {'image_blob': self.pathMiddlePhoto}
-            multi_part = QtNetwork.QHttpMultiPart(QtNetwork.QHttpMultiPart.FormDataType)
-            for key, value in data.items():
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"".format(key))
-                post_part.setBody(str(value).encode())
-                multi_part.append(post_part)
-            for field, filepath in  files.items():
-                file = QtCore.QFile(filepath)
-                if not file.open(QtCore.QIODevice.ReadOnly):
-                    break
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"; filename=\"{}\"".format(field, file.fileName()))
-                post_part.setBodyDevice(file)
-                file.setParent(multi_part)
-                multi_part.append(post_part)
-            if multi_part:
-                print("Sending middle image..")
-                url = QtCore.QUrl(self.cameraURL)
-                request = QtNetwork.QNetworkRequest(url)
-                request.setRawHeader("CHAMBER_KEY".encode(), self.chamberKey.encode())
-                reply = self._manager.post(request, multi_part)
-                multi_part.setParent(reply)
-        except:
-            print("Middle Camera not found")
-
     #function for sending user photo to cloud
     def sendPhotoUser(self):
         try:
@@ -1439,35 +1349,16 @@ class UI(QMainWindow):
             indexUserCam = df2Byte.index(self.userCameraDevice)
             indexUserVideo = df2Byte[indexUserCam+1][-1]
             cam4 = cv2.VideoCapture(int(indexUserVideo))
-            ret, image = cam4.read()
-            cv2.imwrite(self.pathUserPhoto, image)
-            print("User Image Captured and Saved")
-            cam4.release()
+            if cam4.isOpened():
+                ret, image = cam4.read()
+                if ret:
+                    cv2.imwrite(self.pathUserPhoto, image)
+                    print("User Image Captured and Saved")
+                cam4.release()
             self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            data = {"position" : "front",}
-            files = {'image_blob': self.pathUserPhoto}
-            multi_part = QtNetwork.QHttpMultiPart(QtNetwork.QHttpMultiPart.FormDataType)
-            for key, value in data.items():
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"".format(key))
-                post_part.setBody(str(value).encode())
-                multi_part.append(post_part)
-            for field, filepath in  files.items():
-                file = QtCore.QFile(filepath)
-                if not file.open(QtCore.QIODevice.ReadOnly):
-                    break
-                post_part = QtNetwork.QHttpPart()
-                post_part.setHeader(QtNetwork.QNetworkRequest.ContentDispositionHeader, "form-data; name=\"{}\"; filename=\"{}\"".format(field, file.fileName()))
-                post_part.setBodyDevice(file)
-                file.setParent(multi_part)
-                multi_part.append(post_part)
-            if multi_part:
-                print("Sending user image..")
-                url = QtCore.QUrl(self.cameraURL)
-                request = QtNetwork.QNetworkRequest(url)
-                request.setRawHeader("CHAMBER_KEY".encode(), self.chamberKey.encode())
-                reply = self._manager.post(request, multi_part)
-                multi_part.setParent(reply)
+            files = {'files': open(self.pathUserPhoto,'rb')}
+            values = {'device_id': int(self.chamberKey)}
+            response = requests.post(self.urlPostPhoto, files=files, data=values)
         except:
             print("User Camera not found")
     
@@ -1493,26 +1384,11 @@ class UI(QMainWindow):
                 self.actualLight.setText(self.actLight)
                 self.subActualLight.setText(self.actLight)
                 self.pwmHeater = data.get("pwmHeater")
-                #self.sendDataCloud()              
             except json.JSONDecodeError:
                 pass
 
 #initialize app
-"""
-displayDevice = ['state 0xa [HDMI DMT (85) RGB full 16:9], 1280x720 @ 60.00Hz, progressive', '']
-displayConnected = False
-while (displayConnected == False):
-    try:
-        df3 = subprocess.check_output("tvservice -s", shell=True)
-        df3Byte = df3.decode('utf8').split('\n')
-        print("check display")
-        if (df3Byte == displayDevice):
-            displayConnected = True
-    except:
-        displayConnected = False
-"""
 QtWidgets.QApplication.setStyle("fussion")
 app = QApplication(sys.argv)
 UIWindow = UI()
 app.exec_()
-
