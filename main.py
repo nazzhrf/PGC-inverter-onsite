@@ -76,15 +76,14 @@ class UI(QMainWindow):
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         #variable for photo
-        self.pathTopPhoto = 'Image/top.png'
-        self.pathMiddlePhoto = 'Image/middle.png'
-        self.pathBottomPhoto = 'Image/bottom.png'
-        self.pathUserPhoto = 'Image/user.png'
+        self.timePhoto = QDateTime.currentDateTime()
+        self.pathTopPhoto = 'Image/Top-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
+        self.pathBottomPhoto = 'Image/Bottom-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
+        self.pathUserPhoto = 'Image/User-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
         #camera devices
-        self.middleCameraDevice = 'USB 2.0 PC Cam (usb-3f980000.usb-1.2.2):'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-3f980000.usb-1.2.4):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-3f980000.usb-1.2.2):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-3f980000.usb-1.2.3):'
@@ -239,7 +238,6 @@ class UI(QMainWindow):
         self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
         self.takePhoto.clicked.connect(lambda:self.sendPhotoTop())
-        self.takePhoto.clicked.connect(lambda:self.sendPhotoMiddle())
         self.takePhoto.clicked.connect(lambda:self.sendPhotoBottom())
         
         #behaviour on dashboard page
@@ -313,7 +311,6 @@ class UI(QMainWindow):
         #behaviour on photo page
         self.backFromCamera.clicked.connect(lambda:self.backFromCamera_clicked())
         self.subTakePhoto.clicked.connect(lambda:self.sendPhotoTop())
-        self.subTakePhoto.clicked.connect(lambda:self.sendPhotoMiddle())
         self.subTakePhoto.clicked.connect(lambda:self.sendPhotoBottom())
 
         #check user behaviour
