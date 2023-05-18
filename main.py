@@ -77,9 +77,9 @@ class UI(QMainWindow):
 
         #variable for photo
         self.timePhoto = QDateTime.currentDateTime()
-        self.pathTopPhoto = 'Image/Top-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
-        self.pathBottomPhoto = 'Image/Bottom-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
-        self.pathUserPhoto = 'Image/User-' + (self.timePhoto).toString('dddd,dd-MM-yyyy,hh:mm:ss') + '.png'
+        self.pathTopPhoto = 'Image/top-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
+        self.pathBottomPhoto = 'Image/bottom-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
+        self.pathUserPhoto = 'Image/user-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
