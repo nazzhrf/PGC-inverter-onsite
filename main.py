@@ -220,7 +220,7 @@ class UI(QMainWindow):
         self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
-        self.actualMode.setText("Current Mode: Auto")
+        self.actualMode.setText("Current Mode: Auto (Manual Mode has been Removed)")
         self.setpointTempDay.setText(self.SPTempDay)
         self.setpointTempNight.setText(self.SPTempNight)
         self.setpointHumDay.setText(self.SPHumDay)
@@ -233,6 +233,11 @@ class UI(QMainWindow):
         self.coolerButton.setEnabled(False)
         self.humidifierButton.setEnabled(False)
         self.lampSlider.setEnabled(False)
+
+        # disable manual mode
+        self.manualTempButton.setEnabled(False)
+        self.manualHumButton.setEnabled(False)
+        self.manualLightButton.setEnabled(False)
         
         #behaviour on central widget
         self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
@@ -1215,18 +1220,6 @@ class UI(QMainWindow):
         self.receiveCloud = True
         if ("chamberKey" in data_json):
             if (str(data_json.get("device_id")) == self.chamberKey):
-                if ("mode" in data_json):		
-                    self.mode = str(data_json.get("mode"))
-                    if self.mode == "manual":
-                        self.manualTempButton.setChecked(True)
-                        self.manualHumButton.setChecked(True)
-                        self.manualLightButton.setChecked(True)
-                        self.actualMode.setText("Current Mode: Manual")
-                    else:
-                        self.manualTempButton.setChecked(False)
-                        self.manualHumButton.setChecked(False)
-                        self.manualLightButton.setChecked(False)
-                        self.actualMode.setText("Current Mode: Auto")
                 if ("temperature" in data_json):
                     if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
                         self.SPTempDay = str(data_json.get("temperature"))
@@ -1248,27 +1241,6 @@ class UI(QMainWindow):
                     else:
                         self.SPLightNight = str(data_json.get("intensity"))
                         self.setpointLightNight.setText(self.SPLightNight)
-                if ("sHeater" in data_json):
-                    self.manHeater = data_json.get("sHeater")
-                    if self.manHeater == True:
-                        self.heaterButton.setChecked(True)
-                    else:
-                        self.heaterButton.setChecked(False)
-                if ("sComp" in data_json):		
-                    self.manComp = data_json.get("sComp")
-                    if self.manComp == True:
-                        self.coolerButton.setChecked(True)
-                    else:
-                        self.coolerButton.setChecked(False)
-                if ("sLight" in data_json):		
-                    self.manLight = data_json.get("sLight")/4
-                    self.lampSlider.setValue(data_json["sLight"])
-                if ("sHum" in data_json):		
-                    self.manHum = data_json.get("sHum")
-                    if self.manHum == True:
-                        self.humidifierButton.setChecked(True)
-                    else:
-                        self.humidifierButton.setChecked(False)
 
     #function for sending data to hardware
     def sendDataMCU(self):
