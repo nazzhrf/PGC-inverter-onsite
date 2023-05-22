@@ -90,11 +90,10 @@ class UI(QMainWindow):
 
         #variable for chamber identifier
         self.baseUrl = 'http://52.221.208.114'
-        self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.userKey
-        self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.userKey
+        self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.chamberKey
+        self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.chamberKey
         self.urlPostCondToDB = self.baseUrl + '/api/condition/create'
         self.urlPostPhoto = self.baseUrl + '/api/file/create'
-        self.userKey = "1"
         self.chamberKey = "2"
 
         #waiting till internet connection exist for initialize app
