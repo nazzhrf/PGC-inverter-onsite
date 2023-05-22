@@ -89,13 +89,13 @@ class UI(QMainWindow):
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-3f980000.usb-1.2.3):'
 
         #variable for chamber identifier
+        self.chamberKey = "2"
         self.baseUrl = 'http://52.221.208.114'
         self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.chamberKey
         self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.chamberKey
         self.urlPostCondToDB = self.baseUrl + '/api/condition/create'
         self.urlPostPhoto = self.baseUrl + '/api/file/create'
-        self.chamberKey = "2"
-
+        
         #waiting till internet connection exist for initialize app
         while (self.connected == False):
             try:
@@ -1217,29 +1217,27 @@ class UI(QMainWindow):
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         self.receiveCloud = True
-        if ("chamberKey" in data_json):
-            if (str(data_json.get("device_id")) == self.chamberKey):
-                if ("temperature" in data_json):
-                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                        self.SPTempDay = str(data_json.get("temperature"))
-                        self.setpointTempDay.setText(self.SPTempDay)
-                    else:
-                        self.SPTempNight = str(data_json.get("temperature"))
-                        self.setpointTempNight.setText(self.SPTempNight)
-                if ("humidity" in data_json):
-                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                        self.SPHumDay = str(data_json.get("humidity"))
-                        self.setpointHumDay.setText(self.SPHumDay)
-                    else:
-                        self.SPHumNight = str(data_json.get("humidity"))
-                        self.setpointHumNight.setText(self.SPHumNight)
-                if ("intensity" in data_json):
-                    if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                        self.SPLightDay = str(data_json.get("intensity"))
-                        self.setpointLightDay.setText(self.SPLightDay)
-                    else:
-                        self.SPLightNight = str(data_json.get("intensity"))
-                        self.setpointLightNight.setText(self.SPLightNight)
+        if ("temperature" in data_json):
+            if (data_json.get("mode") == "Day"):
+                self.SPTempDay = str(data_json.get("temperature"))
+                self.setpointTempDay.setText(self.SPTempDay)
+            else:
+                self.SPTempNight = str(data_json.get("temperature"))
+                self.setpointTempNight.setText(self.SPTempNight)
+        if ("humidity" in data_json):
+            if (data_json.get("mode") == "Day"):
+                self.SPHumDay = str(data_json.get("humidity"))
+                self.setpointHumDay.setText(self.SPHumDay)
+            else:
+                self.SPHumNight = str(data_json.get("humidity"))
+                self.setpointHumNight.setText(self.SPHumNight)
+        if ("intensity" in data_json):
+            if (data_json.get("mode") == "Day"):
+                self.SPLightDay = str(data_json.get("intensity"))
+                self.setpointLightDay.setText(self.SPLightDay)
+            else:
+                self.SPLightNight = str(data_json.get("intensity"))
+                self.setpointLightNight.setText(self.SPLightNight)
 
     #function for sending data to hardware
     def sendDataMCU(self):
