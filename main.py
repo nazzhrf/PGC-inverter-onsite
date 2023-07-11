@@ -75,26 +75,26 @@ class UI(QMainWindow):
         self.connected = False
         self.lastMinuteTouch = (time.localtime()).tm_min
 
-        #variable for photo
-        self.timePhoto = QDateTime.currentDateTime()
-        self.pathTopPhoto = 'Image/top-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
-        self.pathBottomPhoto = 'Image/bottom-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
-        self.pathUserPhoto = 'Image/user-' + (self.timePhoto).toString('dddd,dd_MM_yyyy,hh_mm_ss') + '.png'
-        self.currentPhoto = self.pathTopPhoto
-        self.intervalSendUserPhoto = 1
-        
         #camera devices
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-3f980000.usb-1.2.4):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-3f980000.usb-1.2.2):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-3f980000.usb-1.2.3):'
 
         #variable for chamber identifier
-        self.chamberKey = "2"
+        self.chamberKey = "3"
         self.baseUrl = 'http://52.221.208.114'
         self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.chamberKey
         self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.chamberKey
         self.urlPostCondToDB = self.baseUrl + '/api/condition/create'
-        self.urlPostPhoto = self.baseUrl + '/api/file/create'
+        self.urlPostPhoto = self.baseUrl + '/api/file/kamera'
+
+        #variable for photo
+        self.timePhoto = QDateTime.currentDateTime()
+        self.pathTopPhoto = 'Image/top-chamber' + self.chamberKey + '.png'
+        self.pathBottomPhoto = 'Image/bottom-chamber' + self.chamberKey + '.png'
+        self.pathUserPhoto = 'Image/user-chamber' + self.chamberKey + '.png'
+        self.currentPhoto = self.pathTopPhoto
+        self.intervalSendUserPhoto = 1
         
         #waiting till internet connection exist for initialize app
         while (self.connected == False):
