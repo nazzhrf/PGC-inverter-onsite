@@ -8,7 +8,9 @@ Thesis by Muhammad Arbi Minanda (23220344)
 from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
-from PyQt5 import uic 
+from PyQt5 import uic
+from PyQt5.QtCore import QThread
+import sseclient
 import sys 
 import time; 
 import json
@@ -17,6 +19,7 @@ import cv2
 import os.path
 import subprocess
 import os
+os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 # thread to read data from API
 class Worker(QThread):
@@ -82,14 +85,13 @@ class UI(QMainWindow):
 
         #variable for chamber identifier
         self.chamberKey = "3"
-        self.baseUrl = 'http://52.221.208.114'
-        self.urlGetLiveSetpoint = self.baseUrl + '/api/condition/getsetpoint/' + self.chamberKey
-        self.urlPostLiveCond = self.baseUrl + '/api/condition/data/' + self.chamberKey
-        self.urlPostCondToDB = self.baseUrl + '/api/condition/create'
-        self.urlPostPhoto = self.baseUrl + '/api/file/kamera'
+        self.baseUrl = 'https://api.smartfarm.id'
+        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.chamberKey
+        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.chamberKey
+        self.urlPostCondToDB = self.baseUrl + '/condition/create'
+        self.urlPostPhoto = self.baseUrl + '/file/kamera'
 
         #variable for photo
-        self.timePhoto = QDateTime.currentDateTime()
         self.pathTopPhoto = 'Image/top-chamber' + self.chamberKey + '.png'
         self.pathBottomPhoto = 'Image/bottom-chamber' + self.chamberKey + '.png'
         self.pathUserPhoto = 'Image/user-chamber' + self.chamberKey + '.png'
@@ -214,12 +216,11 @@ class UI(QMainWindow):
         self.stackedWidget.setCurrentWidget(self.dashboardPage)
         self.showFullScreen()
         self.fullscreenButton.setText("↙")
-        self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
-        self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+        #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+        #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+        #self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
-        self.actualMode.setText("Current Mode: Auto (Manual Mode has been Removed)")
+        self.actualMode.setText("Current Mode: Auto Only")
         self.setpointTempDay.setText(self.SPTempDay)
         self.setpointTempNight.setText(self.SPTempNight)
         self.setpointHumDay.setText(self.SPHumDay)
@@ -1237,7 +1238,8 @@ class UI(QMainWindow):
                 self.setpointLightDay.setText(self.SPLightDay)
             else:
                 self.SPLightNight = str(data_json.get("intensity"))
-                self.setpointLightNight.setText(self.SPLightNight)
+                self.setpointLightNight.setText(self.SPLightNight)        
+        print("Receive Set Point Data from Cloud!")
 
     #function for sending data to hardware
     def sendDataMCU(self):
