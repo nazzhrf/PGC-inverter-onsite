@@ -19,6 +19,7 @@ import cv2
 import os.path
 import subprocess
 import os
+
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 # thread to read data from API
@@ -79,9 +80,9 @@ class UI(QMainWindow):
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         #camera devices
-        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-3f980000.usb-1.2.4):'
-        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-3f980000.usb-1.2.2):'
-        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-3f980000.usb-1.2.3):'
+        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.4):'
+        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.2):'
+        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
 
         #variable for chamber identifier
         self.chamberKey = "3"
@@ -92,9 +93,9 @@ class UI(QMainWindow):
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
 
         #variable for photo
-        self.pathTopPhoto = 'Image/top-chamber' + self.chamberKey + '.png'
-        self.pathBottomPhoto = 'Image/bottom-chamber' + self.chamberKey + '.png'
-        self.pathUserPhoto = 'Image/user-chamber' + self.chamberKey + '.png'
+        self.pathTopPhoto = 'Image/top_chamber' + self.chamberKey + '.png'
+        self.pathBottomPhoto = 'Image/bottom_chamber' + self.chamberKey + '.png'
+        self.pathUserPhoto = 'Image/user_chamber' + self.chamberKey + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
@@ -1217,6 +1218,7 @@ class UI(QMainWindow):
 
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
+        print("Receive Set Point Data from Cloud!")
         self.receiveCloud = True
         if ("temperature" in data_json):
             if (data_json.get("mode") == "Day"):
@@ -1238,8 +1240,7 @@ class UI(QMainWindow):
                 self.setpointLightDay.setText(self.SPLightDay)
             else:
                 self.SPLightNight = str(data_json.get("intensity"))
-                self.setpointLightNight.setText(self.SPLightNight)        
-        print("Receive Set Point Data from Cloud!")
+                self.setpointLightNight.setText(self.SPLightNight)
 
     #function for sending data to hardware
     def sendDataMCU(self):
@@ -1280,10 +1281,14 @@ class UI(QMainWindow):
                     cv2.imwrite(self.pathTopPhoto, image)
                     print("Top Image Captured and Saved")
                 cam.release()
-            self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            files = {'files': open(self.pathTopPhoto,'rb')}
-            values = {'device_id': int(self.chamberKey)}
-            response = requests.post(self.urlPostPhoto, files=files, data=values)
+            #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+            try:
+                files = {'files': open(self.pathTopPhoto,'rb')}
+                values = {'device_id': int(self.chamberKey)}
+                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                print("Successfully sent Top Photo")
+            except:
+                print("Failed sent Top Photo")
         except:
             print("Top Camera not found")
     
@@ -1301,11 +1306,14 @@ class UI(QMainWindow):
                     cv2.imwrite(self.pathBottomPhoto, image)
                     print("Bottom Image Captured and Saved")
                 cam2.release()
-            self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            files = {'files': open(self.pathBottomPhoto,'rb')}
-            values = {'device_id': int(self.chamberKey)}
-            response = requests.post(self.urlPostPhoto, files=files, data=values)
-
+            #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+            try:
+                files = {'files': open(self.pathBottomPhoto,'rb')}
+                values = {'device_id': int(self.chamberKey)}
+                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                print("Successfully sent Bottom Photo")
+            except:
+                print("Failed sent Bottom Photo")
         except:
             print("Bottom Camera not found")
     
@@ -1323,10 +1331,15 @@ class UI(QMainWindow):
                     cv2.imwrite(self.pathUserPhoto, image)
                     print("User Image Captured and Saved")
                 cam4.release()
-            self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-            files = {'files': open(self.pathUserPhoto,'rb')}
-            values = {'device_id': int(self.chamberKey)}
-            response = requests.post(self.urlPostPhoto, files=files, data=values)
+            #self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
+            try:
+                files = {'files': open(self.pathUserPhoto,'rb')}
+                values = {'device_id': int(self.chamberKey)}
+                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                print(response)
+                print("Successfully sent User Photo")
+            except:
+                print("Failed sent User Photo")
         except:
             print("User Camera not found")
     
