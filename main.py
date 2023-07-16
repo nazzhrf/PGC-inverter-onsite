@@ -85,17 +85,18 @@ class UI(QMainWindow):
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
 
         #variable for chamber identifier
-        self.chamberKey = "3"
+        self.deviceId = "3"
+        self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
         self.baseUrl = 'https://api.smartfarm.id'
-        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.chamberKey
-        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.chamberKey
+        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
+        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
 
         #variable for photo
-        self.pathTopPhoto = 'Image/top_chamber' + self.chamberKey + '.png'
-        self.pathBottomPhoto = 'Image/bottom_chamber' + self.chamberKey + '.png'
-        self.pathUserPhoto = 'Image/user_chamber' + self.chamberKey + '.png'
+        self.pathTopPhoto = 'Image/top_chamber' + self.deviceId + '.png'
+        self.pathBottomPhoto = 'Image/bottom_chamber' + self.deviceId + '.png'
+        self.pathUserPhoto = 'Image/user_chamber' + self.deviceId + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
@@ -1184,7 +1185,7 @@ class UI(QMainWindow):
             self.SPHum = self.SPHumNight
             self.SPLight = self.SPLightNight
         data_json ={
-            "device_id" : self.chamberKey,
+            "device_id" : self.deviceId,
             "mode" : self.mode,
             "SPTemp" : self.SPTemp,
             "SPHum" : self.SPHum,
@@ -1198,7 +1199,8 @@ class UI(QMainWindow):
             "sHum" : self.manHum,
         }
         header = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'device_key': self.deviceKey,
         }
         response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
         print("Live Data sent to Cloud")
@@ -1209,10 +1211,11 @@ class UI(QMainWindow):
             "temperature" : float(self.actTemp),
             "humidity" : float(self.actHum),
             "intensity" : float(self.actLight),
-            "device_id" : int(self.chamberKey)
+            "device_id" : int(self.deviceId)
         }
         header = {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'device_key': self.deviceKey,
         }
         response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
 
@@ -1241,6 +1244,8 @@ class UI(QMainWindow):
             else:
                 self.SPLightNight = str(data_json.get("intensity"))
                 self.setpointLightNight.setText(self.SPLightNight)
+        if ("take_photos" in data_json):
+            self.takePhoto()
 
     #function for sending data to hardware
     def sendDataMCU(self):
@@ -1284,8 +1289,11 @@ class UI(QMainWindow):
             #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
                 files = {'files': open(self.pathTopPhoto,'rb')}
-                values = {'device_id': int(self.chamberKey)}
-                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                values = {'device_id': int(self.deviceId)}
+                header = {
+                    'device_key': self.deviceKey,
+                }
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
                 print("Successfully sent Top Photo")
             except:
                 print("Failed sent Top Photo")
@@ -1309,8 +1317,11 @@ class UI(QMainWindow):
             #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
                 files = {'files': open(self.pathBottomPhoto,'rb')}
-                values = {'device_id': int(self.chamberKey)}
-                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                values = {'device_id': int(self.deviceId)}
+                header = {
+                    'device_key': self.deviceKey,
+                }
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
                 print("Successfully sent Bottom Photo")
             except:
                 print("Failed sent Bottom Photo")
@@ -1334,8 +1345,11 @@ class UI(QMainWindow):
             #self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
                 files = {'files': open(self.pathUserPhoto,'rb')}
-                values = {'device_id': int(self.chamberKey)}
-                response = requests.post(self.urlPostPhoto, files=files, data=values)
+                values = {'device_id': int(self.deviceId)}
+                header = {
+                    'device_key': self.deviceKey,
+                }
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
                 print(response)
                 print("Successfully sent User Photo")
             except:
