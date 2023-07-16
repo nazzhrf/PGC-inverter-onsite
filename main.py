@@ -240,6 +240,9 @@ class UI(QMainWindow):
         self.manualTempButton.setEnabled(False)
         self.manualHumButton.setEnabled(False)
         self.manualLightButton.setEnabled(False)
+
+        #disable toPhotoPage button
+        self.toPhotoPageButton.setEnabled(False)
         
         #behaviour on central widget
         self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
