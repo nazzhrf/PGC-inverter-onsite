@@ -222,7 +222,7 @@ class UI(QMainWindow):
         #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         #self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
-        self.actualMode.setText("Current Mode: Auto Only")
+        self.actualMode.setText("Current Mode: Auto")
         self.setpointTempDay.setText(self.SPTempDay)
         self.setpointTempNight.setText(self.SPTempNight)
         self.setpointHumDay.setText(self.SPHumDay)
@@ -237,9 +237,11 @@ class UI(QMainWindow):
         self.lampSlider.setEnabled(False)
 
         # disable manual mode
+        """
         self.manualTempButton.setEnabled(False)
         self.manualHumButton.setEnabled(False)
         self.manualLightButton.setEnabled(False)
+        """
 
         #disable toPhotoPage button
         self.toPhotoPageButton.setEnabled(False)
