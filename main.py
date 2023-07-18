@@ -31,16 +31,22 @@ class Worker(QThread):
         
     def run(self) :
         url = self.endpoint
-        messages = sseclient.SSEClient(url)
-        for msg in messages:
+        while True:
             try:
-                data = json.loads(msg.data)
-                if (data == {}) :
-                    pass
-                else :
-                    self.data_json.emit(data)
-            except json.JSONDecodeError:
-                pass
+                messages = sseclient.SSEClient(url)
+                for msg in messages:
+                    try:
+                        data = json.loads(msg.data)
+                        if (data == {}):
+                            pass
+                        else:
+                            self.data_json.emit(data)
+                    except json.JSONDecodeError:
+                        pass
+            except Exception as e:
+                print("Error:", e)
+                # Add a delay before attempting reconnect SSE
+                time.sleep(5)
 
 class UI(QMainWindow):
     def __init__(self):
@@ -1181,48 +1187,58 @@ class UI(QMainWindow):
 
     #send current live data in hardware to cloud
     def sendDataCloud(self) :
-        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.SPTemp = self.SPTempDay
-            self.SPHum = self.SPHumDay
-            self.SPLight = self.SPLightDay
-        else:
-            self.SPTemp = self.SPTempNight
-            self.SPHum = self.SPHumNight
-            self.SPLight = self.SPLightNight
-        data_json ={
-            "device_id" : self.deviceId,
-            "mode" : self.mode,
-            "SPTemp" : self.SPTemp,
-            "SPHum" : self.SPHum,
-            "SPLight" : self.SPLight,
-            "temperature" : float(self.actTemp),
-            "humidity" : float(self.actHum),
-            "intensity" : float(self.actLight),
-            "sHeater" : self.manHeater,
-            "sComp" : self.manComp,
-            "sLight" : self.manLight*4,
-            "sHum" : self.manHum,
-        }
-        header = {
-            'Content-Type': 'application/json',
-            'device_key': self.deviceKey,
-        }
-        response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
-        print("Live Data sent to Cloud")
+        try:
+            if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                self.SPTemp = self.SPTempDay
+                self.SPHum = self.SPHumDay
+                self.SPLight = self.SPLightDay
+            else:
+                self.SPTemp = self.SPTempNight
+                self.SPHum = self.SPHumNight
+                self.SPLight = self.SPLightNight
+            data_json ={
+                "device_id" : self.deviceId,
+                "mode" : self.mode,
+                "SPTemp" : self.SPTemp,
+                "SPHum" : self.SPHum,
+                "SPLight" : self.SPLight,
+                "temperature" : float(self.actTemp),
+                "humidity" : float(self.actHum),
+                "intensity" : float(self.actLight),
+                "sHeater" : self.manHeater,
+                "sComp" : self.manComp,
+                "sLight" : self.manLight*4,
+                "sHum" : self.manHum,
+            }
+            header = {
+                'Content-Type': 'application/json',
+                'device_key': self.deviceKey,
+            }
+            response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
+            print("Live Data sent to Cloud")
+        except (requests.ConnectionError, requests.Timeout) as exception:
+            pass
+            print("Failed sent Live Data to Cloud")
+        
 
     #send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
-        data = {
-            "temperature" : float(self.actTemp),
-            "humidity" : float(self.actHum),
-            "intensity" : float(self.actLight),
-            "device_id" : int(self.deviceId)
-        }
-        header = {
-            'Content-Type': 'application/json',
-            'device_key': self.deviceKey,
-        }
-        response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
+        try:
+            data = {
+                "temperature" : float(self.actTemp),
+                "humidity" : float(self.actHum),
+                "intensity" : float(self.actLight),
+                "device_id" : int(self.deviceId)
+            }
+            header = {
+                'Content-Type': 'application/json',
+                'device_key': self.deviceKey,
+            }
+            response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
+        except (requests.ConnectionError, requests.Timeout) as exception:
+            pass
+            print("Send data to database cloud failed")
+        
 
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
@@ -1250,7 +1266,9 @@ class UI(QMainWindow):
                 self.SPLightNight = str(data_json.get("intensity"))
                 self.setpointLightNight.setText(self.SPLightNight)
         if ("take_photos" in data_json):
-            self.takePhoto()
+            self.sendPhotoTop()
+            self.sendPhotoBottom()
+            self.sendPhotoUser()
 
     #function for sending data to hardware
     def sendDataMCU(self):
