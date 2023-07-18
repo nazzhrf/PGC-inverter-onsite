@@ -1250,9 +1250,7 @@ class UI(QMainWindow):
                 self.SPLightNight = str(data_json.get("intensity"))
                 self.setpointLightNight.setText(self.SPLightNight)
         if ("take_photos" in data_json):
-            self.sendPhotoTop()
-            self.sendPhotoBottom()
-            self.sendPhotoUser()
+            self.takePhoto()
 
     #function for sending data to hardware
     def sendDataMCU(self):
