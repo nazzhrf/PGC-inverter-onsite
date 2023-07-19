@@ -350,9 +350,11 @@ class UI(QMainWindow):
         self.sendDataToDBcloudTimer.start(1800000)
         
         #send data to mcu scheduling
+        """
         self.sendDataMCUTimer = QtCore.QTimer()
         self.sendDataMCUTimer.timeout.connect(lambda:self.sendDataMCU())
         self.sendDataMCUTimer.start(5000)
+        """
         
         #save data to local file scheduling
         self.saveDataToLocalFileTimer = QtCore.QTimer()
@@ -1254,32 +1256,41 @@ class UI(QMainWindow):
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
-        self.receiveCloud = True
-        if ("temperature" in data_json):
-            if (data_json.get("mode") == "Day"):
-                self.SPTempDay = str(data_json.get("temperature"))
-                self.setpointTempDay.setText(self.SPTempDay)
-            else:
-                self.SPTempNight = str(data_json.get("temperature"))
-                self.setpointTempNight.setText(self.SPTempNight)
-        if ("humidity" in data_json):
-            if (data_json.get("mode") == "Day"):
-                self.SPHumDay = str(data_json.get("humidity"))
-                self.setpointHumDay.setText(self.SPHumDay)
-            else:
-                self.SPHumNight = str(data_json.get("humidity"))
-                self.setpointHumNight.setText(self.SPHumNight)
-        if ("intensity" in data_json):
-            if (data_json.get("mode") == "Day"):
-                self.SPLightDay = str(data_json.get("intensity"))
-                self.setpointLightDay.setText(self.SPLightDay)
-            else:
-                self.SPLightNight = str(data_json.get("intensity"))
-                self.setpointLightNight.setText(self.SPLightNight)
-        if ("take_photos" in data_json):
-            self.sendPhotoTop()
-            self.sendPhotoBottom()
-            self.sendPhotoUser()
+        try:
+            self.receiveCloud = True
+            if ("take_photos" in data_json):
+                self.sendPhotoTop()
+                self.sendPhotoBottom()
+                self.sendPhotoUser()
+            else: 
+                if ("temperature" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPTempDay = str(data_json.get("temperature"))
+                        self.setpointTempDay.setText(self.SPTempDay)
+                    else:
+                        self.SPTempNight = str(data_json.get("temperature"))
+                        self.setpointTempNight.setText(self.SPTempNight)
+                if ("humidity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPHumDay = str(data_json.get("humidity"))
+                        self.setpointHumDay.setText(self.SPHumDay)
+                    else:
+                        self.SPHumNight = str(data_json.get("humidity"))
+                        self.setpointHumNight.setText(self.SPHumNight)
+                if ("intensity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPLightDay = str(data_json.get("intensity"))
+                        self.setpointLightDay.setText(self.SPLightDay)
+                    else:
+                        self.SPLightNight = str(data_json.get("intensity"))
+                        self.setpointLightNight.setText(self.SPLightNight)
+                if ("take_photos" in data_json):
+                    self.sendPhotoTop()
+                    self.sendPhotoBottom()
+                    self.sendPhotoUser()
+                self.sendDataMCU()
+        except:
+            print("Error on reading live data from Cloud")
 
     #function for sending data to hardware
     def sendDataMCU(self):
