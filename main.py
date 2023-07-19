@@ -12,41 +12,61 @@ from PyQt5 import uic
 from PyQt5.QtCore import QThread
 import sseclient
 import sys 
-import time; 
+import time
 import json
 import requests
 import cv2
 import os.path
 import subprocess
 import os
+import socket
 
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 # thread to read data from API
+import socket
+
 class Worker(QThread):
-    data_json = QtCore.pyqtSignal(dict)
+    data_json = pyqtSignal(dict)
+
     def __init__(self, endpoint):
         super().__init__()
         self.endpoint = endpoint
-        
-    def run(self) :
-        url = self.endpoint
+
+    def is_internet_available(self):
+        try:
+            # Use a non-blocking socket to check internet connectivity
+            # Connect to a known external host, like Google's public DNS server
+            socket.create_connection(("8.8.8.8", 53), timeout=5)
+            return True
+        except OSError:
+            pass
+        return False
+
+    def run(self):
         while True:
-            try:
-                messages = sseclient.SSEClient(url)
-                for msg in messages:
-                    try:
-                        data = json.loads(msg.data)
-                        if (data == {}):
+            if not self.is_internet_available():
+                print("No internet access. Waiting to reconnect...")
+                while not self.is_internet_available():
+                    time.sleep(5)
+                print("Internet access available. Reconnecting...")
+            else:
+                try:
+                    messages = sseclient.SSEClient(self.endpoint)
+                    for msg in messages:
+                        try:
+                            data = json.loads(msg.data)
+                            if data == {}:
+                                pass
+                            else:
+                                self.data_json.emit(data)
+                        except json.JSONDecodeError:
                             pass
-                        else:
-                            self.data_json.emit(data)
-                    except json.JSONDecodeError:
-                        pass
-            except Exception as e:
-                print("Error:", e)
-                # Add a delay before attempting reconnect SSE
-                time.sleep(5)
+                except Exception as e:
+                    # Handle the error appropriately (e.g., log the error, emit a signal, etc.)
+                    print("Error:", e)
+                    # Add a delay before attempting to reconnect
+                    time.sleep(5)
 
 class UI(QMainWindow):
     def __init__(self):
