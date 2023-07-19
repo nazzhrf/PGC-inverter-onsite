@@ -101,7 +101,6 @@ class UI(QMainWindow):
         self.startNight = "18"
         
         #boolean variable
-        self.receiveCloud = False
         self.connected = False
         self.lastMinuteTouch = (time.localtime()).tm_min
 
@@ -331,7 +330,6 @@ class UI(QMainWindow):
         self.nightLightButton.stateChanged.connect(lambda:self.nightLightButton_clicked())
         self.lightButton.clicked.connect(lambda:self.lightButton_clicked())
         self.lightSlider.sliderReleased.connect(lambda:self.lampSlider_released())
-        self.lightSlider.valueChanged.connect(lambda:self.lampSlider_changed())
         self.oneButtonLight.clicked.connect(lambda:self.oneButtonLight_clicked())
         self.twoButtonLight.clicked.connect(lambda:self.twoButtonLight_clicked())
         self.threeButtonLight.clicked.connect(lambda:self.threeButtonLight_clicked())
@@ -368,13 +366,6 @@ class UI(QMainWindow):
         self.sendDataToDBcloudTimer = QtCore.QTimer()
         self.sendDataToDBcloudTimer.timeout.connect(lambda:self.sendDataToDBcloud())
         self.sendDataToDBcloudTimer.start(1800000)
-        
-        #send data to mcu scheduling
-        """
-        self.sendDataMCUTimer = QtCore.QTimer()
-        self.sendDataMCUTimer.timeout.connect(lambda:self.sendDataMCU())
-        self.sendDataMCUTimer.start(5000)
-        """
         
         #save data to local file scheduling
         self.saveDataToLocalFileTimer = QtCore.QTimer()
@@ -587,9 +578,6 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(False)
             self.humidifierButton.setEnabled(False)
             self.lightSlider.setEnabled(False)
-            #self.setpointTemp.setDisabled(False)
-            #self.setpointHum.setDisabled(False)
-            #self.setpointLight.setDisabled(False)
             self.tempButton.setEnabled(True)
             self.humButton.setEnabled(True)
             self.lightButton.setEnabled(True)
@@ -809,14 +797,6 @@ class UI(QMainWindow):
         self.manLight = self.lampSlider.value()/4
         self.sendDataCloud()
         self.sendDataMCU()
-    
-    #function if lamp slider value is changed
-    def lampSlider_changed(self):
-        if self.receiveCloud == True:
-            self.manLight = self.lampSlider.value()/4
-            self.sendDataCloud()
-            self.sendDataMCU()
-            self.receiveCloud = False
     
     #function if button one for type temp optimum value is clicked
     def oneButtonTemp_clicked(self):
@@ -1277,7 +1257,6 @@ class UI(QMainWindow):
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
         try:
-            self.receiveCloud = True
             if ("take_photos" in data_json):
                 self.sendPhotoTop()
                 self.sendPhotoBottom()
@@ -1309,6 +1288,7 @@ class UI(QMainWindow):
                     self.sendPhotoBottom()
                     self.sendPhotoUser()
                 self.sendDataMCU()
+                self.sendDataCloud()
         except:
             print("Error on reading live data from Cloud")
 
@@ -1379,7 +1359,6 @@ class UI(QMainWindow):
                     cv2.imwrite(self.pathBottomPhoto, image)
                     print("Bottom Image Captured and Saved")
                 cam2.release()
-            #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
                 files = {'files': open(self.pathBottomPhoto,'rb')}
                 values = {'device_id': int(self.deviceId)}
@@ -1407,7 +1386,6 @@ class UI(QMainWindow):
                     cv2.imwrite(self.pathUserPhoto, image)
                     print("User Image Captured and Saved")
                 cam4.release()
-            #self.cameraUser.setPixmap(QPixmap(self.pathUserPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
                 files = {'files': open(self.pathUserPhoto,'rb')}
                 values = {'device_id': int(self.deviceId)}
