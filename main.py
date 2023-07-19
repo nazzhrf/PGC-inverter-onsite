@@ -364,6 +364,11 @@ class UI(QMainWindow):
         self.updateTimeTimer.timeout.connect(lambda:self.updateTime())
         self.updateTimeTimer.start(500)
 
+        #update actual data display scheduling
+        self.updateActualDataDisplayTimer = QtCore.QTimer()
+        self.updateActualDataDisplayTimer.timeout.connect(lambda:self.updateActualDataDisplay())
+        self.updateActualDataDisplayTimer.start(10000)
+
         #update photo home scheduling
         self.updatePhotoTimer = QtCore.QTimer()
         self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
@@ -1114,6 +1119,12 @@ class UI(QMainWindow):
         elif self.nightLightButton.isChecked() == True:
             self.SPLightNight = self.setpointLightNight.text()
             self.setpointLightNight.setText(self.SPLightNight[:-1])
+
+    #update actual data display
+    def updateActualDataDisplay(self):
+        self.actualTemp.setText(self.actTemp)
+        self.actualHum.setText(self.actHum)
+        self.actualLight.setText(self.actLight)
     
     #function to update time on display
     def updateTime(self):
@@ -1391,15 +1402,12 @@ class UI(QMainWindow):
                 data = json.loads(buffer.encode().decode())
                 tempTemp = data.get("actTemp")
                 self.actTemp = tempTemp[0:len(tempTemp)-1]
-                self.actualTemp.setText(self.actTemp)
                 self.subActualTemp.setText(self.actTemp)
                 tempHum = data.get("actHum")
                 self.actHum = tempHum[0:len(tempHum)-3]
-                self.actualHum.setText(self.actHum)
                 self.subActualHum.setText(self.actHum)
                 tempLight = data.get("actLight")
                 self.actLight = tempLight[0:len(tempLight)-3]
-                self.actualLight.setText(self.actLight)
                 self.subActualLight.setText(self.actLight)
                 self.pwmHeater = data.get("pwmHeater")
             except json.JSONDecodeError:
