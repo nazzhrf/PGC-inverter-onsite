@@ -1283,10 +1283,6 @@ class UI(QMainWindow):
                     else:
                         self.SPLightNight = str(data_json.get("intensity"))
                         self.setpointLightNight.setText(self.SPLightNight)
-                if ("take_photos" in data_json):
-                    self.sendPhotoTop()
-                    self.sendPhotoBottom()
-                    self.sendPhotoUser()
                 self.sendDataMCU()
                 self.sendDataCloud()
         except:
