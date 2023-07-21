@@ -27,7 +27,7 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 import socket
 
 class Worker(QThread):
-    data_json = pyqtSignal(dict)
+    data_json = QtCore.pyqtSignal(dict)
 
     def __init__(self, endpoint):
         super().__init__()
