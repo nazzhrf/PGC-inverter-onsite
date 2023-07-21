@@ -382,6 +382,11 @@ class UI(QMainWindow):
         self.updateActualDataDisplayTimer.timeout.connect(lambda:self.updateActualDataDisplay())
         self.updateActualDataDisplayTimer.start(10000)
 
+         #send data to mcu scheduling
+        self.sendDataMCUTimer = QtCore.QTimer()
+        self.sendDataMCUTimer.timeout.connect(lambda:self.sendDataMCU())
+        self.sendDataMCUTimer.start(5000)
+
         #update photo home scheduling
         self.updatePhotoTimer = QtCore.QTimer()
         self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
@@ -1283,8 +1288,6 @@ class UI(QMainWindow):
                     else:
                         self.SPLightNight = str(data_json.get("intensity"))
                         self.setpointLightNight.setText(self.SPLightNight)
-                self.sendDataMCU()
-                self.sendDataCloud()
         except:
             print("Error on reading live data from Cloud")
 
