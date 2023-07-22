@@ -9,64 +9,36 @@ from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
-from PyQt5.QtCore import QThread
-import sseclient
+from sseclient import SSEClient
 import sys 
 import time
 import json
 import requests
 import cv2
-import os.path
 import subprocess
 import os
-import socket
 
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
-# thread to read data from API
-import socket
-
-class Worker(QThread):
-    data_json = QtCore.pyqtSignal(dict)
-
-    def __init__(self, endpoint):
-        super().__init__()
-        self.endpoint = endpoint
-
-    def is_internet_available(self):
+def sse_client(url):
+    retry_delay = 1  # Initial retry delay in seconds
+    max_retry_delay = 16  # Maximum retry delay in seconds
+    while True:
         try:
-            # Use a non-blocking socket to check internet connectivity
-            # Connect to a known external host, like Google's public DNS server
-            socket.create_connection(("8.8.8.8", 53), timeout=5)
-            return True
-        except OSError:
-            pass
-        return False
-
-    def run(self):
-        while True:
-            if not self.is_internet_available():
-                print("No internet access. Waiting to reconnect...")
-                while not self.is_internet_available():
-                    time.sleep(5)
-                print("Internet access available. Reconnecting...")
-            else:
-                try:
-                    messages = sseclient.SSEClient(self.endpoint)
-                    for msg in messages:
-                        try:
-                            data = json.loads(msg.data)
-                            if data == {}:
-                                pass
-                            else:
-                                self.data_json.emit(data)
-                        except json.JSONDecodeError:
-                            pass
-                except Exception as e:
-                    # Handle the error appropriately (e.g., log the error, emit a signal, etc.)
-                    print("Error:", e)
-                    # Add a delay before attempting to reconnect
-                    time.sleep(5)
+            messages = SSEClient(url)
+            print("Connected to SSE server")
+            for message in messages:
+                if message.data:  
+                    data_json = json.loads(message.data)
+                    print("Received message:", data_json)
+                    readLiveSetPointFromCloud(data_json)
+        except Exception as e:
+            print("Error:", e)
+            print("Retrying in {} seconds...".format(retry_delay))
+        # Exponential backoff for retries
+        time.sleep(retry_delay)
+        retry_delay *= 2
+        retry_delay = min(retry_delay, max_retry_delay)
 
 class UI(QMainWindow):
     def __init__(self):
@@ -245,7 +217,7 @@ class UI(QMainWindow):
         self.fullscreenButton.setText("↙")
         #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        #self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
+        self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
         self.actualMode.setText("Current Mode: Auto")
         self.setpointTempDay.setText(self.SPTempDay)
@@ -401,9 +373,11 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.start(3600000)
         
         #create thread to get/subscribe live setpoint
-        self.thread = Worker(self.urlGetLiveSetpoint)
-        self.thread.data_json.connect(self.readLiveSetPointFromCloud)
-        self.thread.start()
+        self.sse_thread = QtCore.QThread()
+        self.sse_worker = QtCore.QObject()
+        self.sse_thread.started.connect(lambda: sse_client(self.urlGetLiveSetpoint))
+        self.sse_worker.moveToThread(self.sse_thread)
+        self.sse_thread.start()
         
         #wired serial to hardware
         self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
