@@ -9,36 +9,54 @@ from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
-from sseclient import SSEClient
+from PyQt5.QtCore import QThread
+import sseclient
 import sys 
 import time
 import json
 import requests
 import cv2
+import os.path
 import subprocess
 import os
+import socket
 
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
-def sse_client(url):
-    retry_delay = 1  # Initial retry delay in seconds
-    max_retry_delay = 16  # Maximum retry delay in seconds
-    while True:
-        try:
-            messages = SSEClient(url)
-            print("Connected to SSE server")
-            for message in messages:
-                if message.data:  
-                    data_json = json.loads(message.data)
-                    print("Received message:", data_json)
-                    readLiveSetPointFromCloud(data_json)
-        except Exception as e:
-            print("Error:", e)
-            print("Retrying in {} seconds...".format(retry_delay))
-        # Exponential backoff for retries
-        time.sleep(retry_delay)
-        retry_delay *= 2
-        retry_delay = min(retry_delay, max_retry_delay)
+# thread to read data from API
+import socket
+
+class Worker(QThread):
+    data_json = QtCore.pyqtSignal(dict)
+
+    def __init__(self, endpoint):
+        super().__init__()
+        self.endpoint = endpoint
+
+    def run(self):
+        retry_delay = 1  # Initial retry delay in seconds
+        max_retry_delay = 32  # Maximum retry delay in seconds
+        while True:
+            try:
+                messages = sseclient.SSEClient(self.endpoint)
+                print("Connected to SSE server")
+                for msg in messages:
+                        try:
+                            data = json.loads(msg.data)
+                            if data == {}:
+                                pass
+                            else:
+                                self.data_json.emit(data)
+                        except json.JSONDecodeError:
+                            pass
+            except Exception as e:
+                print("Error:", e)
+                print("Retrying in {} seconds...".format(retry_delay))
+
+            # Exponential backoff for retries
+            time.sleep(retry_delay)
+            retry_delay *= 2
+            retry_delay = min(retry_delay, max_retry_delay)
 
 class UI(QMainWindow):
     def __init__(self):
@@ -217,7 +235,7 @@ class UI(QMainWindow):
         self.fullscreenButton.setText("↙")
         #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
         #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
+        #self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
         self.actualMode.setText("Current Mode: Auto")
         self.setpointTempDay.setText(self.SPTempDay)
@@ -372,33 +390,16 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
         
-        # Create a QTimer to restart the SSE client every 5 minutes
-        self.sse_timer = QtCore.QTimer(self)
-        self.sse_timer.timeout.connect(self.start_sse_client)
-        self.sse_timer.start(300000)
-
-        # Start the SSE client for the first time
-        self.start_sse_client()
+        #create thread to get/subscribe live setpoint
+        self.thread = Worker(self.urlGetLiveSetpoint)
+        self.thread.data_json.connect(self.readLiveSetPointFromCloud)
+        self.thread.start()
         
         #wired serial to hardware
         self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         if not self.serial.isOpen():
             self.serial.open(QtCore.QIODevice.ReadWrite)
 
-    # 
-    def start_sse_client(self):
-        # Stop the existing thread, if any
-        if hasattr(self, "sse_thread"):
-            self.sse_thread.quit()
-            self.sse_thread.wait()
-
-        # Start the SSE client in a new thread
-        self.sse_thread = QtCore.QThread()
-        self.sse_worker = QtCore.QObject()
-        self.sse_thread.started.connect(lambda: sse_client(self.urlGetLiveSetpoint))
-        self.sse_worker.moveToThread(self.sse_thread)
-        self.sse_thread.start()
-    
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
         if self.isFullScreen():
