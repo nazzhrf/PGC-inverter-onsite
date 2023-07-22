@@ -19,13 +19,10 @@ import cv2
 import os.path
 import subprocess
 import os
-import socket
 
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 # thread to read data from API
-import socket
-
 class Worker(QThread):
     data_json = QtCore.pyqtSignal(dict)
 
@@ -416,9 +413,10 @@ class UI(QMainWindow):
 
     def get_default_interface(self):
         try:
-            default_route = socket.getdefaultgateway()
-            return default_route[1] if default_route else None
-        except OSError:
+            output = subprocess.check_output(['ip', 'route', 'show', 'default'], text=True)
+            default_route = output.split()
+            return default_route[4] if len(default_route) >= 5 else None
+        except subprocess.CalledProcessError:
             return None
 
     def toggle_network_connection(self):
