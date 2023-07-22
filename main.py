@@ -389,6 +389,11 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer = QtCore.QTimer()
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
+
+        #reconnect network scheduling
+        self.reconnectNetworkTimer = QtCore.QTimer()
+        self.reconnectNetworkTimer.timeout.connect(lambda:self.toggle_network_connection())
+        self.reconnectNetworkTimer.start(300000)
         
         #create thread to get/subscribe live setpoint
         self.thread = Worker(self.urlGetLiveSetpoint)
@@ -408,6 +413,29 @@ class UI(QMainWindow):
         else:
             self.showFullScreen()
             self.fullscreenButton.setText("↙")
+
+    def get_default_interface(self):
+        try:
+            default_route = socket.getdefaultgateway()
+            return default_route[1] if default_route else None
+        except OSError:
+            return None
+
+    def toggle_network_connection(self):
+        network_interface = self.get_default_interface()
+        def is_network_connected():
+            try:
+                subprocess.check_call(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                return True
+            except subprocess.CalledProcessError:
+                return False
+        def connect_network():
+            subprocess.run(['sudo', 'ifup', network_interface])
+        def disconnect_network():
+            subprocess.run(['sudo', 'ifdown', network_interface])
+        if network_interface and is_network_connected():
+            disconnect_network()
+            connect_network()
     
     #function for moving to temp page
     def toTempPageButton_clicked(self):
