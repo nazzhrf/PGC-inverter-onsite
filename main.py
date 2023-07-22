@@ -372,18 +372,33 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
         
-        #create thread to get/subscribe live setpoint
-        self.sse_thread = QtCore.QThread()
-        self.sse_worker = QtCore.QObject()
-        self.sse_thread.started.connect(lambda: sse_client(self.urlGetLiveSetpoint))
-        self.sse_worker.moveToThread(self.sse_thread)
-        self.sse_thread.start()
+        # Create a QTimer to restart the SSE client every 5 minutes
+        self.sse_timer = QtCore.QTimer(self)
+        self.sse_timer.timeout.connect(self.start_sse_client)
+        self.sse_timer.start(300000)
+
+        # Start the SSE client for the first time
+        self.start_sse_client()
         
         #wired serial to hardware
         self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         if not self.serial.isOpen():
             self.serial.open(QtCore.QIODevice.ReadWrite)
 
+    # 
+    def start_sse_client(self):
+        # Stop the existing thread, if any
+        if hasattr(self, "sse_thread"):
+            self.sse_thread.quit()
+            self.sse_thread.wait()
+
+        # Start the SSE client in a new thread
+        self.sse_thread = QtCore.QThread()
+        self.sse_worker = QtCore.QObject()
+        self.sse_thread.started.connect(lambda: sse_client(self.urlGetLiveSetpoint))
+        self.sse_worker.moveToThread(self.sse_thread)
+        self.sse_thread.start()
+    
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
         if self.isFullScreen():
