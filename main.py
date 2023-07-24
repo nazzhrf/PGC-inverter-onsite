@@ -401,13 +401,6 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
 
-        #reconnect network scheduling
-        """
-        self.reconnectNetworkTimer = QtCore.QTimer()
-        self.reconnectNetworkTimer.timeout.connect(lambda:self.toggle_network_connection())
-        self.reconnectNetworkTimer.start(300000)
-        """
-        
         #create thread to get/subscribe live setpoint
         self.thread = Worker(self.urlGetLiveSetpoint)
         self.thread.data_json.connect(self.readLiveSetPointFromCloud)
@@ -427,31 +420,6 @@ class UI(QMainWindow):
             self.showFullScreen()
             self.fullscreenButton.setText("↙")
 
-    def get_default_interface(self):
-        try:
-            output = subprocess.check_output(['ip', 'route', 'show', 'default'], text=True)
-            default_route = output.split()
-            return default_route[4] if len(default_route) >= 5 else None
-        except subprocess.CalledProcessError:
-            return None
-
-    def toggle_network_connection(self):
-        network_interface = self.get_default_interface()
-        def is_network_connected():
-            try:
-                subprocess.check_call(['ping', '-c', '1', '8.8.8.8'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                return True
-            except subprocess.CalledProcessError:
-                return False
-        def connect_network():
-            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'up'])
-        def disconnect_network():
-            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'down'])
-        if network_interface and is_network_connected():
-            disconnect_network()
-            time.sleep(1)
-            connect_network()
-    
     #function for moving to temp page
     def toTempPageButton_clicked(self):
         self.stackedWidget.setCurrentWidget(self.tempPage)
