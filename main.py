@@ -81,11 +81,25 @@ class UI(QMainWindow):
         self.SPTempDay = "30"
         self.SPHumDay = "70"
         self.SPLightDay = "4000"
+        self.prevSPTempDay = "30"
+        self.prevSPHumDay = "70"
+        self.prevSPLightDay = "4000"
         self.SPTempNight = "23"
         self.SPHumNight = "90"
         self.SPLightNight = "0"
+        self.prevSPTempNight = "23"
+        self.prevSPHumNight = "90"
+        self.prevSPLightNight = "0"
         self.startDay = "6"
         self.startNight = "18"
+
+        #set point limiter
+        self.upLimitSPTemp = 40
+        self.bottomLimitSPTemp = 0
+        self.upLimitSPHum = 90
+        self.bottomLimitSPHum = 0
+        self.upLimitSPLight = 15000
+        self.bottomLimitSPLight = 0
         
         #boolean variable
         self.connected = False
@@ -776,18 +790,42 @@ class UI(QMainWindow):
 
     #function if set optimum temp button is clicked
     def tempButton_clicked(self):
-        self.sendDataCloud()
-        self.sendDataMCU()
+        if ((float(self.SPTempDay) > self.upLimitSPTemp) or (float(self.SPTempDay) < self.bottomLimitSPTemp) or (float(self.SPTempNight) > self.upLimitSPTemp) or (float(self.SPTempNight) < self.bottomLimitSPTemp)):
+            self.SPTempDay = self.prevSPTempDay
+            self.SPTempNight = self.prevSPTempNight
+            self.setpointTempDay.setText(self.SPTempDay)
+            self.setpointTempNight.setText(self.SPTempNight)
+        else:
+            self.prevSPTempDay = self.SPTempDay
+            self.prevSPTempNight = self.SPTempNight
+            self.sendDataCloud()
+            self.sendDataMCU()
     
     #function if set optimum hum button is clicked
     def humButton_clicked(self):
-        self.sendDataCloud()
-        self.sendDataMCU()
+        if ((float(self.SPHumDay) > self.upLimitSPHum) or (float(self.SPHumDay) < self.bottomLimitSPHum) or (float(self.SPHumNight) > self.upLimitSPHum) or (float(self.SPHumNight) < self.bottomLimitSPHum)):
+            self.SPHumDay = self.prevSPHumDay
+            self.SPHumNight = self.prevSPHumNight
+            self.setpointHumDay.setText(self.SPHumDay)
+            self.setpointHumNight.setText(self.SPHumNight)
+        else:
+            self.prevSPHumDay = self.SPHumDay
+            self.prevSPHumNight = self.SPHumNight
+            self.sendDataCloud()
+            self.sendDataMCU()
 
     #function if set optimum light button is clicked
     def lightButton_clicked(self):
-        self.sendDataCloud()
-        self.sendDataMCU()
+        if ((float(self.SPLightDay) > self.upLimitSPLight) or (float(self.SPLightDay) < self.bottomLimitSPLight) or (float(self.SPLightNight) > self.upLimitSPLight) or (float(self.SPLightNight) < self.bottomLimitSPLight)):
+            self.SPLightDay = self.prevSPLightDay
+            self.SPLightNight = self.prevSPLightNight
+            self.setpointLightDay.setText(self.SPLightDay)
+            self.setpointLightNight.setText(self.SPLightNight)
+        else:
+            self.prevSPLightDay = self.SPLightDay
+            self.prevSPLightNight = self.SPLightNight
+            self.sendDataCloud()
+            self.sendDataMCU()
     
     #function if set heater state is clicked
     def heaterButton_clicked(self):
@@ -1289,23 +1327,29 @@ class UI(QMainWindow):
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
                         self.SPTempDay = str(data_json.get("temperature"))
+                        self.prevSPTempDay = self.SPTempDay
                         self.setpointTempDay.setText(self.SPTempDay)
                     else:
                         self.SPTempNight = str(data_json.get("temperature"))
+                        self.prevSPTempNight = self.SPTempNight
                         self.setpointTempNight.setText(self.SPTempNight)
                 if ("humidity" in data_json):
                     if (data_json.get("mode") == "Day"):
                         self.SPHumDay = str(data_json.get("humidity"))
+                        self.prevSPHumDay = self.SPHumDay
                         self.setpointHumDay.setText(self.SPHumDay)
                     else:
                         self.SPHumNight = str(data_json.get("humidity"))
+                        self.prevSPHumNight = self.SPHumNight
                         self.setpointHumNight.setText(self.SPHumNight)
                 if ("intensity" in data_json):
                     if (data_json.get("mode") == "Day"):
                         self.SPLightDay = str(data_json.get("intensity"))
+                        self.prevSPLightDay = self.SPLightDay
                         self.setpointLightDay.setText(self.SPLightDay)
                     else:
                         self.SPLightNight = str(data_json.get("intensity"))
+                        self.prevSPLightNight = self.SPLightNight
                         self.setpointLightNight.setText(self.SPLightNight)
         except:
             print("Error on reading live data from Cloud")
