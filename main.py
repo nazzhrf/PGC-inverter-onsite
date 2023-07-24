@@ -97,7 +97,7 @@ class UI(QMainWindow):
         self.upLimitSPTemp = 40
         self.bottomLimitSPTemp = 0
         self.upLimitSPHum = 90
-        self.bottomLimitSPHum = 0
+        self.bottomLimitSPHum = 40
         self.upLimitSPLight = 15000
         self.bottomLimitSPLight = 0
         
