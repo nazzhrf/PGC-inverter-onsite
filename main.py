@@ -38,14 +38,12 @@ class Worker(QThread):
                 messages = sseclient.SSEClient(self.endpoint)
                 print("Connected to SSE server")
                 for msg in messages:
-                        try:
-                            data = json.loads(msg.data)
-                            if data == {}:
-                                pass
-                            else:
-                                self.data_json.emit(data)
-                        except json.JSONDecodeError:
-                            pass
+                    if msg.data:
+                        data = json.loads(msg.data)
+                        self.data_json.emit(data)
+                    else:
+                        messages.close()  # Disconnect from SSE server
+                        print("Disconnected from SSE server")
             except Exception as e:
                 print("Error:", e)
                 print("Retrying in {} seconds...".format(retry_delay))
