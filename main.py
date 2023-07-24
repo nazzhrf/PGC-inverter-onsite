@@ -32,7 +32,7 @@ class Worker(QThread):
 
     def run(self):
         retry_delay = 1  # Initial retry delay in seconds
-        max_retry_delay = 32  # Maximum retry delay in seconds
+        max_retry_delay = 4  # Maximum retry delay in seconds
         while True:
             try:
                 messages = sseclient.SSEClient(self.endpoint)

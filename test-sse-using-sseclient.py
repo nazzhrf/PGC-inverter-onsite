@@ -4,7 +4,7 @@ import json
 
 def sse_client(url):
     retry_delay = 1  # Initial retry delay in seconds
-    max_retry_delay = 8  # Maximum retry delay in seconds
+    max_retry_delay = 4  # Maximum retry delay in seconds
 
     while True:
         try:
