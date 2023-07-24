@@ -388,9 +388,11 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.start(3600000)
 
         #reconnect network scheduling
+        """
         self.reconnectNetworkTimer = QtCore.QTimer()
         self.reconnectNetworkTimer.timeout.connect(lambda:self.toggle_network_connection())
         self.reconnectNetworkTimer.start(300000)
+        """
         
         #create thread to get/subscribe live setpoint
         self.thread = Worker(self.urlGetLiveSetpoint)
