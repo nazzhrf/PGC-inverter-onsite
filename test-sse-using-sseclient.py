@@ -4,17 +4,19 @@ import json
 
 def sse_client(url):
     retry_delay = 1  # Initial retry delay in seconds
-    max_retry_delay = 32  # Maximum retry delay in seconds
+    max_retry_delay = 8  # Maximum retry delay in seconds
 
     while True:
         try:
             messages = SSEClient(url)
             print("Connected to SSE server")
-            for message in messages:
-                if message.data:  
-                    data_json = json.loads(message.data)
-                    print("Received message:", data_json)
+            for msg in messages:
+                if msg.data:
+                    data_json = json.loads(msg.data)
                     readLiveSetPointFromCloud(data_json)
+                else:
+                    messages.close()  # Disconnect from SSE server
+                    print("Disconnected from SSE server")
         except Exception as e:
             print("Error:", e)
             print("Retrying in {} seconds...".format(retry_delay))
@@ -49,5 +51,5 @@ def printTakePhoto():
     print("Take photo....")
 
 if __name__ == "__main__":
-    url = "https://api.smartfarm.id/condition/getsetpoint/3?device_key=e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
+    url = "http://localhost:9000/condition/getsetpoint/1?device_key=7580e769d9bc179870133a98255588320d21392803544323019372acbddc559f7ea16813dfaa91dd9b2ab069208cf07fe6988567ea9282"
     sse_client(url)

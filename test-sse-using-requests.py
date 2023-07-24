@@ -19,6 +19,10 @@ def sse_client(url):
                         data_json = json.loads(line.replace("data: ", ""))
                         print("Received message:", data_json)
                         readLiveSetPointFromCloud(data_json)
+                    if ":heartbeat" in line:
+                        break
+                response.close() 
+                print("Disconnected from SSE server")
             else:
                 print("Failed to connect. Retrying in {} seconds...".format(retry_delay))
         except requests.exceptions.RequestException as e:
@@ -52,6 +56,5 @@ def readLiveSetPointFromCloud(data_json):
         print("Error on reading live data from Cloud:", e)
 
 if __name__ == "__main__":
-    url = "https://api.smartfarm.id/condition/getsetpoint/3?device_key=e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
+    url = "https://api-staging.smartfarm.id/condition/getsetpoint/3?device_key=e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
     sse_client(url)
-
