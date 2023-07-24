@@ -428,11 +428,12 @@ class UI(QMainWindow):
             except subprocess.CalledProcessError:
                 return False
         def connect_network():
-            subprocess.run(['sudo', 'ifup', network_interface])
+            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'up'])
         def disconnect_network():
-            subprocess.run(['sudo', 'ifdown', network_interface])
+            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'down'])
         if network_interface and is_network_connected():
             disconnect_network()
+            time.sleep(1)
             connect_network()
     
     #function for moving to temp page

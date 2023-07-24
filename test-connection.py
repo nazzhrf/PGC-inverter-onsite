@@ -21,10 +21,10 @@ def toggle_network_connection():
                 print("No network connection")
                 return False
         def connect_network():
-            subprocess.run(['sudo', 'ifup', network_interface])
+            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'up'])
             print("Success connect to " + network_interface + " network interface")
         def disconnect_network():
-            subprocess.run(['sudo', 'ifdown', network_interface])
+            subprocess.run(['sudo', 'ip', 'link', 'set', 'dev', network_interface, 'down'])
             print("Success disconnect from " + network_interface + " network interface")
         if network_interface and is_network_connected():
             disconnect_network()
