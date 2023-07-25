@@ -404,10 +404,12 @@ class UI(QMainWindow):
             data = self.sseRequest.readAll().data().decode(errors='ignore')
             if data:
                 try:
-                    data_str = data.decode('utf-8')
-                    data_json = json.loads(data_str)
-                    print("Received SSE data:", data_json)
-                    self.readLiveSetPointFromCloud(data_json)
+                    json_start_idx = data.find("{")
+                        if json_start_idx != -1:
+                            json_str = data[json_start_idx:]
+                            data_json = json.loads(json_str)
+                            print("Received SSE data:", data_json)
+                            self.readLiveSetPointFromCloud(data_json)
                 except json.JSONDecodeError as e:
                     print("Error while decoding JSON data:", e)
             else:
