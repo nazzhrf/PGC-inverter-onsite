@@ -9,7 +9,8 @@ from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, QUrl, QTimer
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 import sseclient
 import sys 
 import time
@@ -21,37 +22,6 @@ import subprocess
 import os
 
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
-
-# thread to read data from API
-class Worker(QThread):
-    data_json = QtCore.pyqtSignal(dict)
-
-    def __init__(self, endpoint):
-        super().__init__()
-        self.endpoint = endpoint
-
-    def run(self):
-        retry_delay = 1  # Initial retry delay in seconds
-        max_retry_delay = 4  # Maximum retry delay in seconds
-        while True:
-            try:
-                messages = sseclient.SSEClient(self.endpoint)
-                print("Connected to SSE server")
-                for msg in messages:
-                    if msg.data:
-                        data = json.loads(msg.data)
-                        self.data_json.emit(data)
-                    else:
-                        messages.close()  # Disconnect from SSE server
-                        print("Disconnected from SSE server")
-            except Exception as e:
-                print("Error:", e)
-                print("Retrying in {} seconds...".format(retry_delay))
-
-            # Exponential backoff for retries
-            time.sleep(retry_delay)
-            retry_delay *= 2
-            retry_delay = min(retry_delay, max_retry_delay)
 
 class UI(QMainWindow):
     def __init__(self):
@@ -131,6 +101,10 @@ class UI(QMainWindow):
                 self.connected = True
             except:
                 self.connected = False
+
+        # SSE related variables
+        self.sseManager = None
+        self.sseRequest = None
         
         #pages
         self.stackedWidget = self.findChild(QStackedWidget, "stackedWidget")
@@ -390,7 +364,14 @@ class UI(QMainWindow):
         self.updatePhotoTimer = QtCore.QTimer()
         self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
         self.updatePhotoTimer.start(5000)
-        
+
+        # Start the timer for SSE connection refresh
+        """
+        self.sseRefreshTimer = QtCore.QTimer()
+        self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
+        self.sseRefreshTimer.start(1800000)
+        """
+
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
         self.sendPhotoTopTimer.timeout.connect(lambda:self.sendPhotoTop())
@@ -398,17 +379,89 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer = QtCore.QTimer()
         self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
         self.sendPhotoBottomTimer.start(3600000)
-
-        #create thread to get/subscribe live setpoint
-        self.thread = Worker(self.urlGetLiveSetpoint)
-        self.thread.data_json.connect(self.readLiveSetPointFromCloud)
-        self.thread.start()
         
         #wired serial to hardware
         self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         if not self.serial.isOpen():
             self.serial.open(QtCore.QIODevice.ReadWrite)
 
+        # Start the SSE connection
+        self.subscribeSSE()
+
+    def subscribeSSE(self):
+        if self.sseManager is not None:
+            self.sseManager.deleteLater()
+
+        self.sseManager = QNetworkAccessManager()
+        url = QUrl(self.urlGetLiveSetpoint)
+        request = QNetworkRequest(url)
+        request.setRawHeader(b"Cache-Control", b"no-cache")
+        request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
+        self.sseRequest = self.sseManager.get(request)
+        print("Connected to SSE Server")
+        self.sseRequest.readyRead.connect(self.onSSEDataReady)
+    
+    def onSSEDataReady(self):
+        if self.sseRequest.error() == QNetworkReply.NoError:
+            data = self.sseRequest.readAll().data().decode(errors='ignore')
+            if data:
+                try:
+                    json_start_idx = data.find("{")
+                    if json_start_idx != -1:
+                        json_str = data[json_start_idx:]
+                        data_json = json.loads(json_str)
+                        print("Received SSE data:", data_json)
+                        self.readLiveSetPointFromCloud(data_json)
+                except json.JSONDecodeError as e:
+                    print("Error while decoding JSON data:", e)
+            else:
+                print("Empty data received from SSE.")
+        else:
+            print("Error while receiving SSE:", self.sseRequest.errorString())
+    
+    #function to read live setpoint data from cloud
+    def readLiveSetPointFromCloud(self, data_json):
+        print("Receive Set Point Data from Cloud!")
+        try:
+            if ("take_photos" in data_json):
+                self.sendPhotoTop()
+                self.sendPhotoBottom()
+                self.sendPhotoUser()
+            else: 
+                if ("temperature" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPTempDay = str(data_json.get("temperature"))
+                        self.prevSPTempDay = self.SPTempDay
+                        self.setpointTempDay.setText(self.SPTempDay)
+                    else:
+                        self.SPTempNight = str(data_json.get("temperature"))
+                        self.prevSPTempNight = self.SPTempNight
+                        self.setpointTempNight.setText(self.SPTempNight)
+                if ("humidity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPHumDay = str(data_json.get("humidity"))
+                        self.prevSPHumDay = self.SPHumDay
+                        self.setpointHumDay.setText(self.SPHumDay)
+                    else:
+                        self.SPHumNight = str(data_json.get("humidity"))
+                        self.prevSPHumNight = self.SPHumNight
+                        self.setpointHumNight.setText(self.SPHumNight)
+                if ("intensity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPLightDay = str(data_json.get("intensity"))
+                        self.prevSPLightDay = self.SPLightDay
+                        self.setpointLightDay.setText(self.SPLightDay)
+                    else:
+                        self.SPLightNight = str(data_json.get("intensity"))
+                        self.prevSPLightNight = self.SPLightNight
+                        self.setpointLightNight.setText(self.SPLightNight)
+        except:
+            print("Error on reading live data from Cloud")
+
+    def refreshSSEConnection(self):
+        print("Refreshing SSE connection...")
+        self.subscribeSSE()
+    
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
         if self.isFullScreen():
@@ -1280,45 +1333,6 @@ class UI(QMainWindow):
             pass
             print("Send data to database cloud failed")
         
-
-    #function to read live setpoint data from cloud
-    def readLiveSetPointFromCloud(self, data_json):
-        print("Receive Set Point Data from Cloud!")
-        try:
-            if ("take_photos" in data_json):
-                self.sendPhotoTop()
-                self.sendPhotoBottom()
-                self.sendPhotoUser()
-            else: 
-                if ("temperature" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPTempDay = str(data_json.get("temperature"))
-                        self.prevSPTempDay = self.SPTempDay
-                        self.setpointTempDay.setText(self.SPTempDay)
-                    else:
-                        self.SPTempNight = str(data_json.get("temperature"))
-                        self.prevSPTempNight = self.SPTempNight
-                        self.setpointTempNight.setText(self.SPTempNight)
-                if ("humidity" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPHumDay = str(data_json.get("humidity"))
-                        self.prevSPHumDay = self.SPHumDay
-                        self.setpointHumDay.setText(self.SPHumDay)
-                    else:
-                        self.SPHumNight = str(data_json.get("humidity"))
-                        self.prevSPHumNight = self.SPHumNight
-                        self.setpointHumNight.setText(self.SPHumNight)
-                if ("intensity" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPLightDay = str(data_json.get("intensity"))
-                        self.prevSPLightDay = self.SPLightDay
-                        self.setpointLightDay.setText(self.SPLightDay)
-                    else:
-                        self.SPLightNight = str(data_json.get("intensity"))
-                        self.prevSPLightNight = self.SPLightNight
-                        self.setpointLightNight.setText(self.SPLightNight)
-        except:
-            print("Error on reading live data from Cloud")
 
     #function for sending data to hardware
     def sendDataMCU(self):
