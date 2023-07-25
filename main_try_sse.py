@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, 
 from PyQt5.QtGui import QPixmap
 from PyQt5 import uic
 from PyQt5.QtCore import QThread, QUrl, QTimer
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 import sseclient
 import sys 
 import time
@@ -402,12 +402,16 @@ class UI(QMainWindow):
     def onSSEDataReady(self):
         if self.sseRequest.error() == QNetworkReply.NoError:
             data = self.sseRequest.readAll().data().decode(errors='ignore')
-            try:
-                data_json = json.loads(data)
-                print("Received SSE data:", data_json)
-                self.readLiveSetPointFromCloud(data_json)
-            except json.JSONDecodeError:
-                print("Error while parsing SSE data: Invalid JSON format")
+            if data:
+                try:
+                    data_str = data.decode('utf-8')
+                    data_json = json.loads(data_str)
+                    print("Received SSE data:", data_json)
+                    self.readLiveSetPointFromCloud(data_json)
+                except json.JSONDecodeError as e:
+                    print("Error while decoding JSON data:", e)
+            else:
+                print("Empty data received from SSE.")
         else:
             print("Error while receiving SSE:", self.sseRequest.errorString())
     
