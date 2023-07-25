@@ -368,7 +368,7 @@ class UI(QMainWindow):
         # Start the timer for SSE connection refresh
         self.sseRefreshTimer = QtCore.QTimer()
         self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
-        self.sseRefreshTimer.start(60000)
+        self.sseRefreshTimer.start(30000)
         
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
@@ -396,6 +396,7 @@ class UI(QMainWindow):
         request.setRawHeader(b"Cache-Control", b"no-cache")
         request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
         self.sseRequest = self.sseManager.get(request)
+        print("Connected to SSE Server")
         self.sseRequest.readyRead.connect(self.onSSEDataReady)
     
     def onSSEDataReady(self):
