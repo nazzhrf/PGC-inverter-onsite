@@ -65,7 +65,7 @@ class UI(QMainWindow):
         self.actTemp = ""
         self.actHum = ""
         self.actLight = ""
-        self.SPTemp = "30"
+        self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
         self.pwmHeater = 0
@@ -76,10 +76,10 @@ class UI(QMainWindow):
         self.manLight = 0
         
         #day or night parameter
-        self.SPTempDay = "30"
+        self.SPTempDay = "27"
         self.SPHumDay = "70"
         self.SPLightDay = "4000"
-        self.prevSPTempDay = "30"
+        self.prevSPTempDay = "27"
         self.prevSPHumDay = "70"
         self.prevSPLightDay = "4000"
         self.SPTempNight = "23"
