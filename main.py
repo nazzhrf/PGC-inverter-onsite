@@ -1,6 +1,6 @@
 """
-Gateway Subsistem
-Smart Growth Chamber
+Gateway Subsystem
+Plant Growth Chamber
 Thesis by Muhammad Arbi Minanda (23220344)
 """
 
