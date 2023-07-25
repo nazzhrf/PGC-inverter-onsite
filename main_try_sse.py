@@ -35,7 +35,7 @@ class UI(QMainWindow):
         self.actTemp = ""
         self.actHum = ""
         self.actLight = ""
-        self.SPTemp = "30"
+        self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
         self.pwmHeater = 0
@@ -46,10 +46,10 @@ class UI(QMainWindow):
         self.manLight = 0
         
         #day or night parameter
-        self.SPTempDay = "30"
+        self.SPTempDay = "27"
         self.SPHumDay = "70"
         self.SPLightDay = "4000"
-        self.prevSPTempDay = "30"
+        self.prevSPTempDay = "27"
         self.prevSPHumDay = "70"
         self.prevSPLightDay = "4000"
         self.SPTempNight = "23"
@@ -364,6 +364,11 @@ class UI(QMainWindow):
         self.updatePhotoTimer = QtCore.QTimer()
         self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
         self.updatePhotoTimer.start(5000)
+
+        # Start the timer for SSE connection refresh
+        self.sseRefreshTimer = QtCore.QTimer()
+        self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
+        self.sseRefreshTimer.start(60000)
         
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
@@ -386,58 +391,67 @@ class UI(QMainWindow):
             self.sseManager.deleteLater()
 
         self.sseManager = QNetworkAccessManager()
-        url = QUrl(self.urlGetLiveSetpoint)
+        url = QUrl("{{baseUrl}}/condition/setpoint/3")
         request = QNetworkRequest(url)
-        request.setHeader(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.PreferCache)
+        request.setRawHeader(b"Cache-Control", b"no-cache")
         request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
         self.sseRequest = self.sseManager.get(request)
-        self.sseRequest.finished.connect(self.onSSEFinished)
-
-    def onSSEFinished(self):
+        self.sseRequest.readyRead.connect(self.onSSEDataReady)
+    
+    def onSSEDataReady(self):
         if self.sseRequest.error() == QNetworkReply.NoError:
-            message = self.sseRequest.readAll().data().decode(errors='ignore')
-            print("Received SSE data:", data)
-            print("Receive Set Point Data from Cloud!")
-            data_json = json.loads(message.data)
+            data = self.sseRequest.readAll().data().decode(errors='ignore')
             try:
-                if ("take_photos" in data_json):
-                    self.sendPhotoTop()
-                    self.sendPhotoBottom()
-                    self.sendPhotoUser()
-                else: 
-                    if ("temperature" in data_json):
-                        if (data_json.get("mode") == "Day"):
-                            self.SPTempDay = str(data_json.get("temperature"))
-                            self.prevSPTempDay = self.SPTempDay
-                            self.setpointTempDay.setText(self.SPTempDay)
-                        else:
-                            self.SPTempNight = str(data_json.get("temperature"))
-                            self.prevSPTempNight = self.SPTempNight
-                            self.setpointTempNight.setText(self.SPTempNight)
-                    if ("humidity" in data_json):
-                        if (data_json.get("mode") == "Day"):
-                            self.SPHumDay = str(data_json.get("humidity"))
-                            self.prevSPHumDay = self.SPHumDay
-                            self.setpointHumDay.setText(self.SPHumDay)
-                        else:
-                            self.SPHumNight = str(data_json.get("humidity"))
-                            self.prevSPHumNight = self.SPHumNight
-                            self.setpointHumNight.setText(self.SPHumNight)
-                    if ("intensity" in data_json):
-                        if (data_json.get("mode") == "Day"):
-                            self.SPLightDay = str(data_json.get("intensity"))
-                            self.prevSPLightDay = self.SPLightDay
-                            self.setpointLightDay.setText(self.SPLightDay)
-                        else:
-                            self.SPLightNight = str(data_json.get("intensity"))
-                            self.prevSPLightNight = self.SPLightNight
-                            self.setpointLightNight.setText(self.SPLightNight)
-            except:
-                print("Error on reading live data from Cloud")
+                data_json = json.loads(data)
+                print("Received SSE data:", data_json)
+                self.readLiveSetPointFromCloud(data_json)
+            except json.JSONDecodeError:
+                print("Error while parsing SSE data: Invalid JSON format")
         else:
             print("Error while receiving SSE:", self.sseRequest.errorString())
-        # Re-subscribe after a delay (e.g., 5 seconds)
-        QTimer.singleShot(5000, self.subscribeSSE)
+    
+    #function to read live setpoint data from cloud
+    def readLiveSetPointFromCloud(self, data_json):
+        print("Receive Set Point Data from Cloud!")
+        try:
+            if ("take_photos" in data_json):
+                self.sendPhotoTop()
+                self.sendPhotoBottom()
+                self.sendPhotoUser()
+            else: 
+                if ("temperature" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPTempDay = str(data_json.get("temperature"))
+                        self.prevSPTempDay = self.SPTempDay
+                        self.setpointTempDay.setText(self.SPTempDay)
+                    else:
+                        self.SPTempNight = str(data_json.get("temperature"))
+                        self.prevSPTempNight = self.SPTempNight
+                        self.setpointTempNight.setText(self.SPTempNight)
+                if ("humidity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPHumDay = str(data_json.get("humidity"))
+                        self.prevSPHumDay = self.SPHumDay
+                        self.setpointHumDay.setText(self.SPHumDay)
+                    else:
+                        self.SPHumNight = str(data_json.get("humidity"))
+                        self.prevSPHumNight = self.SPHumNight
+                        self.setpointHumNight.setText(self.SPHumNight)
+                if ("intensity" in data_json):
+                    if (data_json.get("mode") == "Day"):
+                        self.SPLightDay = str(data_json.get("intensity"))
+                        self.prevSPLightDay = self.SPLightDay
+                        self.setpointLightDay.setText(self.SPLightDay)
+                    else:
+                        self.SPLightNight = str(data_json.get("intensity"))
+                        self.prevSPLightNight = self.SPLightNight
+                        self.setpointLightNight.setText(self.SPLightNight)
+        except:
+            print("Error on reading live data from Cloud")
+
+    def refreshSSEConnection(self):
+        print("Refreshing SSE connection...")
+        self.subscribeSSE()
     
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
