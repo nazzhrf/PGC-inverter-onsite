@@ -391,7 +391,7 @@ class UI(QMainWindow):
             self.sseManager.deleteLater()
 
         self.sseManager = QNetworkAccessManager()
-        url = QUrl("{{baseUrl}}/condition/setpoint/3")
+        url = QUrl(self.urlGetLiveSetpoint)
         request = QNetworkRequest(url)
         request.setRawHeader(b"Cache-Control", b"no-cache")
         request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
