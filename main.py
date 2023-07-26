@@ -368,7 +368,7 @@ class UI(QMainWindow):
         # Start the timer for SSE connection refresh
         self.sseRefreshTimer = QtCore.QTimer()
         self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
-        self.sseRefreshTimer.start(30000)
+        self.sseRefreshTimer.start(60000)
         
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
