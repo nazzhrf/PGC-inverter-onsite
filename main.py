@@ -366,12 +366,10 @@ class UI(QMainWindow):
         self.updatePhotoTimer.start(5000)
 
         # Start the timer for SSE connection refresh
-        """
         self.sseRefreshTimer = QtCore.QTimer()
         self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
-        self.sseRefreshTimer.start(1800000)
-        """
-
+        self.sseRefreshTimer.start(30000)
+        
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
         self.sendPhotoTopTimer.timeout.connect(lambda:self.sendPhotoTop())
@@ -459,6 +457,10 @@ class UI(QMainWindow):
             print("Error on reading live data from Cloud")
 
     def refreshSSEConnection(self):
+        if self.sseRequest is not None:
+            self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
+            self.sseRequest.deleteLater()  # Clean up the request object
+            print("Previous SSE Connection disconnected")
         print("Refreshing SSE connection...")
         self.subscribeSSE()
     
