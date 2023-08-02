@@ -1282,12 +1282,12 @@ class UI(QMainWindow):
         self.lastMinuteTouch = currentTouch 
 
     def get_cpu_temperature(self):
-    try:
-        with open('/sys/class/thermal/thermal_zone0/temp', 'r') as file:
-            temp = float(file.read()) / 1000.0
-            return temp
-    except FileNotFoundError:
-        return None
+        try:
+            with open('/sys/class/thermal/thermal_zone0/temp', 'r') as file:
+                temp = float(file.read()) / 1000.0
+                return temp
+        except FileNotFoundError:
+            return None
 
     #send current live data in hardware to cloud
     def sendDataCloud(self) :
