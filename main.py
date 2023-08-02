@@ -1281,6 +1281,14 @@ class UI(QMainWindow):
             print("New User Detected, Photo User sent to Cloud")
         self.lastMinuteTouch = currentTouch 
 
+    def get_cpu_temperature(self):
+    try:
+        with open('/sys/class/thermal/thermal_zone0/temp', 'r') as file:
+            temp = float(file.read()) / 1000.0
+            return temp
+    except FileNotFoundError:
+        return None
+
     #send current live data in hardware to cloud
     def sendDataCloud(self) :
         try:
@@ -1292,6 +1300,7 @@ class UI(QMainWindow):
                 self.SPTemp = self.SPTempNight
                 self.SPHum = self.SPHumNight
                 self.SPLight = self.SPLightNight
+            cpu_temp = self.get_cpu_temperature()
             data_json ={
                 "device_id" : self.deviceId,
                 "mode" : self.mode,
@@ -1305,6 +1314,7 @@ class UI(QMainWindow):
                 "sComp" : self.manComp,
                 "sLight" : self.manLight*4,
                 "sHum" : self.manHum,
+                "gateway_temp": f"{cpu_temp:.2f}"
             }
             header = {
                 'Content-Type': 'application/json',
