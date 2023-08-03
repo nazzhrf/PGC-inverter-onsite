@@ -1331,11 +1331,16 @@ class UI(QMainWindow):
     #send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
         try:
+            cpu_temp = self.get_cpu_temperature()
             data = {
                 "temperature" : float(self.actTemp),
                 "humidity" : float(self.actHum),
                 "intensity" : float(self.actLight),
-                "device_id" : int(self.deviceId)
+                "device_id" : int(self.deviceId),
+                "SPTemp" : self.SPTemp,
+                "SPHum" : self.SPHum,
+                "SPLight" : self.SPLight,
+                "gateway_temp": f"{cpu_temp:.2f}"
             }
             header = {
                 'Content-Type': 'application/json',
