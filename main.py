@@ -73,8 +73,8 @@ class UI(QMainWindow):
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         #camera devices
-        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.4):'
-        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.2):'
+        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
+        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
 
         #variable for chamber identifier
@@ -85,6 +85,7 @@ class UI(QMainWindow):
         self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
+        self.portUART = '/dev/ttyAMA0'
 
         #variable for photo
         self.pathTopPhoto = 'Image/top_chamber' + self.deviceId + '.png'
@@ -371,7 +372,7 @@ class UI(QMainWindow):
         
         #wired serial to hardware
         try:
-            self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
+            self.serial = QtSerialPort.QSerialPort(self.portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
             if not self.serial.isOpen():
                 self.serial.open(QtCore.QIODevice.ReadWrite)
         except:
