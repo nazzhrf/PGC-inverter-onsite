@@ -21,6 +21,7 @@ import os.path
 import subprocess
 import os
 
+#comment this if not needed
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
