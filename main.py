@@ -70,7 +70,6 @@ class UI(QMainWindow):
         self.bottomLimitSPLight = 0
         
         #boolean variable
-        self.connected = False
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         #camera devices
@@ -94,14 +93,6 @@ class UI(QMainWindow):
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
-        #waiting till internet connection exist for initialize app
-        while (self.connected == False):
-            try:
-                requests.get('https://reqres.in/api/users/1')
-                self.connected = True
-            except:
-                self.connected = False
-
         # SSE related variables
         self.sseManager = None
         self.sseRequest = None
@@ -379,43 +370,51 @@ class UI(QMainWindow):
         self.sendPhotoBottomTimer.start(3600000)
         
         #wired serial to hardware
-        self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
-        if not self.serial.isOpen():
-            self.serial.open(QtCore.QIODevice.ReadWrite)
+        try:
+            self.serial = QtSerialPort.QSerialPort('/dev/ttyAMA0', baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
+            if not self.serial.isOpen():
+                self.serial.open(QtCore.QIODevice.ReadWrite)
+        except:
+            print("Serial UART port not available")
 
         # Start the SSE connection
         self.subscribeSSE()
 
     def subscribeSSE(self):
-        if self.sseManager is not None:
-            self.sseManager.deleteLater()
-
-        self.sseManager = QNetworkAccessManager()
-        url = QUrl(self.urlGetLiveSetpoint)
-        request = QNetworkRequest(url)
-        request.setRawHeader(b"Cache-Control", b"no-cache")
-        request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
-        self.sseRequest = self.sseManager.get(request)
-        print("Connected to SSE Server")
-        self.sseRequest.readyRead.connect(self.onSSEDataReady)
+        try:
+            if self.sseManager is not None:
+                self.sseManager.deleteLater()
+            self.sseManager = QNetworkAccessManager()
+            url = QUrl(self.urlGetLiveSetpoint)
+            request = QNetworkRequest(url)
+            request.setRawHeader(b"Cache-Control", b"no-cache")
+            request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
+            self.sseRequest = self.sseManager.get(request)
+            print("Connected to SSE Server")
+            self.sseRequest.readyRead.connect(self.onSSEDataReady)
+        except:
+            print("Failed connect to SSE Server")
     
     def onSSEDataReady(self):
-        if self.sseRequest.error() == QNetworkReply.NoError:
-            data = self.sseRequest.readAll().data().decode(errors='ignore')
-            if data:
-                try:
-                    json_start_idx = data.find("{")
-                    if json_start_idx != -1:
-                        json_str = data[json_start_idx:]
-                        data_json = json.loads(json_str)
-                        print("Received SSE data:", data_json)
-                        self.readLiveSetPointFromCloud(data_json)
-                except json.JSONDecodeError as e:
-                    print("Error while decoding JSON data:", e)
+        try:
+            if self.sseRequest.error() == QNetworkReply.NoError:
+                data = self.sseRequest.readAll().data().decode(errors='ignore')
+                if data:
+                    try:
+                        json_start_idx = data.find("{")
+                        if json_start_idx != -1:
+                            json_str = data[json_start_idx:]
+                            data_json = json.loads(json_str)
+                            print("Received SSE data:", data_json)
+                            self.readLiveSetPointFromCloud(data_json)
+                    except json.JSONDecodeError as e:
+                        print("Error while decoding JSON data:", e)
+                else:
+                    print("Empty data received from SSE.")
             else:
-                print("Empty data received from SSE.")
-        else:
-            print("Error while receiving SSE:", self.sseRequest.errorString())
+                print("Error while receiving SSE:", self.sseRequest.errorString())
+        except:
+            print("Failed Receiving Data from SSE")
     
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
@@ -457,12 +456,16 @@ class UI(QMainWindow):
             print("Error on reading live data from Cloud")
 
     def refreshSSEConnection(self):
-        if self.sseRequest is not None:
-            self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
-            self.sseRequest.deleteLater()  # Clean up the request object
-            print("Previous SSE Connection disconnected")
-        print("Refreshing SSE connection...")
-        self.subscribeSSE()
+        try:
+            if self.sseRequest is not None:
+                self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
+                self.sseRequest.deleteLater()  # Clean up the request object
+                print("Previous SSE Connection disconnected")
+            print("Refreshing SSE connection...")
+            self.subscribeSSE()
+        except:
+            print("Failed refresh SSE connection")
+        
     
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
@@ -1250,26 +1253,29 @@ class UI(QMainWindow):
 
     #function for save data to local file
     def saveDataToLocalFile(self):
-        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.SPTemp = self.SPTempDay
-            self.SPHum = self.SPHumDay
-            self.SPLight = self.SPLightDay
-        else:
-            self.SPTemp = self.SPTempNight
-            self.SPHum = self.SPHumNight
-            self.SPLight = self.SPLightNight
-        cpu_temp = self.get_cpu_temperature()
-        data_local = str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min) + ":" + str(time.localtime().tm_sec) + "_" + str(time.localtime().tm_mday) + "/" + str(time.localtime().tm_mon) + "/" + str(time.localtime().tm_year) + "," + str(self.mode) + "," + str(self.SPTemp) + "," + str(self.SPHum) + "," + str(self.SPLight) + "," + str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight) + "," + str(self.manHeater) + "," + str(self.manComp) + "," + str(self.manLight) + "," + str(self.manHum) + "," + f"{cpu_temp:.2f}" + "\n"
-        header = "timestamp,mode,SPTemp,SPHum,SPLight,actTemp,actHum,actLight,manHeater,manComp,manLight,manHum,cpuTemp" + "\n"
-        dbFilename = "Data/Data " + str(time.localtime().tm_mon) + "_" + str(time.localtime().tm_year) + ".csv"
-        if (os.path.exists(dbFilename) == True):
-            f = open(dbFilename, "a")
-            f.write(data_local)
-        else:
-            f = open(dbFilename, "a")
-            f.write(header)
-            f.write(data_local)
-        print("Data saved to local file (" + dbFilename + ")")
+        try:
+            if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                self.SPTemp = self.SPTempDay
+                self.SPHum = self.SPHumDay
+                self.SPLight = self.SPLightDay
+            else:
+                self.SPTemp = self.SPTempNight
+                self.SPHum = self.SPHumNight
+                self.SPLight = self.SPLightNight
+            cpu_temp = self.get_cpu_temperature()
+            data_local = str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min) + ":" + str(time.localtime().tm_sec) + "_" + str(time.localtime().tm_mday) + "/" + str(time.localtime().tm_mon) + "/" + str(time.localtime().tm_year) + "," + str(self.mode) + "," + str(self.SPTemp) + "," + str(self.SPHum) + "," + str(self.SPLight) + "," + str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight) + "," + str(self.manHeater) + "," + str(self.manComp) + "," + str(self.manLight) + "," + str(self.manHum) + "," + f"{cpu_temp:.2f}" + "\n"
+            header = "timestamp,mode,SPTemp,SPHum,SPLight,actTemp,actHum,actLight,manHeater,manComp,manLight,manHum,cpuTemp" + "\n"
+            dbFilename = "Data/Data " + str(time.localtime().tm_mon) + "_" + str(time.localtime().tm_year) + ".csv"
+            if (os.path.exists(dbFilename) == True):
+                f = open(dbFilename, "a")
+                f.write(data_local)
+            else:
+                f = open(dbFilename, "a")
+                f.write(header)
+                f.write(data_local)
+            print("Data saved to local file (" + dbFilename + ")")
+        except:
+            print("Failed save data to local file as excel")
     
     #function for checking duration from last touch
     def checkLastTouch(self):
@@ -1354,28 +1360,31 @@ class UI(QMainWindow):
 
     #function for sending data to hardware
     def sendDataMCU(self):
-        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.SPTemp = self.SPTempDay
-            self.SPHum = self.SPHumDay
-            self.SPLight = self.SPLightDay
-        else:
-            self.SPTemp = self.SPTempNight
-            self.SPHum = self.SPHumNight
-            self.SPLight = self.SPLightNight
-        data_json ={
-            "mode"        : self.mode,
-            "SPTemp"    : self.SPTemp,
-            "SPHum"        : self.SPHum,
-            "SPLight"    : self.SPLight,
-            "sHeater"    : self.manHeater,
-            "sComp"        : self.manComp,
-            "sLight"    : self.manLight,
-            "sHum"        : self.manHum,
-        }
-        payloadMCU = str.encode(json.dumps(data_json)+'\n')
-        print(payloadMCU)
-        self.serial.write(payloadMCU)
-        print("Data sent to MCU")
+        try:
+            if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                self.SPTemp = self.SPTempDay
+                self.SPHum = self.SPHumDay
+                self.SPLight = self.SPLightDay
+            else:
+                self.SPTemp = self.SPTempNight
+                self.SPHum = self.SPHumNight
+                self.SPLight = self.SPLightNight
+            data_json ={
+                "mode"        : self.mode,
+                "SPTemp"    : self.SPTemp,
+                "SPHum"        : self.SPHum,
+                "SPLight"    : self.SPLight,
+                "sHeater"    : self.manHeater,
+                "sComp"        : self.manComp,
+                "sLight"    : self.manLight,
+                "sHum"        : self.manHum,
+            }
+            payloadMCU = str.encode(json.dumps(data_json)+'\n')
+            print(payloadMCU)
+            self.serial.write(payloadMCU)
+            print("Data sent to MCU")
+        except:
+            print("Failed send data to MCU")
 
     #function for sending top photo to cloud
     def sendPhotoTop(self):
@@ -1463,24 +1472,27 @@ class UI(QMainWindow):
     #function for receiving serial message from mcu
     @QtCore.pyqtSlot()
     def receive(self):
-        self.serial.open(QtCore.QIODevice.ReadWrite)
-        while self.serial.canReadLine():
-            buffer = self.serial.readLine().data().decode(errors='ignore')
-            print(buffer)
-            try:
-                data = json.loads(buffer.encode().decode())
-                tempTemp = data.get("actTemp")
-                self.actTemp = tempTemp[0:len(tempTemp)-1]
-                self.subActualTemp.setText(self.actTemp)
-                tempHum = data.get("actHum")
-                self.actHum = tempHum[0:len(tempHum)-3]
-                self.subActualHum.setText(self.actHum)
-                tempLight = data.get("actLight")
-                self.actLight = tempLight[0:len(tempLight)-3]
-                self.subActualLight.setText(self.actLight)
-                self.pwmHeater = data.get("pwmHeater")
-            except json.JSONDecodeError:
-                pass
+        try:
+            self.serial.open(QtCore.QIODevice.ReadWrite)
+            while self.serial.canReadLine():
+                buffer = self.serial.readLine().data().decode(errors='ignore')
+                print(buffer)
+                try:
+                    data = json.loads(buffer.encode().decode())
+                    tempTemp = data.get("actTemp")
+                    self.actTemp = tempTemp[0:len(tempTemp)-1]
+                    self.subActualTemp.setText(self.actTemp)
+                    tempHum = data.get("actHum")
+                    self.actHum = tempHum[0:len(tempHum)-3]
+                    self.subActualHum.setText(self.actHum)
+                    tempLight = data.get("actLight")
+                    self.actLight = tempLight[0:len(tempLight)-3]
+                    self.subActualLight.setText(self.actLight)
+                    self.pwmHeater = data.get("pwmHeater")
+                except json.JSONDecodeError:
+                    pass
+        except:
+            print("Failed receiving data from MCU")
 
 #initialize app
 QtWidgets.QApplication.setStyle("fussion")
