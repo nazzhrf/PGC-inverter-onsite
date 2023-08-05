@@ -431,7 +431,18 @@ class UI(QMainWindow):
                     print("Error while receiving SSE:", self.sseRequest.errorString())
             except:
                 print("Failed Receiving Data from SSE")
-    
+
+        def refreshSSEConnection(self):
+        try:
+            if self.sseRequest is not None:
+                self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
+                self.sseRequest.deleteLater()  # Clean up the request object
+                print("Previous SSE Connection disconnected")
+            print("Refreshing SSE connection...")
+            self.subscribeSSE()
+        except:
+            print("Failed refresh SSE connection")
+
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
@@ -470,18 +481,6 @@ class UI(QMainWindow):
                         self.setpointLightNight.setText(self.SPLightNight)
         except:
             print("Error on reading live data from Cloud")
-
-    def refreshSSEConnection(self):
-        try:
-            if self.sseRequest is not None:
-                self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
-                self.sseRequest.deleteLater()  # Clean up the request object
-                print("Previous SSE Connection disconnected")
-            print("Refreshing SSE connection...")
-            self.subscribeSSE()
-        except:
-            print("Failed refresh SSE connection")
-        
     
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
