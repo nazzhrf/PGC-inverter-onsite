@@ -21,7 +21,7 @@ import os.path
 import subprocess
 import os
 
-#comment this if not needed
+#comment this if make script error
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
@@ -30,6 +30,25 @@ class UI(QMainWindow):
         uic.loadUi("UI/main.ui", self)
         
         self._manager = QtNetwork.QNetworkAccessManager()
+
+        #variable for chamber identifier
+        self.deviceId = "3"
+        self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
+        
+        #variable for server related
+        self.baseUrl = 'https://api.smartfarm.id'
+        
+        #variable for devices related
+        self.portUART = '/dev/ttyAMA0'
+        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
+        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
+        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
+
+        #server endpoint
+        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
+        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
+        self.urlPostCondToDB = self.baseUrl + '/condition/create'
+        self.urlPostPhoto = self.baseUrl + '/file/kamera'
         
         #hardware parameter
         self.mode = "auto"
@@ -72,21 +91,6 @@ class UI(QMainWindow):
         
         #boolean variable
         self.lastMinuteTouch = (time.localtime()).tm_min
-
-        #camera devices
-        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
-        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
-        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
-
-        #variable for chamber identifier
-        self.deviceId = "3"
-        self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
-        self.baseUrl = 'https://api.smartfarm.id'
-        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
-        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
-        self.urlPostCondToDB = self.baseUrl + '/condition/create'
-        self.urlPostPhoto = self.baseUrl + '/file/kamera'
-        self.portUART = '/dev/ttyAMA0'
 
         #variable for photo
         self.pathTopPhoto = 'Image/top_chamber' + self.deviceId + '.png'
