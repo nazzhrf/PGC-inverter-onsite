@@ -30,8 +30,6 @@ class UI(QMainWindow):
         super(UI, self).__init__()
         uic.loadUi("UI/main.ui", self)
         
-        self._manager = QtNetwork.QNetworkAccessManager()
-
         #variable for chamber identifier
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
@@ -40,7 +38,7 @@ class UI(QMainWindow):
         self.baseUrl = 'https://api.smartfarm.id'
         
         #variable for devices related
-        self.portUART = '/dev/ttyAMA0'
+        self.portUART = '/dev/ttyS0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
@@ -53,9 +51,9 @@ class UI(QMainWindow):
         
         #hardware parameter
         self.mode = "auto"
-        self.actTemp = "0"
-        self.actHum = "0"
-        self.actLight = "0"
+        self.actTemp = ""
+        self.actHum = ""
+        self.actLight = ""
         self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
@@ -385,8 +383,11 @@ class UI(QMainWindow):
     class SSEThread(threading.Thread):
         def __init__(self, url_get_live_setpoint, signal):
             super().__init__()
+            self._manager = QNetworkAccessManager()
             self.signal = signal
             self.refresh_timer = None
+            self.sseManager = None
+            self.sseRequest = None
             self.url_get_live_setpoint = url_get_live_setpoint
 
         def run(self):
