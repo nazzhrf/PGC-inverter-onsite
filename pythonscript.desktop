@@ -1,4 +1,4 @@
 [Desktop Entry]
 Type=Application
 Name=Main
-Exec=/usr/bin/python3 -c "import subprocess, time; main_process=None; while True: subprocess.run(['/usr/bin/python3', '/home/pi/main.py']); if main_process: main_process.terminate(); main_process = subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']); time.sleep(3600)"
+Exec=/usr/bin/python3 /home/pi/run-scheduled.py
