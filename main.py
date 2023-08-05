@@ -20,7 +20,6 @@ import cv2
 import os.path
 import subprocess
 import os
-import threading
 
 #comment this if make script error
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
@@ -30,6 +29,8 @@ class UI(QMainWindow):
         super(UI, self).__init__()
         uic.loadUi("UI/main.ui", self)
         
+        self._manager = QtNetwork.QNetworkAccessManager()
+
         #variable for chamber identifier
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
@@ -38,7 +39,7 @@ class UI(QMainWindow):
         self.baseUrl = 'https://api.smartfarm.id'
         
         #variable for devices related
-        self.portUART = '/dev/ttyS0'
+        self.portUART = '/dev/ttyAMA0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
@@ -361,6 +362,11 @@ class UI(QMainWindow):
         self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
         self.updatePhotoTimer.start(5000)
 
+        # Start the timer for SSE connection refresh
+        self.sseRefreshTimer = QtCore.QTimer()
+        self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
+        self.sseRefreshTimer.start(60000)
+        
         #camera scheduling
         self.sendPhotoTopTimer = QtCore.QTimer()
         self.sendPhotoTopTimer.timeout.connect(lambda:self.sendPhotoTop())
@@ -377,79 +383,45 @@ class UI(QMainWindow):
         except:
             print("Serial UART port not available")
 
-        self.sse_thread = self.SSEThread(self.urlGetLiveSetpoint, self.readLiveSetPointFromCloud)
-        self.sse_thread.start()
+        # Start the SSE connection
+        self.subscribeSSE()
 
-    class SSEThread(threading.Thread):
-        def __init__(self, url_get_live_setpoint, signal):
-            super().__init__()
-            self._manager = QNetworkAccessManager()
-            self.signal = signal
-            self.refresh_timer = None
-            self.sseManager = None
-            self.sseRequest = None
-            self.url_get_live_setpoint = url_get_live_setpoint
-
-        def run(self):
-            while True:
-                self.subscribeSSE()
-
-        def subscribeSSE(self):
-            try:
-                if self.sseManager is not None:
-                    self.sseManager.deleteLater()
-                self.sseManager = QNetworkAccessManager()
-                url = QUrl(self.url_get_live_setpoint)
-                request = QNetworkRequest(url)
-                request.setRawHeader(b"Cache-Control", b"no-cache")
-                request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
-                self.sseRequest = self.sseManager.get(request)
-                print("Connected to SSE Server")
-                self.sseRequest.readyRead.connect(self.onSSEDataReady)
-                self.start_refresh_timer(60)  # Interval of 60 second
-            except:
-                print("Failed connect to SSE Server")
-        
-        def start_refresh_timer(self, interval):
-            self.refresh_timer = threading.Timer(interval, self.refreshSSEConnection)
-            self.refresh_timer.start()
-
-        def stop_refresh_timer(self):
-            if self.refresh_timer:
-                self.refresh_timer.cancel()
-        
-        def onSSEDataReady(self):
-            try:
-                if self.sseRequest.error() == QNetworkReply.NoError:
-                    data = self.sseRequest.readAll().data().decode(errors='ignore')
-                    if data:
-                        try:
-                            json_start_idx = data.find("{")
-                            if json_start_idx != -1:
-                                json_str = data[json_start_idx:]
-                                data_json = json.loads(json_str)
-                                print("Received SSE data:", data_json)
-                                self.signal.emit(data_json)
-                        except json.JSONDecodeError as e:
-                            print("Error while decoding JSON data:", e)
-                    else:
-                        print("Empty data received from SSE.")
+    def subscribeSSE(self):
+        try:
+            if self.sseManager is not None:
+                self.sseManager.deleteLater()
+            self.sseManager = QNetworkAccessManager()
+            url = QUrl(self.urlGetLiveSetpoint)
+            request = QNetworkRequest(url)
+            request.setRawHeader(b"Cache-Control", b"no-cache")
+            request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
+            self.sseRequest = self.sseManager.get(request)
+            print("Connected to SSE Server")
+            self.sseRequest.readyRead.connect(self.onSSEDataReady)
+        except:
+            print("Failed connect to SSE Server")
+    
+    def onSSEDataReady(self):
+        try:
+            if self.sseRequest.error() == QNetworkReply.NoError:
+                data = self.sseRequest.readAll().data().decode(errors='ignore')
+                if data:
+                    try:
+                        json_start_idx = data.find("{")
+                        if json_start_idx != -1:
+                            json_str = data[json_start_idx:]
+                            data_json = json.loads(json_str)
+                            print("Received SSE data:", data_json)
+                            self.readLiveSetPointFromCloud(data_json)
+                    except json.JSONDecodeError as e:
+                        print("Error while decoding JSON data:", e)
                 else:
-                    print("Error while receiving SSE:", self.sseRequest.errorString())
-            except:
-                print("Failed Receiving Data from SSE")
-
-        def refreshSSEConnection(self):
-            try:
-                if self.sseRequest is not None:
-                    self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
-                    self.sseRequest.deleteLater()  # Clean up the request object
-                    print("Previous SSE Connection disconnected")
-                print("Refreshing SSE connection...")
-                self.subscribeSSE()
-            except:
-                print("Failed refresh SSE connection")
-
+                    print("Empty data received from SSE.")
+            else:
+                print("Error while receiving SSE:", self.sseRequest.errorString())
+        except:
+            print("Failed Receiving Data from SSE")
+    
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
@@ -488,6 +460,18 @@ class UI(QMainWindow):
                         self.setpointLightNight.setText(self.SPLightNight)
         except:
             print("Error on reading live data from Cloud")
+
+    def refreshSSEConnection(self):
+        try:
+            if self.sseRequest is not None:
+                self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
+                self.sseRequest.deleteLater()  # Clean up the request object
+                print("Previous SSE Connection disconnected")
+            print("Refreshing SSE connection...")
+            self.subscribeSSE()
+        except:
+            print("Failed refresh SSE connection")
+        
     
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
