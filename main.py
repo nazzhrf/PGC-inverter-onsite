@@ -379,22 +379,18 @@ class UI(QMainWindow):
         except:
             print("Serial UART port not available")
 
-        self.sse_thread = self.SSEThread(self.readLiveSetPointFromCloud)
+        self.sse_thread = self.SSEThread(self.urlGetLiveSetpoint, self.readLiveSetPointFromCloud)
         self.sse_thread.start()
 
     class SSEThread(threading.Thread):
         def __init__(self, signal):
             super().__init__()
             self.signal = signal
+            self.refresh_timer = None
 
         def run(self):
             while True:
                 self.subscribeSSE()
-                
-                # Start the timer for SSE connection refresh
-                self.sseRefreshTimer = QtCore.QTimer()
-                self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
-                self.sseRefreshTimer.start(60000)
 
         def subscribeSSE(self):
             try:
@@ -408,8 +404,17 @@ class UI(QMainWindow):
                 self.sseRequest = self.sseManager.get(request)
                 print("Connected to SSE Server")
                 self.sseRequest.readyRead.connect(self.onSSEDataReady)
+                self.start_refresh_timer(60)  # Interval of 60 second
             except:
                 print("Failed connect to SSE Server")
+        
+        def start_refresh_timer(self, interval):
+            self.refresh_timer = threading.Timer(interval, self.refreshSSEConnection)
+            self.refresh_timer.start()
+
+        def stop_refresh_timer(self):
+            if self.refresh_timer:
+                self.refresh_timer.cancel()
         
         def onSSEDataReady(self):
             try:
@@ -433,15 +438,15 @@ class UI(QMainWindow):
                 print("Failed Receiving Data from SSE")
 
         def refreshSSEConnection(self):
-        try:
-            if self.sseRequest is not None:
-                self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
-                self.sseRequest.deleteLater()  # Clean up the request object
-                print("Previous SSE Connection disconnected")
-            print("Refreshing SSE connection...")
-            self.subscribeSSE()
-        except:
-            print("Failed refresh SSE connection")
+            try:
+                if self.sseRequest is not None:
+                    self.sseRequest.abort()  # Abort the ongoing request, disconnecting from the previous connection
+                    self.sseRequest.deleteLater()  # Clean up the request object
+                    print("Previous SSE Connection disconnected")
+                print("Refreshing SSE connection...")
+                self.subscribeSSE()
+            except:
+                print("Failed refresh SSE connection")
 
     #function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
