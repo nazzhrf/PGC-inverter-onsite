@@ -53,9 +53,9 @@ class UI(QMainWindow):
         
         #hardware parameter
         self.mode = "auto"
-        self.actTemp = ""
-        self.actHum = ""
-        self.actLight = ""
+        self.actTemp = "0"
+        self.actHum = "0"
+        self.actLight = "0"
         self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
@@ -383,10 +383,11 @@ class UI(QMainWindow):
         self.sse_thread.start()
 
     class SSEThread(threading.Thread):
-        def __init__(self, signal):
+        def __init__(self, url_get_live_setpoint, signal):
             super().__init__()
             self.signal = signal
             self.refresh_timer = None
+            self.url_get_live_setpoint = url_get_live_setpoint
 
         def run(self):
             while True:
@@ -397,7 +398,7 @@ class UI(QMainWindow):
                 if self.sseManager is not None:
                     self.sseManager.deleteLater()
                 self.sseManager = QNetworkAccessManager()
-                url = QUrl(self.urlGetLiveSetpoint)
+                url = QUrl(self.url_get_live_setpoint)
                 request = QNetworkRequest(url)
                 request.setRawHeader(b"Cache-Control", b"no-cache")
                 request.setAttribute(QNetworkRequest.CacheLoadControlAttribute, QNetworkRequest.AlwaysNetwork)
