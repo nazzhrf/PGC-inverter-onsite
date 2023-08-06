@@ -73,6 +73,7 @@ class UI(QMainWindow):
             self.actTemp = lines[0].strip()
             self.actHum = lines[1].strip()
             self.actLight = lines[2].strip()
+            print("Success get last actual data")
         
         #day or night parameter
         self.SPTempDay = "27"
@@ -387,8 +388,6 @@ class UI(QMainWindow):
         #wired serial to hardware
         try:
             self.serial = QtSerialPort.QSerialPort(self.portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
-            if not self.serial.isOpen():
-                self.serial.open(QtCore.QIODevice.ReadWrite)
         except:
             print("Serial UART port not available")
 
@@ -1417,6 +1416,7 @@ class UI(QMainWindow):
             }
             payloadMCU = str.encode(json.dumps(data_json)+'\n')
             print(payloadMCU)
+            self.serial.open(QtCore.QIODevice.ReadWrite)
             self.serial.write(payloadMCU)
             print("Data sent to MCU")
         except:
