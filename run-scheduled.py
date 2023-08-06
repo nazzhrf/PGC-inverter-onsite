@@ -19,6 +19,7 @@ def restart_main():
                 main_process.terminate()
                 main_process.wait()  # Wait for the process to terminate gracefully
                 print("Main program terminated")
+            time.sleep(1)
             main_process = run_main()
             print("Main program restarted")
             prev_hour = current_hour
