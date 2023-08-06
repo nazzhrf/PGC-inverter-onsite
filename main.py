@@ -1337,6 +1337,7 @@ class UI(QMainWindow):
                 'Content-Type': 'application/json',
                 'device_key': self.deviceKey,
             }
+            print(data_json)
             response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
             print("Live Data sent to Cloud")
         except (requests.ConnectionError, requests.Timeout) as exception:
@@ -1356,16 +1357,18 @@ class UI(QMainWindow):
                 "gateway_temp": f"{cpu_temp:.2f}"
             }
             if self.actTemp != "":
-                data_json["temperature"] = float(self.actTemp)
+                data["temperature"] = float(self.actTemp)
             if self.actHum != "":
-                data_json["humidity"] = float(self.actHum)
+                data["humidity"] = float(self.actHum)
             if self.actLight != "":
-                data_json["intensity"] = float(self.actLight)
+                data["intensity"] = float(self.actLight)
             header = {
                 'Content-Type': 'application/json',
                 'device_key': self.deviceKey,
             }
+            print(data)
             response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
+            print("Data sent to Cloud Database")
         except (requests.ConnectionError, requests.Timeout) as exception:
             pass
             print("Send data to database cloud failed")
