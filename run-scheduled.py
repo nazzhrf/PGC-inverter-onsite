@@ -25,6 +25,7 @@ def restart_main():
         
         # reboot device at 00:00
         if (current_hour == 0 or current_hour == 24) and current_minute == 0:
+            print("Device will reboot on 30 seconds..")
             time.sleep(30) # sleep 30 seconds before reboot device
             subprocess.run(['sudo', 'reboot'])
 
