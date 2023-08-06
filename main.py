@@ -1386,7 +1386,7 @@ class UI(QMainWindow):
                 'device_key': self.deviceKey,
             }
             print(data)
-            response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data))
+            response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data), timeout=10)
             print("Data sent to Cloud Database")
         except (requests.ConnectionError, requests.Timeout) as exception:
             pass
@@ -1443,7 +1443,7 @@ class UI(QMainWindow):
                 header = {
                     'device_key': self.deviceKey,
                 }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
                 print("Successfully sent Top Photo")
             except:
                 print("Failed sent Top Photo")
@@ -1470,7 +1470,7 @@ class UI(QMainWindow):
                 header = {
                     'device_key': self.deviceKey,
                 }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
                 print("Successfully sent Bottom Photo")
             except:
                 print("Failed sent Bottom Photo")
@@ -1497,7 +1497,7 @@ class UI(QMainWindow):
                 header = {
                     'device_key': self.deviceKey,
                 }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values)
+                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
                 print(response)
                 print("Successfully sent User Photo")
             except:
