@@ -52,9 +52,9 @@ class UI(QMainWindow):
         
         #hardware parameter
         self.mode = "auto"
-        self.actTemp = ""
-        self.actHum = ""
-        self.actLight = ""
+        self.actTemp = "0"
+        self.actHum = "0"
+        self.actLight = "0"
         self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
