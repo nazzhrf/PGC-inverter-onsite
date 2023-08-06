@@ -1313,6 +1313,7 @@ class UI(QMainWindow):
                 self.SPTemp = self.SPTempNight
                 self.SPHum = self.SPHumNight
                 self.SPLight = self.SPLightNight
+            floatAct
             cpu_temp = self.get_cpu_temperature()
             data_json ={
                 "device_id" : self.deviceId,
@@ -1320,15 +1321,18 @@ class UI(QMainWindow):
                 "SPTemp" : self.SPTemp,
                 "SPHum" : self.SPHum,
                 "SPLight" : self.SPLight,
-                "temperature" : float(self.actTemp) if self.actTemp != "" else None,
-                "humidity" : float(self.actHum) if self.actHum != "" else None,
-                "intensity" : float(self.actLight) if self.actLight != "" else None,
                 "sHeater" : self.manHeater,
                 "sComp" : self.manComp,
                 "sLight" : self.manLight*4,
                 "sHum" : self.manHum,
                 "gateway_temp": f"{cpu_temp:.2f}"
             }
+            if self.actTemp != "":
+                data_json["temperature"] = float(self.actTemp)
+            if self.actHum != "":
+                data_json["humidity"] = float(self.actHum)
+            if self.actLight != "":
+                data_json["intensity"] = float(self.actLight)
             header = {
                 'Content-Type': 'application/json',
                 'device_key': self.deviceKey,
@@ -1345,15 +1349,18 @@ class UI(QMainWindow):
         try:
             cpu_temp = self.get_cpu_temperature()
             data = {
-                "temperature" : float(self.actTemp) if self.actTemp != "" else None,
-                "humidity" : float(self.actHum) if self.actHum != "" else None,
-                "intensity" : float(self.actLight) if self.actLight != "" else None,
                 "device_id" : int(self.deviceId),
                 "SPTemp" : self.SPTemp,
                 "SPHum" : self.SPHum,
                 "SPLight" : self.SPLight,
                 "gateway_temp": f"{cpu_temp:.2f}"
             }
+            if self.actTemp != "":
+                data_json["temperature"] = float(self.actTemp)
+            if self.actHum != "":
+                data_json["humidity"] = float(self.actHum)
+            if self.actLight != "":
+                data_json["intensity"] = float(self.actLight)
             header = {
                 'Content-Type': 'application/json',
                 'device_key': self.deviceKey,
