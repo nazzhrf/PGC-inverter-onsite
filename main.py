@@ -64,6 +64,15 @@ class UI(QMainWindow):
         self.manComp = False
         self.manHum = False
         self.manLight = 0
+
+        #get last actual data if exist
+        lastActualDataFilename = "Data/Last_Actual_Data.csv"
+        if (os.path.exists(lastActualDataFilename) == True):
+            with open(lastActualDataFilename, "r") as file:
+                lines = file.readlines()
+            self.actTemp = lines[0].strip()
+            self.actHum = lines[1].strip()
+            self.actLight = lines[2].strip()
         
         #day or night parameter
         self.SPTempDay = "27"
@@ -1283,6 +1292,17 @@ class UI(QMainWindow):
         except:
             print("Failed save data to local file as excel")
     
+    #function for save last actual data
+    def saveActualDataToLocalFile(self):
+        try:
+            data_local = str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight)
+            dbFilename = "Data/Last_Actual_Data.csv"
+            with open(dbFilename, "w") as f:
+                f.write(data_local)
+            print("Data saved to local file (" + dbFilename + ")")
+        except:
+            print("Failed save data to local file as excel")
+    
     #function for checking duration from last touch
     def checkLastTouch(self):
         currentTouch = (time.localtime()).tm_min
@@ -1505,6 +1525,7 @@ class UI(QMainWindow):
                     self.actLight = tempLight[0:len(tempLight)-3]
                     self.subActualLight.setText(self.actLight)
                     self.pwmHeater = data.get("pwmHeater")
+                    self.saveActualDataToLocalFile()
                 except json.JSONDecodeError:
                     pass
         except:
