@@ -52,9 +52,9 @@ class UI(QMainWindow):
         
         #hardware parameter
         self.mode = "auto"
-        self.actTemp = "0"
-        self.actHum = "0"
-        self.actLight = "0"
+        self.actTemp = ""
+        self.actHum = ""
+        self.actLight = ""
         self.SPTemp = "27"
         self.SPHum = "70"
         self.SPLight = "4000"
@@ -1320,9 +1320,9 @@ class UI(QMainWindow):
                 "SPTemp" : self.SPTemp,
                 "SPHum" : self.SPHum,
                 "SPLight" : self.SPLight,
-                "temperature" : float(self.actTemp),
-                "humidity" : float(self.actHum),
-                "intensity" : float(self.actLight),
+                "temperature" : float(self.actTemp) if self.actTemp != "" else None,
+                "humidity" : float(self.actHum) if self.actHum != "" else None,
+                "intensity" : float(self.actLight) if self.actLight != "" else None,
                 "sHeater" : self.manHeater,
                 "sComp" : self.manComp,
                 "sLight" : self.manLight*4,
@@ -1345,9 +1345,9 @@ class UI(QMainWindow):
         try:
             cpu_temp = self.get_cpu_temperature()
             data = {
-                "temperature" : float(self.actTemp),
-                "humidity" : float(self.actHum),
-                "intensity" : float(self.actLight),
+                "temperature" : float(self.actTemp) if self.actTemp != "" else None,
+                "humidity" : float(self.actHum) if self.actHum != "" else None,
+                "intensity" : float(self.actLight) if self.actLight != "" else None,
                 "device_id" : int(self.deviceId),
                 "SPTemp" : self.SPTemp,
                 "SPHum" : self.SPHum,
