@@ -2,7 +2,18 @@ import subprocess
 import time
 
 def run_main():
-    return subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']) #run on GUI
+    return subprocess.Popen(['xvfb-run', '-a', '/usr/bin/python3', '/home/pi/main.py']) # run headless on terminal using xvfb
+    #return subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']) #run on GUI
+
+def get_pid_by_command(command):
+    try:
+        result = subprocess.check_output(['pgrep', '-f', command])
+        pid_list = result.decode('utf-8').strip().split('\n')
+        pid_list = [int(pid) for pid in pid_list]
+        pid_list.sort(reverse=True)  # Sort the PID list in descending order
+        return pid_list[0]
+    except subprocess.CalledProcessError:
+        return None
 
 def restart_main():
     main_process = run_main()
@@ -16,8 +27,8 @@ def restart_main():
         # restart main program every hour
         if (current_hour - prev_hour) >= 1:
             if main_process is not None:
-                main_process.terminate()
-                main_process.wait()  # Wait for the process to terminate gracefully
+                pid = get_pid_by_command('python3')
+                subprocess.run(["kill", "-9", str(pid)])
                 print("Main program terminated")
             time.sleep(1)
             main_process = run_main()

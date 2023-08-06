@@ -1357,7 +1357,7 @@ class UI(QMainWindow):
                 'device_key': self.deviceKey,
             }
             print(data_json)
-            response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json))
+            response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json), timeout=10)
             print("Live Data sent to Cloud")
         except (requests.ConnectionError, requests.Timeout) as exception:
             pass
