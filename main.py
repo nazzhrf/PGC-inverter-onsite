@@ -342,6 +342,7 @@ class UI(QMainWindow):
             self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
             self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
 
+    # create sse connection
     def subscribeSSE(self):
         try:
             if self.sseManager is not None:
@@ -357,6 +358,7 @@ class UI(QMainWindow):
         except:
             print("Failed connect to SSE Server")
     
+    # function to handle any received event sse from cloud
     def onSSEDataReady(self):
         try:
             if self.sseRequest.error() == QNetworkReply.NoError:
@@ -378,7 +380,7 @@ class UI(QMainWindow):
         except:
             print("Failed Receiving Data from SSE")
     
-    # function to read live setpoint data from cloud
+    # function to parse live data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
         try:
@@ -417,6 +419,7 @@ class UI(QMainWindow):
         except:
             print("Error on reading live data from Cloud")
 
+    # function to refresh sse connection
     def refreshSSEConnection(self):
         try:
             if self.sseRequest is not None:
