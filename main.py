@@ -758,68 +758,68 @@ class UI(QMainWindow):
 
     # send current live data in hardware to cloud
     def sendDataCloud(self) :
-        try:
-            if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-                self.SPTemp = self.SPTempDay
-                self.SPHum = self.SPHumDay
-                self.SPLight = self.SPLightDay
-            else:
-                self.SPTemp = self.SPTempNight
-                self.SPHum = self.SPHumNight
-                self.SPLight = self.SPLightNight
-            cpu_temp = self.get_cpu_temperature()
-            data_json ={
-                "device_id" : self.deviceId,
-                "mode" : self.mode,
-                "SPTemp" : self.SPTemp,
-                "SPHum" : self.SPHum,
-                "SPLight" : self.SPLight,
-                "gateway_temp": f"{cpu_temp:.2f}"
-            }
-            if self.actTemp != "":
-                data_json["temperature"] = float(self.actTemp)
-            if self.actHum != "":
-                data_json["humidity"] = float(self.actHum)
-            if self.actLight != "":
-                data_json["intensity"] = float(self.actLight)
-            header = {
-                'Content-Type': 'application/json',
-                'device_key': self.deviceKey,
-            }
-            print(data_json)
-            response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json), timeout=10)
-            print("Live Data sent to Cloud")
-        except (requests.ConnectionError, requests.Timeout) as exception:
-            pass
-            print("Failed sent Live Data to Cloud")
+        if (self.actTemp != "") or (self.actHum != "") or (self.actLight != ""):
+            try:
+                if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+                    self.SPTemp = self.SPTempDay
+                    self.SPHum = self.SPHumDay
+                    self.SPLight = self.SPLightDay
+                else:
+                    self.SPTemp = self.SPTempNight
+                    self.SPHum = self.SPHumNight
+                    self.SPLight = self.SPLightNight
+                cpu_temp = self.get_cpu_temperature()
+                data_json ={
+                    "device_id" : self.deviceId,
+                    "mode" : self.mode,
+                    "temperature": float(self.actTemp),
+                    "humidity": float(self.actHum),
+                    "intensity": float(self.actLight),
+                    "SPTemp" : self.SPTemp,
+                    "SPHum" : self.SPHum,
+                    "SPLight" : self.SPLight,
+                    "gateway_temp": f"{cpu_temp:.2f}"
+                }
+                header = {
+                    'Content-Type': 'application/json',
+                    'device_key': self.deviceKey,
+                }
+                print(data_json)
+                response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json), timeout=10)
+                print("Live Data sent to Cloud")
+            except (requests.ConnectionError, requests.Timeout) as exception:
+                pass
+                print("Failed sent Live Data to Cloud")
+        else:
+            print("Skip send live data to cloud since any var with null value")
 
     # send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
-        try:
-            cpu_temp = self.get_cpu_temperature()
-            data = {
-                "device_id" : int(self.deviceId),
-                "SPTemp" : self.SPTemp,
-                "SPHum" : self.SPHum,
-                "SPLight" : self.SPLight,
-                "gateway_temp": f"{cpu_temp:.2f}"
-            }
-            if self.actTemp != "":
-                data["temperature"] = float(self.actTemp)
-            if self.actHum != "":
-                data["humidity"] = float(self.actHum)
-            if self.actLight != "":
-                data["intensity"] = float(self.actLight)
-            header = {
-                'Content-Type': 'application/json',
-                'device_key': self.deviceKey,
-            }
-            print(data)
-            response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data), timeout=10)
-            print("Data sent to Cloud Database")
-        except (requests.ConnectionError, requests.Timeout) as exception:
-            pass
-            print("Send data to database cloud failed")
+        if (self.actTemp != "") or (self.actHum != "") or (self.actLight != ""):
+            try:
+                cpu_temp = self.get_cpu_temperature()
+                data = {
+                    "device_id" : int(self.deviceId),
+                    "temperature": float(self.actTemp),
+                    "humidity": float(self.actHum),
+                    "intensity": float(self.actLight),
+                    "SPTemp" : self.SPTemp,
+                    "SPHum" : self.SPHum,
+                    "SPLight" : self.SPLight,
+                    "gateway_temp": f"{cpu_temp:.2f}",
+                }
+                header = {
+                    'Content-Type': 'application/json',
+                    'device_key': self.deviceKey,
+                }
+                print(data)
+                response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data), timeout=10)
+                print("Data sent to Cloud Database")
+            except (requests.ConnectionError, requests.Timeout) as exception:
+                pass
+                print("Send data to database cloud failed")
+        else:
+            print("Skip send data to database since any var with null value")
 
     # function for sending data to hardware
     def sendDataMCU(self):
