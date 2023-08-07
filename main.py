@@ -68,12 +68,15 @@ class UI(QMainWindow):
         #get last actual data if exist
         lastActualDataFilename = "Data/Last_Actual_Data.csv"
         if (os.path.exists(lastActualDataFilename) == True):
-            with open(lastActualDataFilename, "r") as file:
-                lines = file.readlines()
-            self.actTemp = lines[0].strip()
-            self.actHum = lines[1].strip()
-            self.actLight = lines[2].strip()
-            print("Success get last actual data")
+            try:
+                with open(lastActualDataFilename, "r") as file:
+                    lines = file.readlines()
+                self.actTemp = lines[0].strip()
+                self.actHum = lines[1].strip()
+                self.actLight = lines[2].strip()
+                print("Success get last actual data")
+            except:
+                print("Failed get last actual data")
         
         #day or night parameter
         self.SPTempDay = "27"
@@ -249,9 +252,9 @@ class UI(QMainWindow):
         
         #behaviour on dashboard page
         self.shutdownButton.clicked.connect(lambda:self.shutdownButton_clicked())
-        self.toTempPageButton.clicked.connect(lambda:self.toTempPageButton_clicked())
-        self.toHumPageButton.clicked.connect(lambda:self.toHumPageButton_clicked())
-        self.toLightPageButton.clicked.connect(lambda:self.toLightPageButton_clicked())
+        self.toTempPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.tempPage))
+        self.toHumPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.humPage))
+        self.toLightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.lightPage))
         
         #behaviour on temp page
         self.manualTempButton.stateChanged.connect(lambda:self.manualTempButton_clicked())
@@ -272,7 +275,7 @@ class UI(QMainWindow):
         self.zeroButtonTemp.clicked.connect(lambda:self.zeroButtonTemp_clicked())
         self.delButtonTemp.clicked.connect(lambda:self.delButtonTemp_clicked())
         self.commaButtonTemp.clicked.connect(lambda:self.commaButtonTemp_clicked())
-        self.backFromTemp.clicked.connect(lambda:self.backFromTemp_clicked())
+        self.backFromTemp.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         #behaviour on hum page
         self.manualHumButton.stateChanged.connect(lambda:self.manualHumButton_clicked())
@@ -292,7 +295,7 @@ class UI(QMainWindow):
         self.zeroButtonHum.clicked.connect(lambda:self.zeroButtonHum_clicked())
         self.delButtonHum.clicked.connect(lambda:self.delButtonHum_clicked())
         self.commaButtonHum.clicked.connect(lambda:self.commaButtonHum_clicked())
-        self.backFromHum.clicked.connect(lambda:self.backFromHum_clicked())
+        self.backFromHum.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         #behaviour on light page
         self.manualLightButton.stateChanged.connect(lambda:self.manualLightButton_clicked())
@@ -312,13 +315,8 @@ class UI(QMainWindow):
         self.zeroButtonLight.clicked.connect(lambda:self.zeroButtonLight_clicked())
         self.delButtonLight.clicked.connect(lambda:self.delButtonLight_clicked())
         self.commaButtonLight.clicked.connect(lambda:self.commaButtonLight_clicked())
-        self.backFromLight.clicked.connect(lambda:self.backFromLight_clicked())
+        self.backFromLight.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
-        #behaviour on photo page
-        self.backFromCamera.clicked.connect(lambda:self.backFromCamera_clicked())
-        self.subTakePhoto.clicked.connect(lambda:self.sendPhotoTop())
-        self.subTakePhoto.clicked.connect(lambda:self.sendPhotoBottom())
-
         #check user behaviour
         self.toPhotoPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
@@ -442,7 +440,6 @@ class UI(QMainWindow):
             self.subscribeSSE()
         except:
             print("Failed refresh SSE connection")
-        
     
     #function to change fullscreen status
     def fullscreenButton_clicked(self):
@@ -453,35 +450,13 @@ class UI(QMainWindow):
             self.showFullScreen()
             self.fullscreenButton.setText("↙")
 
-    #function for moving to temp page
-    def toTempPageButton_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.tempPage)
-
+    # function for moving page by click any button
+    def buttonToPage_clicked(self, destinationPage):
+        self.stackedWidget.setCurrentWidget(destinationPage)
+    
     #function for shutdown raspberry
     def shutdownButton_clicked(self):
         os.system("sudo shutdown -h now")
-
-    #function for moving to hum page
-    def toHumPageButton_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.humPage)
-
-    #function for moving to light page
-    def toLightPageButton_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.lightPage)
-
-    #function for moving to photo page
-    def toPhotoPageButton_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.photoPage)
-
-    #function for moving to dashboard page
-    def backFromTemp_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.dashboardPage)
-    def backFromHum_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.dashboardPage)
-    def backFromLight_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.dashboardPage)
-    def backFromCamera_clicked(self):
-        self.stackedWidget.setCurrentWidget(self.dashboardPage)
 
     #function if all manual button is clicked    
     def manualTempButton_clicked(self):
@@ -670,6 +645,7 @@ class UI(QMainWindow):
             self.coolerButton.setEnabled(True)
             self.humidifierButton.setEnabled(True)
             self.lightSlider.setEnabled(True)
+            self.tempButton.setEnabled(False)
             self.humButton.setEnabled(False)
             self.lightButton.setEnabled(False)
             self.oneButtonTemp.setEnabled(False)
