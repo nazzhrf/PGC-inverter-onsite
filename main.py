@@ -15,56 +15,49 @@ import sseclient, sys, time, json, requests, cv2, os, subprocess
 
 class UI(QMainWindow):
     def __init__(self):
-        super(UI, self).__init__()
-        uic.loadUi("UI/main.ui", self)
-        
-        # variable for chamber identifier
+        # variable for chamber identifier or device related
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
-        
-        # variable for server related
-        self.baseUrl = 'https://api.smartfarm.id'
-        
-        # variable for devices related
         self.portUART = '/dev/ttyS0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
-
-        # server endpoint
+        
+        # variable for server related
+        self.baseUrl = 'https://api.smartfarm.id'
         self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
         self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
-        
+
         # hardware parameter
         self.mode = "auto"
-        self.actTemp = ""
-        self.actHum = ""
-        self.actLight = ""
-        self.SPTemp = "27"
-        self.SPHum = "70"
-        self.SPLight = "4000"
-        self.pwmHeater = 0
-        self.pwmFan = 0
-        self.manHeater = False
-        self.manComp = False
-        self.manHum = False
-        self.manLight = 0
+        self.pwmHeater, self.pwmFan, self.manLight = 0, 0, 0
+        self.manHeater, self.manComp, self.manHum = False, False, False
+
+        # set actual condition parameter
+        lastActualDataFilename = "Data/Last_Actual_Data.csv"
+        if (os.path.exists(lastActualDataFilename) == True):
+            try:
+                with open(lastActualDataFilename, "r") as file:
+                    lines = file.readlines()
+                self.actTemp = lines[0].strip()
+                self.actHum = lines[1].strip()
+                self.actLight = lines[2].strip()
+                print("Success get last actual data")
+            except:
+                self.actTemp, self.actHum, self.actLight = "", "", ""
+                print("Failed get last actual data")
+
+        # set point parameter
+        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "27", "27", "27"
+        self.SPHum, self.SPHumDay, self.prevSPHumDay = "70", "70", "70"
+        self.SPLight, self.SPLightDay, self.prevSPLightDay = "4000", "4000", "4000"
+        self.SPTempNight, self.prevSPTempNight = "23", "23"
+        self.SPHumNight, self.prevSPHumNight = "90", "90"
+        self.SPLightNight, self.prevSPLightNight = "0", "0"
 
         # day or night parameter
-        self.SPTempDay = "27"
-        self.SPHumDay = "70"
-        self.SPLightDay = "4000"
-        self.prevSPTempDay = "27"
-        self.prevSPHumDay = "70"
-        self.prevSPLightDay = "4000"
-        self.SPTempNight = "23"
-        self.SPHumNight = "90"
-        self.SPLightNight = "0"
-        self.prevSPTempNight = "23"
-        self.prevSPHumNight = "90"
-        self.prevSPLightNight = "0"
         self.startDay = "6"
         self.startNight = "18"
 
@@ -76,7 +69,7 @@ class UI(QMainWindow):
         self.upLimitSPLight = 15000
         self.bottomLimitSPLight = 0
         
-        # boolean variable
+        # variable for any onsite user touch the screen
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         # variable for photo
@@ -87,8 +80,11 @@ class UI(QMainWindow):
         self.intervalSendUserPhoto = 1
         
         # SSE related variables
-        self.sseManager = None
-        self.sseRequest = None
+        self.sseManager, self.sseRequest = None, None
+
+        # initiate GUI
+        super(UI, self).__init__()
+        uic.loadUi("UI/main.ui", self)
         
         # pages
         self.stackedWidget = self.findChild(QStackedWidget, "stackedWidget")
@@ -188,13 +184,6 @@ class UI(QMainWindow):
         self.commaButtonLight = self.findChild(QPushButton, "buttonCommaLight")
         self.backFromLight = self.findChild(QPushButton, "goDashboardFromLight")
 
-        # camera page element
-        self.cameraTop = self.findChild(QLabel, "cameraTop")
-        self.cameraBottom = self.findChild(QLabel, "cameraBottom")
-        self.cameraUser = self.findChild(QLabel, "cameraUser")
-        self.subTakePhoto = self.findChild(QPushButton, "subTakePhoto")
-        self.backFromCamera = self.findChild(QPushButton, "goDashboardFromCamera")
-
         # initial display
         self.showMaximized()
         self.stackedWidget.setCurrentWidget(self.dashboardPage)
@@ -218,19 +207,6 @@ class UI(QMainWindow):
         # disable toPhotoPage button
         self.toPhotoPageButton.setEnabled(False)
 
-        # get last actual data if exist
-        lastActualDataFilename = "Data/Last_Actual_Data.csv"
-        if (os.path.exists(lastActualDataFilename) == True):
-            try:
-                with open(lastActualDataFilename, "r") as file:
-                    lines = file.readlines()
-                self.actTemp = lines[0].strip()
-                self.actHum = lines[1].strip()
-                self.actLight = lines[2].strip()
-                print("Success get last actual data")
-            except:
-                print("Failed get last actual data")
-        
         # behaviour on central widget
         self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
@@ -318,15 +294,14 @@ class UI(QMainWindow):
             timer.timeout.connect(slot)
             timer.start(interval)
             return timer
-
         self.sendDataCloudTimer = createQTimer(self.sendDataCloud, 10010) # send data to cloud scheduling
-        self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 1770000) # send data to DB in cloud scheduling
+        self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 1750000) # send data to DB in cloud scheduling
         self.saveDataToLocalFileTimer = createQTimer(self.saveDataToLocalFile, 120000) # save data to local file scheduling
         self.updateTimeTimer = createQTimer(self.updateTime, 500) # update time scheduling
         self.updateActualDataDisplayTimer = createQTimer(self.updateActualDataDisplay, 10000) # update actual data display scheduling
         self.sendDataMCUTimer = createQTimer(self.sendDataMCU, 5000) # send data to mcu scheduling
-        self.updatePhotoTimer = createQTimer(self.updatePhoto, 5000) # update photo on onsite UI scheduling
-        self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 60000) # start the timer for SSE connection refresh
+        self.updatePhotoTimer = createQTimer(self.updatePhoto, 2000) # update photo on onsite UI scheduling
+        self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 30000) # start the timer for SSE connection refresh
         
         # wired serial to hardware
         try:
@@ -337,7 +312,7 @@ class UI(QMainWindow):
         # start the SSE connection
         self.subscribeSSE()
 
-        # take photo when program start and when day
+        # take photo when program start and on day
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
             self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
             self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")

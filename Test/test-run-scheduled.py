@@ -2,8 +2,8 @@ import subprocess
 import time
 
 def run_main():
-    #return subprocess.Popen(['xvfb-run', '-a', '/usr/bin/python3', '/home/pi/main.py']) # run headless on terminal using xvfb
-    return subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']) #run on GUI
+    return subprocess.Popen(['xvfb-run', '-a', '/usr/bin/python3', '/home/pi/main.py']) # run headless on terminal using xvfb
+    #return subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']) #run on GUI
 
 def get_pid_by_command(command):
     try:
