@@ -22,7 +22,7 @@ import subprocess
 import os
 
 #comment this if make script error
-os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
+#os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
     def __init__(self):
@@ -39,7 +39,7 @@ class UI(QMainWindow):
         self.baseUrl = 'https://api.smartfarm.id'
         
         #variable for devices related
-        self.portUART = '/dev/ttyAMA0'
+        self.portUART = '/dev/ttyS0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
@@ -327,45 +327,21 @@ class UI(QMainWindow):
         self.toHumPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toLightPageButton.clicked.connect(lambda:self.checkLastTouch())
 
-        #send data to cloud scheduling
-        self.sendDataCloudTimer = QtCore.QTimer()
-        self.sendDataCloudTimer.timeout.connect(lambda:self.sendDataCloud())
-        self.sendDataCloudTimer.start(10010)
-        
-        #send data to DB in cloud scheduling
-        self.sendDataToDBcloudTimer = QtCore.QTimer()
-        self.sendDataToDBcloudTimer.timeout.connect(lambda:self.sendDataToDBcloud())
-        self.sendDataToDBcloudTimer.start(1770000)
-        
-        #save data to local file scheduling
-        self.saveDataToLocalFileTimer = QtCore.QTimer()
-        self.saveDataToLocalFileTimer.timeout.connect(lambda:self.saveDataToLocalFile())
-        self.saveDataToLocalFileTimer.start(120000)
+        #function to create QT timer
+        def createQTimer(slot, interval):
+            timer = QtCore.QTimer()
+            timer.timeout.connect(slot)
+            timer.start(interval)
+            return timer
 
-        #update time scheduling
-        self.updateTimeTimer = QtCore.QTimer()
-        self.updateTimeTimer.timeout.connect(lambda:self.updateTime())
-        self.updateTimeTimer.start(500)
-
-        #update actual data display scheduling
-        self.updateActualDataDisplayTimer = QtCore.QTimer()
-        self.updateActualDataDisplayTimer.timeout.connect(lambda:self.updateActualDataDisplay())
-        self.updateActualDataDisplayTimer.start(10000)
-
-         #send data to mcu scheduling
-        self.sendDataMCUTimer = QtCore.QTimer()
-        self.sendDataMCUTimer.timeout.connect(lambda:self.sendDataMCU())
-        self.sendDataMCUTimer.start(5000)
-
-        #update photo home scheduling
-        self.updatePhotoTimer = QtCore.QTimer()
-        self.updatePhotoTimer.timeout.connect(lambda:self.updatePhoto())
-        self.updatePhotoTimer.start(5000)
-
-        # Start the timer for SSE connection refresh
-        self.sseRefreshTimer = QtCore.QTimer()
-        self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
-        self.sseRefreshTimer.start(60000)
+        self.sendDataCloudTimer = createQTimer(self.sendDataCloud, 10010) # send data to cloud scheduling
+        self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 1770000) # send data to DB in cloud scheduling
+        self.saveDataToLocalFileTimer = createQTimer(self.saveDataToLocalFile, 120000) # save data to local file scheduling
+        self.updateTimeTimer = createQTimer(self.updateTime, 500) # update time scheduling
+        self.updateActualDataDisplayTimer = createQTimer(self.updateActualDataDisplay, 10000) # update actual data display scheduling
+        self.sendDataMCUTimer = createQTimer(self.sendDataMCU, 5000) # send data to mcu scheduling
+        self.updatePhotoTimer = createQTimer(self.updatePhoto, 5000) # update photo on onsite UI scheduling
+        self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 60000) # start the timer for SSE connection refresh
         
         #wired serial to hardware
         try:
@@ -1319,7 +1295,6 @@ class UI(QMainWindow):
                 self.SPTemp = self.SPTempNight
                 self.SPHum = self.SPHumNight
                 self.SPLight = self.SPLightNight
-            floatAct
             cpu_temp = self.get_cpu_temperature()
             data_json ={
                 "device_id" : self.deviceId,
