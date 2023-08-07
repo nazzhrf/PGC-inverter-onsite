@@ -223,9 +223,6 @@ class UI(QMainWindow):
         self.stackedWidget.setCurrentWidget(self.dashboardPage)
         self.showFullScreen()
         self.fullscreenButton.setText("↙")
-        #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        #self.cameraBottom.setPixmap(QPixmap(self.pathBottomPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
-        #self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
         self.actualPosition.setText("Top")
         self.actualMode.setText("Current Mode: Auto")
         self.setpointTempDay.setText(self.SPTempDay)
@@ -240,13 +237,6 @@ class UI(QMainWindow):
         self.coolerButton.setEnabled(False)
         self.humidifierButton.setEnabled(False)
         self.lampSlider.setEnabled(False)
-
-        # disable manual mode
-        """
-        self.manualTempButton.setEnabled(False)
-        self.manualHumButton.setEnabled(False)
-        self.manualLightButton.setEnabled(False)
-        """
 
         #disable toPhotoPage button
         self.toPhotoPageButton.setEnabled(False)
@@ -345,7 +335,7 @@ class UI(QMainWindow):
         #send data to DB in cloud scheduling
         self.sendDataToDBcloudTimer = QtCore.QTimer()
         self.sendDataToDBcloudTimer.timeout.connect(lambda:self.sendDataToDBcloud())
-        self.sendDataToDBcloudTimer.start(1800000)
+        self.sendDataToDBcloudTimer.start(2700000)
         
         #save data to local file scheduling
         self.saveDataToLocalFileTimer = QtCore.QTimer()
@@ -377,22 +367,19 @@ class UI(QMainWindow):
         self.sseRefreshTimer.timeout.connect(self.refreshSSEConnection)
         self.sseRefreshTimer.start(60000)
         
-        #camera scheduling
-        self.sendPhotoTopTimer = QtCore.QTimer()
-        self.sendPhotoTopTimer.timeout.connect(lambda:self.sendPhotoTop())
-        self.sendPhotoTopTimer.start(3600000)
-        self.sendPhotoBottomTimer = QtCore.QTimer()
-        self.sendPhotoBottomTimer.timeout.connect(lambda:self.sendPhotoBottom())
-        self.sendPhotoBottomTimer.start(3600000)
-        
         #wired serial to hardware
         try:
             self.serial = QtSerialPort.QSerialPort(self.portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         except:
             print("Serial UART port not available")
 
-        # Start the SSE connection
+        #start the SSE connection
         self.subscribeSSE()
+
+        #take photo when program start and when day
+        if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
+            self.sendPhotoTop()
+            self.sendPhotoBottom()
 
     def subscribeSSE(self):
         try:
