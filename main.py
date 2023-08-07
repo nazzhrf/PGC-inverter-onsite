@@ -335,7 +335,7 @@ class UI(QMainWindow):
         #send data to DB in cloud scheduling
         self.sendDataToDBcloudTimer = QtCore.QTimer()
         self.sendDataToDBcloudTimer.timeout.connect(lambda:self.sendDataToDBcloud())
-        self.sendDataToDBcloudTimer.start(2700000)
+        self.sendDataToDBcloudTimer.start(1770000)
         
         #save data to local file scheduling
         self.saveDataToLocalFileTimer = QtCore.QTimer()
