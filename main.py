@@ -4,7 +4,7 @@ Plant Growth Chamber
 Thesis by Muhammad Arbi Minanda (23220344)
 """
 
-#libraries
+# libraries
 from PyQt5 import QtCore, QtWidgets, QtSerialPort, QtNetwork
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog 
 from PyQt5.QtGui import QPixmap
@@ -21,7 +21,7 @@ import os.path
 import subprocess
 import os
 
-#comment this if make script error
+# comment this if make script error
 #os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
@@ -31,26 +31,26 @@ class UI(QMainWindow):
         
         self._manager = QtNetwork.QNetworkAccessManager()
 
-        #variable for chamber identifier
+        # variable for chamber identifier
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
         
-        #variable for server related
+        # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'
         
-        #variable for devices related
+        # variable for devices related
         self.portUART = '/dev/ttyS0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
 
-        #server endpoint
+        # server endpoint
         self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
         self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
         
-        #hardware parameter
+        # hardware parameter
         self.mode = "auto"
         self.actTemp = ""
         self.actHum = ""
@@ -65,7 +65,7 @@ class UI(QMainWindow):
         self.manHum = False
         self.manLight = 0
 
-        #get last actual data if exist
+        # get last actual data if exist
         lastActualDataFilename = "Data/Last_Actual_Data.csv"
         if (os.path.exists(lastActualDataFilename) == True):
             try:
@@ -78,7 +78,7 @@ class UI(QMainWindow):
             except:
                 print("Failed get last actual data")
         
-        #day or night parameter
+        # day or night parameter
         self.SPTempDay = "27"
         self.SPHumDay = "70"
         self.SPLightDay = "4000"
@@ -94,7 +94,7 @@ class UI(QMainWindow):
         self.startDay = "6"
         self.startNight = "18"
 
-        #set point limiter
+        # set point limiter
         self.upLimitSPTemp = 40
         self.bottomLimitSPTemp = 0
         self.upLimitSPHum = 90
@@ -102,10 +102,10 @@ class UI(QMainWindow):
         self.upLimitSPLight = 15000
         self.bottomLimitSPLight = 0
         
-        #boolean variable
+        # boolean variable
         self.lastMinuteTouch = (time.localtime()).tm_min
 
-        #variable for photo
+        # variable for photo
         self.pathTopPhoto = 'Image/top_chamber' + self.deviceId + '.png'
         self.pathBottomPhoto = 'Image/bottom_chamber' + self.deviceId + '.png'
         self.pathUserPhoto = 'Image/user_chamber' + self.deviceId + '.png'
@@ -116,7 +116,7 @@ class UI(QMainWindow):
         self.sseManager = None
         self.sseRequest = None
         
-        #pages
+        # pages
         self.stackedWidget = self.findChild(QStackedWidget, "stackedWidget")
         self.dashboardPage = self.findChild(QWidget, "dashboardPage")
         self.tempPage = self.findChild(QWidget, "tempPage")
@@ -124,7 +124,7 @@ class UI(QMainWindow):
         self.lightPage = self.findChild(QWidget, "lightPage")
         self.photoPage = self.findChild(QWidget, "photoPage")
         
-        #parent element
+        # parent element
         self.fullscreenButton = self.findChild(QPushButton, "fullscreenButton")
         self.toPhotoPageButton = self.findChild(QPushButton, "toPhotoPage")
         self.shutdownButton = self.findChild(QPushButton, "shutdown")
@@ -133,7 +133,7 @@ class UI(QMainWindow):
         self.actualDate = self.findChild(QLabel, "actualDate")
         self.actualMode = self.findChild(QLabel, "actualMode")
         
-        #dashboard page element
+        # dashboard page element
         self.toTempPageButton = self.findChild(QPushButton, "toTempPage")
         self.toHumPageButton = self.findChild(QPushButton, "toHumPage")
         self.toLightPageButton = self.findChild(QPushButton, "toLightPage")
@@ -144,7 +144,7 @@ class UI(QMainWindow):
         self.actualPosition = self.findChild(QLabel, "actPosition")
         self.takePhoto = self.findChild(QPushButton, "takePhoto")
 
-        #temp page element
+        # temp page element
         self.subActualTemp = self.findChild(QLabel, "subActualTempVal")
         self.manualTempButton = self.findChild(QCheckBox, "manualTempCheckBox")
         self.heaterButton = self.findChild(QCheckBox, "heaterOnOff")
@@ -168,7 +168,7 @@ class UI(QMainWindow):
         self.commaButtonTemp = self.findChild(QPushButton, "buttonCommaTemp")
         self.backFromTemp = self.findChild(QPushButton, "goDashboardFromTemp")
         
-        #hum page element
+        # hum page element
         self.subActualHum = self.findChild(QLabel, "subActualHumVal")
         self.manualHumButton = self.findChild(QCheckBox, "manualHumCheckBox")
         self.humidifierButton = self.findChild(QCheckBox, "humOnOff")
@@ -191,7 +191,7 @@ class UI(QMainWindow):
         self.commaButtonHum = self.findChild(QPushButton, "buttonCommaHum")
         self.backFromHum = self.findChild(QPushButton, "goDashboardFromHum")
 
-        #light page element
+        # light page element
         self.subActualLight = self.findChild(QLabel, "subActualLightVal")
         self.manualLightButton = self.findChild(QCheckBox, "manualLightCheckBox")
         self.lightSlider = self.findChild(QSlider, "lampSlider")
@@ -214,14 +214,14 @@ class UI(QMainWindow):
         self.commaButtonLight = self.findChild(QPushButton, "buttonCommaLight")
         self.backFromLight = self.findChild(QPushButton, "goDashboardFromLight")
 
-        #camera page element
+        # camera page element
         self.cameraTop = self.findChild(QLabel, "cameraTop")
         self.cameraBottom = self.findChild(QLabel, "cameraBottom")
         self.cameraUser = self.findChild(QLabel, "cameraUser")
         self.subTakePhoto = self.findChild(QPushButton, "subTakePhoto")
         self.backFromCamera = self.findChild(QPushButton, "goDashboardFromCamera")
 
-        #initial display
+        # initial display
         self.showMaximized()
         self.stackedWidget.setCurrentWidget(self.dashboardPage)
         self.showFullScreen()
@@ -235,28 +235,28 @@ class UI(QMainWindow):
         self.setpointLightDay.setText(self.SPLightDay)
         self.setpointLightNight.setText(self.SPLightNight)
         
-        #initial state of button
+        # initial state of button
         self.heaterButton.setEnabled(False)
         self.coolerButton.setEnabled(False)
         self.humidifierButton.setEnabled(False)
         self.lampSlider.setEnabled(False)
 
-        #disable toPhotoPage button
+        # disable toPhotoPage button
         self.toPhotoPageButton.setEnabled(False)
         
-        #behaviour on central widget
+        # behaviour on central widget
         self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
-        self.takePhoto.clicked.connect(lambda:self.sendPhotoTop())
-        self.takePhoto.clicked.connect(lambda:self.sendPhotoBottom())
+        self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
+        self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
         
-        #behaviour on dashboard page
+        # behaviour on dashboard page
         self.shutdownButton.clicked.connect(lambda:self.shutdownButton_clicked())
         self.toTempPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.tempPage))
         self.toHumPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.humPage))
         self.toLightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.lightPage))
         
-        #behaviour on temp page
+        # behaviour on temp page
         self.manualTempButton.stateChanged.connect(lambda: self.manualButton_clicked(self.manualTempButton))
         self.dayTempButton.stateChanged.connect(lambda:self.dayTempButton_clicked())
         self.nightTempButton.stateChanged.connect(lambda:self.nightTempButton_clicked())
@@ -277,7 +277,7 @@ class UI(QMainWindow):
         self.commaButtonTemp.clicked.connect(lambda:self.commaButtonTemp_clicked())
         self.backFromTemp.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
-        #behaviour on hum page
+        # behaviour on hum page
         self.manualHumButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualHumButton))
         self.dayHumButton.stateChanged.connect(lambda:self.dayHumButton_clicked())
         self.nightHumButton.stateChanged.connect(lambda:self.nightHumButton_clicked())
@@ -297,7 +297,7 @@ class UI(QMainWindow):
         self.commaButtonHum.clicked.connect(lambda:self.commaButtonHum_clicked())
         self.backFromHum.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
-        #behaviour on light page
+        # behaviour on light page
         self.manualLightButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualLightButton))
         self.dayLightButton.stateChanged.connect(lambda:self.dayLightButton_clicked())
         self.nightLightButton.stateChanged.connect(lambda:self.nightLightButton_clicked())
@@ -317,7 +317,7 @@ class UI(QMainWindow):
         self.commaButtonLight.clicked.connect(lambda:self.commaButtonLight_clicked())
         self.backFromLight.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
-        #check user behaviour
+        # check user behaviour
         self.toPhotoPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
         self.takePhoto.clicked.connect(lambda:self.checkLastTouch())
@@ -325,7 +325,7 @@ class UI(QMainWindow):
         self.toHumPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toLightPageButton.clicked.connect(lambda:self.checkLastTouch())
 
-        #function to create QT timer
+        # function to create QT timer
         def createQTimer(slot, interval):
             timer = QtCore.QTimer()
             timer.timeout.connect(slot)
@@ -341,19 +341,19 @@ class UI(QMainWindow):
         self.updatePhotoTimer = createQTimer(self.updatePhoto, 5000) # update photo on onsite UI scheduling
         self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 60000) # start the timer for SSE connection refresh
         
-        #wired serial to hardware
+        # wired serial to hardware
         try:
             self.serial = QtSerialPort.QSerialPort(self.portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         except:
             print("Serial UART port not available")
 
-        #start the SSE connection
+        # start the SSE connection
         self.subscribeSSE()
 
-        #take photo when program start and when day
+        # take photo when program start and when day
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.sendPhotoTop()
-            self.sendPhotoBottom()
+            self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
+            self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
 
     def subscribeSSE(self):
         try:
@@ -391,14 +391,14 @@ class UI(QMainWindow):
         except:
             print("Failed Receiving Data from SSE")
     
-    #function to read live setpoint data from cloud
+    # function to read live setpoint data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
         try:
             if ("take_photos" in data_json):
-                self.sendPhotoTop()
-                self.sendPhotoBottom()
-                self.sendPhotoUser()
+                self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
+                self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
+                self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -441,7 +441,7 @@ class UI(QMainWindow):
         except:
             print("Failed refresh SSE connection")
     
-    #function to change fullscreen status
+    # function to change fullscreen status
     def fullscreenButton_clicked(self):
         if self.isFullScreen():
             self.showNormal()
@@ -454,7 +454,7 @@ class UI(QMainWindow):
     def buttonToPage_clicked(self, destinationPage):
         self.stackedWidget.setCurrentWidget(destinationPage)
     
-    #function for shutdown raspberry
+    # function for shutdown raspberry
     def shutdownButton_clicked(self):
         os.system("sudo shutdown -h now")
 
@@ -584,7 +584,7 @@ class UI(QMainWindow):
         elif (self.nightLightButton.isChecked() == False):
             self.dayLightButton.setDisabled(False)
 
-    #function if set optimum temp button is clicked
+    # function if set optimum temp button is clicked
     def tempButton_clicked(self):
         if ((float(self.SPTempDay) > self.upLimitSPTemp) or (float(self.SPTempDay) < self.bottomLimitSPTemp) or (float(self.SPTempNight) > self.upLimitSPTemp) or (float(self.SPTempNight) < self.bottomLimitSPTemp)):
             self.SPTempDay = self.prevSPTempDay
@@ -597,7 +597,7 @@ class UI(QMainWindow):
             self.sendDataCloud()
             self.sendDataMCU()
     
-    #function if set optimum hum button is clicked
+    # function if set optimum hum button is clicked
     def humButton_clicked(self):
         if ((float(self.SPHumDay) > self.upLimitSPHum) or (float(self.SPHumDay) < self.bottomLimitSPHum) or (float(self.SPHumNight) > self.upLimitSPHum) or (float(self.SPHumNight) < self.bottomLimitSPHum)):
             self.SPHumDay = self.prevSPHumDay
@@ -610,7 +610,7 @@ class UI(QMainWindow):
             self.sendDataCloud()
             self.sendDataMCU()
 
-    #function if set optimum light button is clicked
+    # function if set optimum light button is clicked
     def lightButton_clicked(self):
         if ((float(self.SPLightDay) > self.upLimitSPLight) or (float(self.SPLightDay) < self.bottomLimitSPLight) or (float(self.SPLightNight) > self.upLimitSPLight) or (float(self.SPLightNight) < self.bottomLimitSPLight)):
             self.SPLightDay = self.prevSPLightDay
@@ -623,7 +623,7 @@ class UI(QMainWindow):
             self.sendDataCloud()
             self.sendDataMCU()
     
-    #function if set heater state is clicked
+    # function if set heater state is clicked
     def heaterButton_clicked(self):
         if self.heaterButton.isChecked() == True:
             self.manHeater = True
@@ -632,7 +632,7 @@ class UI(QMainWindow):
         self.sendDataCloud()
         self.sendDataMCU()
     
-    #function if set cooler state is clicked
+    # function if set cooler state is clicked
     def coolerButton_clicked(self):
         if self.coolerButton.isChecked() == True:
             self.manComp = True
@@ -641,7 +641,7 @@ class UI(QMainWindow):
         self.sendDataCloud()
         self.sendDataMCU()
     
-    #function if set humidifier state is clicked
+    # function if set humidifier state is clicked
     def humidifierButton_clicked(self):
         if self.humidifierButton.isChecked() == True:
             self.manHum = True
@@ -650,13 +650,13 @@ class UI(QMainWindow):
         self.sendDataCloud()
         self.sendDataMCU()
     
-    #function if lamp slider is released
+    # function if lamp slider is released
     def lampSlider_released(self):
         self.manLight = self.lampSlider.value()/4
         self.sendDataCloud()
         self.sendDataMCU()
     
-    #function if button one for type temp optimum value is clicked
+    # function if button one for type temp optimum value is clicked
     def oneButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '1'
@@ -665,7 +665,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '1'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button one for type hum optimum value is clicked
+    # function if button one for type hum optimum value is clicked
     def oneButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '1'
@@ -674,7 +674,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '1'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button one for type light optimum value is clicked
+    # function if button one for type light optimum value is clicked
     def oneButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '1'
@@ -683,7 +683,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '1'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button two for type temp optimum value is clicked
+    # function if button two for type temp optimum value is clicked
     def twoButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '2'
@@ -692,7 +692,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '2'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button two for type hum optimum value is clicked
+    # function if button two for type hum optimum value is clicked
     def twoButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '2'
@@ -701,7 +701,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '2'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button two for type light optimum value is clicked
+    # function if button two for type light optimum value is clicked
     def twoButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '2'
@@ -710,7 +710,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '2'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button three for type temp optimum value is clicked
+    # function if button three for type temp optimum value is clicked
     def threeButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '3'
@@ -719,7 +719,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '3'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button three for type hum optimum value is clicked
+    # function if button three for type hum optimum value is clicked
     def threeButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '3'
@@ -728,7 +728,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '3'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button three for type light optimum value is clicked
+    # function if button three for type light optimum value is clicked
     def threeButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '3'
@@ -737,7 +737,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '3'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button four for type temp optimum value is clicked
+    # function if button four for type temp optimum value is clicked
     def fourButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '4'
@@ -746,7 +746,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '4'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button four for type hum optimum value is clicked
+    # function if button four for type hum optimum value is clicked
     def fourButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '4'
@@ -755,7 +755,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '4'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button four for type light optimum value is clicked
+    # function if button four for type light optimum value is clicked
     def fourButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '4'
@@ -764,7 +764,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '4'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button five for type temp optimum value is clicked
+    # function if button five for type temp optimum value is clicked
     def fiveButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '5'
@@ -773,7 +773,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '5'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button five for type hum optimum value is clicked
+    # function if button five for type hum optimum value is clicked
     def fiveButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '5'
@@ -782,7 +782,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '5'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button five for type light optimum value is clicked
+    # function if button five for type light optimum value is clicked
     def fiveButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '5'
@@ -791,7 +791,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '5'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button six for type temp optimum value is clicked
+    # function if button six for type temp optimum value is clicked
     def sixButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '6'
@@ -800,7 +800,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '6'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button six for type hum optimum value is clicked
+    # function if button six for type hum optimum value is clicked
     def sixButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '6'
@@ -809,7 +809,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '6'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button six for type light optimum value is clicked
+    # function if button six for type light optimum value is clicked
     def sixButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '6'
@@ -818,7 +818,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '6'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button seven for type temp optimum value is clicked
+    # function if button seven for type temp optimum value is clicked
     def sevenButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '7'
@@ -827,7 +827,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '7'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button seven for type hum optimum value is clicked
+    # function if button seven for type hum optimum value is clicked
     def sevenButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '7'
@@ -836,7 +836,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '7'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button seven for type light optimum value is clicked
+    # function if button seven for type light optimum value is clicked
     def sevenButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '7'
@@ -845,7 +845,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '7'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button eight for type temp optimum value is clicked
+    # function if button eight for type temp optimum value is clicked
     def eightButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '8'
@@ -854,7 +854,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '8'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button eight for type hum optimum value is clicked
+    # function if button eight for type hum optimum value is clicked
     def eightButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '8'
@@ -863,7 +863,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '8'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button eight for type light optimum value is clicked
+    # function if button eight for type light optimum value is clicked
     def eightButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '8'
@@ -872,7 +872,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '8'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button nine for type temp optimum value is clicked
+    # function if button nine for type temp optimum value is clicked
     def nineButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '9'
@@ -881,7 +881,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '9'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button nine for type hum optimum value is clicked
+    # function if button nine for type hum optimum value is clicked
     def nineButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '9'
@@ -890,7 +890,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '9'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button nine for type light optimum value is clicked
+    # function if button nine for type light optimum value is clicked
     def nineButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '9'
@@ -899,7 +899,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '9'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button zero for type temp optimum value is clicked
+    # function if button zero for type temp optimum value is clicked
     def zeroButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '0'
@@ -908,7 +908,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '0'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button zero for type hum optimum value is clicked
+    # function if button zero for type hum optimum value is clicked
     def zeroButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '0'
@@ -917,7 +917,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '0'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button zero for type light optimum value is clicked
+    # function if button zero for type light optimum value is clicked
     def zeroButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '0'
@@ -926,7 +926,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '0'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button comma for type temp optimum value is clicked
+    # function if button comma for type temp optimum value is clicked
     def commaButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text() + '.'
@@ -935,7 +935,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text() + '.'
             self.setpointTempNight.setText(self.SPTempNight)
 
-    #function if button comma for type hum optimum value is clicked
+    # function if button comma for type hum optimum value is clicked
     def commaButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text() + '.'
@@ -944,7 +944,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text() + '.'
             self.setpointHumNight.setText(self.SPHumNight)
     
-    #function if button comma for type light optimum value is clicked
+    # function if button comma for type light optimum value is clicked
     def commaButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text() + '.'
@@ -953,7 +953,7 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text() + '.'
             self.setpointLightNight.setText(self.SPLightNight)
     
-    #function if button delete for type temp optimum value is clicked
+    # function if button delete for type temp optimum value is clicked
     def delButtonTemp_clicked(self):
         if self.dayTempButton.isChecked() == True:
             self.SPTempDay = self.setpointTempDay.text()
@@ -962,7 +962,7 @@ class UI(QMainWindow):
             self.SPTempNight = self.setpointTempNight.text()
             self.setpointTempNight.setText(self.SPTempNight[:-1])
 
-    #function if button delete for type hum optimum value is clicked
+    # function if button delete for type hum optimum value is clicked
     def delButtonHum_clicked(self):
         if self.dayHumButton.isChecked() == True:
             self.SPHumDay = self.setpointHumDay.text()
@@ -971,7 +971,7 @@ class UI(QMainWindow):
             self.SPHumNight = self.setpointHumNight.text()
             self.setpointHumNight.setText(self.SPHumNight[:-1])
 
-    #function if button delete for type light optimum value is clicked
+    # function if button delete for type light optimum value is clicked
     def delButtonLight_clicked(self):
         if self.dayLightButton.isChecked() == True:
             self.SPLightDay = self.setpointLightDay.text()
@@ -980,13 +980,13 @@ class UI(QMainWindow):
             self.SPLightNight = self.setpointLightNight.text()
             self.setpointLightNight.setText(self.SPLightNight[:-1])
 
-    #update actual data display
+    # update actual data display
     def updateActualDataDisplay(self):
         self.actualTemp.setText(self.actTemp)
         self.actualHum.setText(self.actHum)
         self.actualLight.setText(self.actLight)
     
-    #function to update time on display
+    # function to update time on display
     def updateTime(self):
         gmt = time.localtime()
         if (len(str(gmt.tm_min)) == 1):
@@ -1013,7 +1013,7 @@ class UI(QMainWindow):
         self.str_date = self.str_day + ",  " + str(gmt.tm_mday) + "/" + str(gmt.tm_mon) + "/" + str(gmt.tm_year)
         self.actualDate.setText(self.str_date)
         
-    #function for updating photo on dashboard
+    # function for updating photo on dashboard
     def updatePhoto(self):
         if (self.currentPhoto == self.pathTopPhoto):
             self.currentPhoto = self.pathBottomPhoto
@@ -1023,7 +1023,7 @@ class UI(QMainWindow):
             self.actualPosition.setText("Top")
         self.cameraHome.setPixmap(QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
 
-    #function for save data to local file
+    # function for save data to local file
     def saveDataToLocalFile(self):
         try:
             if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
@@ -1049,7 +1049,7 @@ class UI(QMainWindow):
         except:
             print("Failed save data to local file as excel")
     
-    #function for save last actual data
+    # function for save last actual data
     def saveActualDataToLocalFile(self):
         try:
             data_local = str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight)
@@ -1060,14 +1060,14 @@ class UI(QMainWindow):
         except:
             print("Failed save data to local file as excel")
     
-    #function for checking duration from last touch
+    # function for checking duration from last touch
     def checkLastTouch(self):
         currentTouch = (time.localtime()).tm_min
         differenceTouchTime = currentTouch - self.lastMinuteTouch
         if (differenceTouchTime < 0):
             differenceTouchTime = differenceTouchTime + 60
         if (differenceTouchTime >= self.intervalSendUserPhoto):
-            self.sendPhotoUser()
+            self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
             print("New User Detected, Photo User sent to Cloud")
         self.lastMinuteTouch = currentTouch 
 
@@ -1079,7 +1079,7 @@ class UI(QMainWindow):
         except FileNotFoundError:
             return None
 
-    #send current live data in hardware to cloud
+    # send current live data in hardware to cloud
     def sendDataCloud(self) :
         try:
             if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
@@ -1119,9 +1119,8 @@ class UI(QMainWindow):
         except (requests.ConnectionError, requests.Timeout) as exception:
             pass
             print("Failed sent Live Data to Cloud")
-        
 
-    #send current live data in hardware to be saved in DB cloud
+    # send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
         try:
             cpu_temp = self.get_cpu_temperature()
@@ -1148,9 +1147,8 @@ class UI(QMainWindow):
         except (requests.ConnectionError, requests.Timeout) as exception:
             pass
             print("Send data to database cloud failed")
-        
 
-    #function for sending data to hardware
+    # function for sending data to hardware
     def sendDataMCU(self):
         try:
             if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
@@ -1179,90 +1177,34 @@ class UI(QMainWindow):
         except:
             print("Failed send data to MCU")
 
-    #function for sending top photo to cloud
-    def sendPhotoTop(self):
+    # function for sending photo to cloud
+    def sendPhoto(self, camera_device, file_path, photo_type):
         try:
             df2 = subprocess.check_output("v4l2-ctl --list-devices", shell=True)
             df2Byte = df2.decode('utf8').split('\n')
-            indexTopCam = df2Byte.index(self.topCameraDevice)
-            indexTopVideo = df2Byte[indexTopCam+1][-1]
-            cam = cv2.VideoCapture(int(indexTopVideo))
+            indexCam = df2Byte.index(camera_device)
+            indexVideo = df2Byte[indexCam + 1][-1]
+            cam = cv2.VideoCapture(int(indexVideo))
             if cam.isOpened():
                 ret, image = cam.read()
                 if ret:
-                    cv2.imwrite(self.pathTopPhoto, image)
-                    print("Top Image Captured and Saved")
+                    cv2.imwrite(file_path, image)
+                    print(f"{photo_type} Image Captured and Saved")
                 cam.release()
-            #self.cameraTop.setPixmap(QPixmap(self.pathTopPhoto).scaled(301, 231, QtCore.Qt.KeepAspectRatio))
             try:
-                files = {'files': open(self.pathTopPhoto,'rb')}
+                files = {'files': open(file_path, 'rb')}
                 values = {'device_id': int(self.deviceId)}
                 header = {
                     'device_key': self.deviceKey,
                 }
                 response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
-                print("Successfully sent Top Photo")
+                print(f"Successfully sent {photo_type} Photo")
             except:
-                print("Failed sent Top Photo")
+                print(f"Failed sent {photo_type} Photo")
         except:
-            print("Top Camera not found")
+            print(f"{photo_type} Camera not found")
     
-    #function for sending bottom photo to cloud
-    def sendPhotoBottom(self):
-        try:
-            df2 = subprocess.check_output("v4l2-ctl --list-devices", shell=True)
-            df2Byte = df2.decode('utf8').split('\n')
-            indexBottomCam = df2Byte.index(self.bottomCameraDevice)
-            indexBottomVideo = df2Byte[indexBottomCam+1][-1]
-            cam2 = cv2.VideoCapture(int(indexBottomVideo))
-            if cam2.isOpened():
-                ret, image = cam2.read()
-                if ret:
-                    cv2.imwrite(self.pathBottomPhoto, image)
-                    print("Bottom Image Captured and Saved")
-                cam2.release()
-            try:
-                files = {'files': open(self.pathBottomPhoto,'rb')}
-                values = {'device_id': int(self.deviceId)}
-                header = {
-                    'device_key': self.deviceKey,
-                }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
-                print("Successfully sent Bottom Photo")
-            except:
-                print("Failed sent Bottom Photo")
-        except:
-            print("Bottom Camera not found")
-    
-    #function for sending user photo to cloud
-    def sendPhotoUser(self):
-        try:
-            df2 = subprocess.check_output("v4l2-ctl --list-devices", shell=True)
-            df2Byte = df2.decode('utf8').split('\n')
-            indexUserCam = df2Byte.index(self.userCameraDevice)
-            indexUserVideo = df2Byte[indexUserCam+1][-1]
-            cam4 = cv2.VideoCapture(int(indexUserVideo))
-            if cam4.isOpened():
-                ret, image = cam4.read()
-                if ret:
-                    cv2.imwrite(self.pathUserPhoto, image)
-                    print("User Image Captured and Saved")
-                cam4.release()
-            try:
-                files = {'files': open(self.pathUserPhoto,'rb')}
-                values = {'device_id': int(self.deviceId)}
-                header = {
-                    'device_key': self.deviceKey,
-                }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
-                print(response)
-                print("Successfully sent User Photo")
-            except:
-                print("Failed sent User Photo")
-        except:
-            print("User Camera not found")
-    
-    #function for receiving serial message from mcu
+    # function for receiving serial message from mcu
     @QtCore.pyqtSlot()
     def receive(self):
         try:
@@ -1288,7 +1230,7 @@ class UI(QMainWindow):
         except:
             print("Failed receiving data from MCU")
 
-#initialize app
+# initialize app
 QtWidgets.QApplication.setStyle("fussion")
 app = QApplication(sys.argv)
 UIWindow = UI()
