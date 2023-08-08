@@ -11,7 +11,7 @@ from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkRepl
 import sseclient, sys, time, json, requests, cv2, os, subprocess
 
 # comment this if make script error
-#os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
+os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
     def __init__(self):
@@ -36,6 +36,7 @@ class UI(QMainWindow):
         self.manHeater, self.manComp, self.manHum = False, False, False
 
         # set actual condition parameter
+        self.actTemp, self.actHum, self.actLight = "", "", ""
         lastActualDataFilename = "Data/Last_Actual_Data.csv"
         if (os.path.exists(lastActualDataFilename) == True):
             try:
@@ -46,7 +47,6 @@ class UI(QMainWindow):
                 self.actLight = lines[2].strip()
                 print("Success get last actual data")
             except:
-                self.actTemp, self.actHum, self.actLight = "", "", ""
                 print("Failed get last actual data")
 
         # set point parameter
@@ -245,7 +245,7 @@ class UI(QMainWindow):
         self.dayHumButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Day", "Hum"))
         self.nightHumButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Night", "Hum"))
         self.humButton.clicked.connect(lambda:self.setButton_clicked("Hum"))
-        self.humidifierButton.stateChanged.connect(lambda:self.self.setActuatorButton_clicked("humidifier"))
+        self.humidifierButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("humidifier"))
         self.oneButtonHum.clicked.connect(lambda:self.digitButton_clicked('1', "Hum"))
         self.twoButtonHum.clicked.connect(lambda:self.digitButton_clicked('2', "Hum"))
         self.threeButtonHum.clicked.connect(lambda:self.digitButton_clicked('3', "Hum"))
