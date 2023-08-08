@@ -30,6 +30,10 @@ class UI(QMainWindow):
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
 
+        # initiate GUI
+        super(UI, self).__init__()
+        uic.loadUi("UI/main.ui", self)
+
         # hardware parameter
         self.mode = "auto"
         self.pwmHeater, self.pwmFan, self.manLight = 0, 0, 0
@@ -37,6 +41,8 @@ class UI(QMainWindow):
 
         # set actual condition parameter
         self.actTemp, self.actHum, self.actLight = "", "", ""
+
+        # try get last actual data
         lastActualDataFilename = "Data/Last_Actual_Data.csv"
         if (os.path.exists(lastActualDataFilename) == True):
             try:
@@ -45,6 +51,11 @@ class UI(QMainWindow):
                 self.actTemp = lines[0].strip()
                 self.actHum = lines[1].strip()
                 self.actLight = lines[2].strip()
+                self.mode = lines[3].strip()
+                self.manHeater = lines[4].strip()
+                self.manComp = lines[5].strip()
+                self.manHum = lines[6].strip()
+                self.manLight = lines[7].strip()
                 print("Success get last actual data")
             except:
                 print("Failed get last actual data")
@@ -82,10 +93,6 @@ class UI(QMainWindow):
         # SSE related variables
         self.sseManager, self.sseRequest = None, None
 
-        # initiate GUI
-        super(UI, self).__init__()
-        uic.loadUi("UI/main.ui", self)
-        
         # pages
         self.stackedWidget = self.findChild(QStackedWidget, "stackedWidget")
         self.dashboardPage = self.findChild(QWidget, "dashboardPage")
@@ -426,30 +433,6 @@ class UI(QMainWindow):
             self.tempButton.setEnabled(False)
             self.humButton.setEnabled(False)
             self.lightButton.setEnabled(False)
-            self.oneButtonTemp.setEnabled(False)
-            self.twoButtonTemp.setEnabled(False)
-            self.threeButtonTemp.setEnabled(False)
-            self.fourButtonTemp.setEnabled(False)
-            self.fiveButtonTemp.setEnabled(False)
-            self.sixButtonTemp.setEnabled(False)
-            self.sevenButtonTemp.setEnabled(False)
-            self.eightButtonTemp.setEnabled(False)
-            self.nineButtonTemp.setEnabled(False)
-            self.zeroButtonTemp.setEnabled(False)
-            self.commaButtonTemp.setEnabled(False)
-            self.delButtonTemp.setEnabled(False)
-            self.oneButtonHum.setEnabled(False)
-            self.twoButtonHum.setEnabled(False)
-            self.threeButtonHum.setEnabled(False)
-            self.fourButtonHum.setEnabled(False)
-            self.fiveButtonHum.setEnabled(False)
-            self.sixButtonHum.setEnabled(False)
-            self.sevenButtonHum.setEnabled(False)
-            self.eightButtonHum.setEnabled(False)
-            self.nineButtonHum.setEnabled(False)
-            self.zeroButtonHum.setEnabled(False)
-            self.commaButtonHum.setEnabled(False)
-            self.delButtonHum.setEnabled(False)
             self.manualTempButton.setChecked(True)
             self.manualHumButton.setChecked(True)
             self.manualLightButton.setChecked(True)
@@ -463,42 +446,6 @@ class UI(QMainWindow):
             self.tempButton.setEnabled(True)
             self.humButton.setEnabled(True)
             self.lightButton.setEnabled(True)
-            self.oneButtonTemp.setEnabled(True)
-            self.twoButtonTemp.setEnabled(True)
-            self.threeButtonTemp.setEnabled(True)
-            self.fourButtonTemp.setEnabled(True)
-            self.fiveButtonTemp.setEnabled(True)
-            self.sixButtonTemp.setEnabled(True)
-            self.sevenButtonTemp.setEnabled(True)
-            self.eightButtonTemp.setEnabled(True)
-            self.nineButtonTemp.setEnabled(True)
-            self.zeroButtonTemp.setEnabled(True)
-            self.commaButtonTemp.setEnabled(True)
-            self.delButtonTemp.setEnabled(True)
-            self.oneButtonHum.setEnabled(True)
-            self.twoButtonHum.setEnabled(True)
-            self.threeButtonHum.setEnabled(True)
-            self.fourButtonHum.setEnabled(True)
-            self.fiveButtonHum.setEnabled(True)
-            self.sixButtonHum.setEnabled(True)
-            self.sevenButtonHum.setEnabled(True)
-            self.eightButtonHum.setEnabled(True)
-            self.nineButtonHum.setEnabled(True)
-            self.zeroButtonHum.setEnabled(True)
-            self.commaButtonHum.setEnabled(True)
-            self.delButtonHum.setEnabled(True)
-            self.oneButtonLight.setEnabled(True)
-            self.twoButtonLight.setEnabled(True)
-            self.threeButtonLight.setEnabled(True)
-            self.fourButtonLight.setEnabled(True)
-            self.fiveButtonLight.setEnabled(True)
-            self.sixButtonLight.setEnabled(True)
-            self.sevenButtonLight.setEnabled(True)
-            self.eightButtonLight.setEnabled(True)
-            self.nineButtonLight.setEnabled(True)
-            self.zeroButtonLight.setEnabled(True)
-            self.commaButtonLight.setEnabled(True)
-            self.delButtonLight.setEnabled(True)
             self.manualTempButton.setChecked(False)
             self.manualHumButton.setChecked(False)
             self.manualLightButton.setChecked(False)
@@ -722,7 +669,7 @@ class UI(QMainWindow):
     # function for save last actual data
     def saveActualDataToLocalFile(self):
         try:
-            data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight)
+            data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight) + "\n" + str(self.mode) + "\n" + str(self.manHeater) + "\n" + str(self.manComp) + "\n" + str(self.manHum) + "\n" + str(self.manLight)
             dbFilename = "Data/Last_Actual_Data.csv"
             with open(dbFilename, "w") as f:
                 f.write(data_local)
