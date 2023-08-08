@@ -43,7 +43,7 @@ class UI(QMainWindow):
         self.actTemp, self.actHum, self.actLight = "", "", ""
 
         # try get last actual data
-        lastActualDataFilename = "Data/Last_Actual_Data.csv"
+        lastActualDataFilename = "Actual/Last_Actual_Data.csv"
         if (os.path.exists(lastActualDataFilename) == True):
             try:
                 with open(lastActualDataFilename, "r") as file:
@@ -670,7 +670,7 @@ class UI(QMainWindow):
     def saveActualDataToLocalFile(self):
         try:
             data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight) + "\n" + str(self.mode) + "\n" + str(self.manHeater) + "\n" + str(self.manComp) + "\n" + str(self.manHum) + "\n" + str(self.manLight)
-            dbFilename = "Data/Last_Actual_Data.csv"
+            dbFilename = "Actual/Last_Actual_Data.csv"
             with open(dbFilename, "w") as f:
                 f.write(data_local)
             print("Data saved to local file (" + dbFilename + ")")
