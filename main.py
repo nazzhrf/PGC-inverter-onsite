@@ -92,11 +92,9 @@ class UI(QMainWindow):
         self.tempPage = self.findChild(QWidget, "tempPage")
         self.humPage = self.findChild(QWidget, "humPage")
         self.lightPage = self.findChild(QWidget, "lightPage")
-        self.photoPage = self.findChild(QWidget, "photoPage")
         
         # parent element
         self.fullscreenButton = self.findChild(QPushButton, "fullscreenButton")
-        self.toPhotoPageButton = self.findChild(QPushButton, "toPhotoPage")
         self.shutdownButton = self.findChild(QPushButton, "shutdown")
         self.actualTime = self.findChild(QLabel, "actualTime")
         self.actualDay = self.findChild(QLabel, "actualDay")
@@ -204,11 +202,7 @@ class UI(QMainWindow):
         self.humidifierButton.setEnabled(False)
         self.lampSlider.setEnabled(False)
 
-        # disable toPhotoPage button
-        self.toPhotoPageButton.setEnabled(False)
-
         # behaviour on central widget
-        self.toPhotoPageButton.clicked.connect(lambda:self.toPhotoPageButton_clicked())
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
@@ -281,7 +275,6 @@ class UI(QMainWindow):
         self.backFromLight.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         # check user behaviour
-        self.toPhotoPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
         self.takePhoto.clicked.connect(lambda:self.checkLastTouch())
         self.toTempPageButton.clicked.connect(lambda:self.checkLastTouch())
