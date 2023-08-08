@@ -25,7 +25,7 @@ def scheduler_main():
         current_hour = current_time.tm_hour
         current_minute = current_time.tm_min
         # restart main program every hour
-        if (current_hour - prev_hour) >= 1:
+        if (current_hour != prev_hour):
             if main_process is not None:
                 pid = get_pid_by_command('python3')
                 subprocess.run(["kill", "-9", str(pid)])
@@ -34,11 +34,6 @@ def scheduler_main():
             main_process = run_main()
             print("Main program restarted")
             prev_hour = current_hour
-        # reboot device at 00:00
-        if (current_hour == 0 or current_hour == 24) and current_minute == 0:
-            print("Device will reboot on 30 seconds..")
-            time.sleep(30) # sleep 30 seconds before reboot device
-            subprocess.run(['sudo', 'reboot'])
         time.sleep(30)  # Sleep for 30 seconds before checking again
 
 if __name__ == "__main__":
