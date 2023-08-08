@@ -18,7 +18,7 @@ class UI(QMainWindow):
         # variable for chamber identifier or device related
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
-        self.portUART = '/dev/ttyS0'
+        self.portUART = '/dev/ttyAMA0'
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
@@ -52,10 +52,10 @@ class UI(QMainWindow):
                 self.actHum = lines[1].strip()
                 self.actLight = lines[2].strip()
                 self.mode = lines[3].strip()
-                self.manHeater = lines[4].strip()
-                self.manComp = lines[5].strip()
-                self.manHum = lines[6].strip()
-                self.manLight = lines[7].strip()
+                self.manHeater = bool(lines[4].strip())
+                self.manComp = bool(lines[4].strip())
+                self.manHum = bool(lines[4].strip())
+                self.manLight = float(lines[7].strip())
                 print("Success get last actual data")
             except:
                 print("Failed get last actual data")
