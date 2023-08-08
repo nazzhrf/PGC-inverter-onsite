@@ -722,7 +722,7 @@ class UI(QMainWindow):
     # function for save last actual data
     def saveActualDataToLocalFile(self):
         try:
-            data_local = str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight)
+            data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight)
             dbFilename = "Data/Last_Actual_Data.csv"
             with open(dbFilename, "w") as f:
                 f.write(data_local)
