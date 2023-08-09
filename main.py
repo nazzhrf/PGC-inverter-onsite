@@ -52,9 +52,9 @@ class UI(QMainWindow):
                 self.actHum = lines[1].strip()
                 self.actLight = lines[2].strip()
                 self.mode = lines[3].strip()
-                self.manHeater = bool(lines[4].strip())
-                self.manComp = bool(lines[5].strip())
-                self.manHum = bool(lines[6].strip())
+                self.manHeater = lines[4].strip() == "True"
+                self.manComp = lines[5].strip() == "True"
+                self.manHum = lines[6].strip() == "True"
                 self.manLight = float(lines[7].strip())
                 print("Success get last actual data")
             except:
