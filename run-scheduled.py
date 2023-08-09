@@ -30,7 +30,7 @@ def scheduler_main():
                 pid = get_pid_by_command('python3')
                 subprocess.run(["kill", "-9", str(pid)])
                 print("Main program terminated")
-            time.sleep(1)
+            time.sleep(0.5)
             main_process = run_main()
             print("Main program restarted")
             prev_hour = current_hour
