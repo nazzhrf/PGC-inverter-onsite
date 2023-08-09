@@ -206,6 +206,12 @@ class UI(QMainWindow):
             self.manualTempButton.setChecked(False)
             self.manualHumButton.setChecked(False)
             self.manualLightButton.setChecked(False)
+            self.dayTempButton.setDisabled(True)
+            self.dayHumButton.setDisabled(True)
+            self.dayLightButton.setDisabled(True)
+            self.nightTempButton.setDisabled(True)
+            self.nightHumButton.setDisabled(True)
+            self.nightLightButton.setDisabled(True)
             self.actualMode.setText("Current Mode: Auto")
         else:
             self.heaterButton.setEnabled(True)
@@ -222,6 +228,12 @@ class UI(QMainWindow):
             self.manualTempButton.setChecked(True)
             self.manualHumButton.setChecked(True)
             self.manualLightButton.setChecked(True)
+            self.dayTempButton.setDisabled(False)
+            self.dayHumButton.setDisabled(False)
+            self.dayLightButton.setDisabled(False)
+            self.nightTempButton.setDisabled(False)
+            self.nightHumButton.setDisabled(False)
+            self.nightLightButton.setDisabled(False)
             self.actualMode.setText("Current Mode: Manual")
         self.setpointTempDay.setText(self.SPTempDay)
         self.setpointTempNight.setText(self.SPTempNight)
@@ -461,6 +473,12 @@ class UI(QMainWindow):
             self.manualTempButton.setChecked(True)
             self.manualHumButton.setChecked(True)
             self.manualLightButton.setChecked(True)
+            self.dayTempButton.setDisabled(False)
+            self.dayHumButton.setDisabled(False)
+            self.dayLightButton.setDisabled(False)
+            self.nightTempButton.setDisabled(False)
+            self.nightHumButton.setDisabled(False)
+            self.nightLightButton.setDisabled(False)
             self.mode = "manual"
             self.actualMode.setText("Current Mode: Manual")
         else:
@@ -475,6 +493,12 @@ class UI(QMainWindow):
             self.manualHumButton.setChecked(False)
             self.manualLightButton.setChecked(False)
             self.mode = "auto"
+            self.dayTempButton.setDisabled(True)
+            self.dayHumButton.setDisabled(True)
+            self.dayLightButton.setDisabled(True)
+            self.nightTempButton.setDisabled(True)
+            self.nightHumButton.setDisabled(True)
+            self.nightLightButton.setDisabled(True)
             self.actualMode.setText("Current Mode: Auto")
         self.sendDataCloud()
         self.sendDataMCU()
@@ -602,25 +626,25 @@ class UI(QMainWindow):
     def delButton_clicked(self, setpoint_type):
         if setpoint_type == "Temp":
             if self.dayTempButton.isChecked():
-                self.SPTempDay = self.setpointTempDay.text()
                 self.setpointTempDay.setText(self.SPTempDay[:-1])
+                self.SPTempDay = self.setpointTempDay.text()
             elif self.nightTempButton.isChecked():
-                self.SPTempNight = self.setpointTempNight.text()
                 self.setpointTempNight.setText(self.SPTempNight[:-1])
+                self.SPTempNight = self.setpointTempNight.text()
         elif setpoint_type == "Hum":
             if self.dayHumButton.isChecked():
-                self.SPHumDay = self.setpointHumDay.text()
                 self.setpointHumDay.setText(self.SPHumDay[:-1])
+                self.SPHumDay = self.setpointHumDay.text()
             elif self.nightHumButton.isChecked():
-                self.SPHumNight = self.setpointHumNight.text()
                 self.setpointHumNight.setText(self.SPHumNight[:-1])
+                self.SPHumNight = self.setpointHumNight.text()
         elif setpoint_type == "Light":
             if self.dayLightButton.isChecked():
-                self.SPLightDay = self.setpointLightDay.text()
                 self.setpointLightDay.setText(self.SPLightDay[:-1])
+                self.SPLightDay = self.setpointLightDay.text()
             elif self.nightLightButton.isChecked():
-                self.SPLightNight = self.setpointLightNight.text()
                 self.setpointLightNight.setText(self.SPLightNight[:-1])
+                self.SPLightNight = self.setpointLightNight.text()
 
     # update actual data display
     def updateActualDataDisplay(self):
