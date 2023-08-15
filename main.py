@@ -334,7 +334,7 @@ class UI(QMainWindow):
         self.updateActualDataDisplayTimer = createQTimer(self.updateActualDataDisplay, 10000) # update actual data display scheduling
         self.sendDataMCUTimer = createQTimer(self.sendDataMCU, 5000) # send data to mcu scheduling
         self.updatePhotoTimer = createQTimer(self.updatePhoto, 5000) # update photo on onsite UI scheduling
-        self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 10000) # start the timer for SSE connection refresh
+        self.sseRefreshTimer = createQTimer(self.refreshSSEConnection, 30000) # start the timer for SSE connection refresh
         
         # wired serial to hardware
         try:
