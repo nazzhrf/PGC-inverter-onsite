@@ -19,9 +19,12 @@ class UI(QMainWindow):
         self.deviceId = "3"
         self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
         self.portUART = '/dev/ttyAMA0'
+        self.isThreeCameras = True
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
+        self.topRightCameraDevice = ''
+        self.bottomRightCameraDevice = ''
         
         # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'
@@ -87,6 +90,8 @@ class UI(QMainWindow):
         self.pathTopPhoto = 'Image/top_chamber' + self.deviceId + '.png'
         self.pathBottomPhoto = 'Image/bottom_chamber' + self.deviceId + '.png'
         self.pathUserPhoto = 'Image/user_chamber' + self.deviceId + '.png'
+        self.pathTopRightPhoto = 'Image/topRight_chamber' + self.deviceId + '.png'
+        self.pathBottomRightPhoto = 'Image/bottomRight_chamber' + self.deviceId + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
@@ -246,6 +251,10 @@ class UI(QMainWindow):
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
+        # if device has 5 cameras
+        if not isThreeCameras:
+            self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right"))
+            self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right"))
         
         # behaviour on dashboard page
         self.shutdownButton.clicked.connect(lambda:self.shutdownButton_clicked())
@@ -349,7 +358,10 @@ class UI(QMainWindow):
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
             self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
             self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
-
+            if not isThreeCameras:
+                self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
+                self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+            
     # create sse connection
     def subscribeSSE(self):
         try:
@@ -396,6 +408,9 @@ class UI(QMainWindow):
                 self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
                 self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
                 self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
+                if not isThreeCameras:
+                    self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
+                    self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -682,13 +697,27 @@ class UI(QMainWindow):
     # function for updating photo on dashboard
     def updatePhoto(self):
         if (self.currentPhoto == self.pathTopPhoto):
+            if isThreeCameras:
+                self.currentPhoto = self.pathBottomPhoto
+                self.actualPosition.setText("Bottom")
+            else:
+                self.currentPhoto = self.pathTopRightPhoto
+                self.actualPosition.setText("Top Right")
+        elif (self.currentPhoto == self.pathTopRightPhoto):
             self.currentPhoto = self.pathBottomPhoto
             self.actualPosition.setText("Bottom")
+        elif (self.currentPhoto == self.pathBottomPhoto):
+            if isThreeCameras:
+                self.currentPhoto = self.pathTopPhoto
+                self.actualPosition.setText("Top")
+            else:
+                self.currentPhoto = self.pathBottomRightPhoto
+                self.actualPosition.setText("Bottom Right")
         else:
             self.currentPhoto = self.pathTopPhoto
             self.actualPosition.setText("Top")
         self.cameraHome.setPixmap(QtGui.QPixmap(self.currentPhoto).scaled(621, 481, QtCore.Qt.KeepAspectRatio))
-
+    
     # function for save data to local file
     def saveDataToLocalFile(self):
         try:

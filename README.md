@@ -13,6 +13,8 @@ Adjust these variable on main.py to setup device:
 ```
 self.deviceId = ""
 self.deviceKey = ""
+self.portUART = ""
+self.isThreeCameras = True/False
 ```
 
 Adjust camera device on main.py using value from get_camera.py:
