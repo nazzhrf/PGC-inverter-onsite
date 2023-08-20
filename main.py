@@ -252,7 +252,7 @@ class UI(QMainWindow):
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
         # if device has 5 cameras
-        if not isThreeCameras:
+        if not self.isThreeCameras:
             self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right"))
             self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right"))
         
@@ -358,7 +358,7 @@ class UI(QMainWindow):
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
             self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
             self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
-            if not isThreeCameras:
+            if not self.isThreeCameras:
                 self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                 self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
             
@@ -408,7 +408,7 @@ class UI(QMainWindow):
                 self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
                 self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
                 self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
-                if not isThreeCameras:
+                if not self.isThreeCameras:
                     self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                     self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
             else: 
@@ -697,7 +697,7 @@ class UI(QMainWindow):
     # function for updating photo on dashboard
     def updatePhoto(self):
         if (self.currentPhoto == self.pathTopPhoto):
-            if isThreeCameras:
+            if self.isThreeCameras:
                 self.currentPhoto = self.pathBottomPhoto
                 self.actualPosition.setText("Bottom")
             else:
@@ -707,7 +707,7 @@ class UI(QMainWindow):
             self.currentPhoto = self.pathBottomPhoto
             self.actualPosition.setText("Bottom")
         elif (self.currentPhoto == self.pathBottomPhoto):
-            if isThreeCameras:
+            if self.isThreeCameras:
                 self.currentPhoto = self.pathTopPhoto
                 self.actualPosition.setText("Top")
             else:
