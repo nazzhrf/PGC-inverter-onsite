@@ -7,3 +7,26 @@ Place this project on this directory:
 ```
 /home/pi
 ```
+
+Adjust these variable on main.py to setup device:
+
+```
+self.deviceId = ""
+self.deviceKey = ""
+```
+
+Adjust camera device on main.py using value from get_camera.py:
+
+```
+self.topCameraDevice = ""
+self.topRightCameraDevice = ""
+self.bottomCameraDevice = ""
+self.bottomRightCameraDevice = ""
+self.userCameraDevice = ""
+```
+
+Run run-scheduled.py to perform auto-restart program hourly functionality:
+
+```
+/usr/bin/python3 home/pi/run-scheduled.py
+```
