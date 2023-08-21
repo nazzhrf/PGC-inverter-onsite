@@ -46,10 +46,10 @@ class UI(QMainWindow):
         self.actTemp, self.actHum, self.actLight = "", "", ""
 
         # try get last actual data
-        lastActualDataFilename = "Actual/Last_Actual_Data.csv"
-        if (os.path.exists(lastActualDataFilename) == True):
+        self.lastActualDataFilename = "Actual/Last_Actual_Data.csv"
+        if (os.path.exists(self.lastActualDataFilename) == True):
             try:
-                with open(lastActualDataFilename, "r") as file:
+                with open(self.lastActualDataFilename, "r") as file:
                     lines = file.readlines()
                 self.actTemp = lines[0].strip()
                 self.actHum = lines[1].strip()
@@ -59,17 +59,33 @@ class UI(QMainWindow):
                 self.manComp = lines[5].strip() == "True"
                 self.manHum = lines[6].strip() == "True"
                 self.manLight = float(lines[7].strip())
-                print("Success get last actual data")
+                print("Success get last actual condition data")
             except:
-                print("Failed get last actual data")
+                print("Failed get last actual condition data")
 
         # set point parameter
-        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "27", "27", "27"
-        self.SPHum, self.SPHumDay, self.prevSPHumDay = "70", "70", "70"
-        self.SPLight, self.SPLightDay, self.prevSPLightDay = "4000", "4000", "4000"
-        self.SPTempNight, self.prevSPTempNight = "23", "23"
-        self.SPHumNight, self.prevSPHumNight = "90", "90"
-        self.SPLightNight, self.prevSPLightNight = "0", "0"
+        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "", "", ""
+        self.SPHum, self.SPHumDay, self.prevSPHumDay = "", "", ""
+        self.SPLight, self.SPLightDay, self.prevSPLightDay = "", "", ""
+        self.SPTempNight, self.prevSPTempNight = "", ""
+        self.SPHumNight, self.prevSPHumNight = "", ""
+        self.SPLightNight, self.prevSPLightNight = "", ""
+
+        # try get last set point data
+        self.lastSPDataFilename = "Actual/Last_SP_Data.csv"
+        if (os.path.exists(self.lastSPDataFilename) == True):
+            try:
+                with open(self.lastSPDataFilename, "r") as file:
+                    lines = file.readlines()
+                self.SPTempDay = lines[0].strip()
+                self.SPHumDay = lines[1].strip()
+                self.SPLightDay = lines[2].strip()
+                self.SPTempNight = lines[4].strip()
+                self.SPHumNight = lines[5].strip()
+                self.SPLightNight = lines[6].strip()
+                print("Success get last set point data")
+            except:
+                print("Failed get last set point data")
 
         # day or night parameter
         self.startDay = "6"
@@ -439,6 +455,7 @@ class UI(QMainWindow):
                         self.SPLightNight = str(data_json.get("intensity"))
                         self.prevSPLightNight = self.SPLightNight
                         self.setpointLightNight.setText(self.SPLightNight)
+                self.saveSPDataToLocalFile()
         except:
             print("Error on reading live data from Cloud")
 
@@ -566,6 +583,7 @@ class UI(QMainWindow):
                 self.prevSPTempNight = self.SPTempNight
                 self.sendDataCloud()
                 self.sendDataMCU()
+                self.saveSPDataToLocalFile()
         elif setpoint_type == "Hum":
             if ((float(self.SPHumDay) > self.upLimitSPHum) or (float(self.SPHumDay) < self.bottomLimitSPHum) or (float(self.SPHumNight) > self.upLimitSPHum) or (float(self.SPHumNight) < self.bottomLimitSPHum)):
                 self.SPHumDay = self.prevSPHumDay
@@ -577,6 +595,7 @@ class UI(QMainWindow):
                 self.prevSPHumNight = self.SPHumNight
                 self.sendDataCloud()
                 self.sendDataMCU()
+                self.saveSPDataToLocalFile()
         elif setpoint_type == "Light":
             if ((float(self.SPLightDay) > self.upLimitSPLight) or (float(self.SPLightDay) < self.bottomLimitSPLight) or (float(self.SPLightNight) > self.upLimitSPLight) or (float(self.SPLightNight) < self.bottomLimitSPLight)):
                 self.SPLightDay = self.prevSPLightDay
@@ -588,6 +607,7 @@ class UI(QMainWindow):
                 self.prevSPLightNight = self.SPLightNight
                 self.sendDataCloud()
                 self.sendDataMCU()
+                self.saveSPDataToLocalFile()
     
     # function if set actuator state is clicked
     def setActuatorButton_clicked(self, actuator_type):
@@ -748,12 +768,21 @@ class UI(QMainWindow):
     def saveActualDataToLocalFile(self):
         try:
             data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight) + "\n" + str(self.mode) + "\n" + str(self.manHeater) + "\n" + str(self.manComp) + "\n" + str(self.manHum) + "\n" + str(self.manLight)
-            dbFilename = "Actual/Last_Actual_Data.csv"
-            with open(dbFilename, "w") as f:
+            with open(self.lastActualDataFilename, "w") as f:
                 f.write(data_local)
-            print("Data saved to local file (" + dbFilename + ")")
+            print("Actual condition data saved to local file (" + self.lastActualDataFilename + ")")
         except:
-            print("Failed save data to local file as excel")
+            print("Failed save actual condition data to local file as excel")
+    
+    # function for save last set point data
+    def saveSPDataToLocalFile(self):
+        try:
+            data_local = str(self.SPTempDay) + "\n" + str(self.SPHumDay) + "\n" + str(self.SPLightDay) + "\n" + str(self.SPTempNight) + "\n" + str(self.SPHumNight) + "\n" + str(self.SPLightNight)
+            with open(self.lastSPDataFilename, "w") as f:
+                f.write(data_local)
+            print("Set point data saved to local file (" + self.lastSPDataFilename + ")")
+        except:
+            print("Failed save set point data to local file as excel")
     
     # function for checking duration from last touch
     def checkLastTouch(self):
