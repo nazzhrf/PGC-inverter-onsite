@@ -64,9 +64,9 @@ class UI(QMainWindow):
                 print("Failed get last actual condition data")
 
         # set point parameter
-        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "", "", ""
-        self.SPHum, self.SPHumDay, self.prevSPHumDay = "", "", ""
-        self.SPLight, self.SPLightDay, self.prevSPLightDay = "", "", ""
+        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "27", "", ""
+        self.SPHum, self.SPHumDay, self.prevSPHumDay = "70", "", ""
+        self.SPLight, self.SPLightDay, self.prevSPLightDay = "4000", "", ""
         self.SPTempNight, self.prevSPTempNight = "", ""
         self.SPHumNight, self.prevSPHumNight = "", ""
         self.SPLightNight, self.prevSPLightNight = "", ""
@@ -80,9 +80,9 @@ class UI(QMainWindow):
                 self.SPTempDay = lines[0].strip()
                 self.SPHumDay = lines[1].strip()
                 self.SPLightDay = lines[2].strip()
-                self.SPTempNight = lines[4].strip()
-                self.SPHumNight = lines[5].strip()
-                self.SPLightNight = lines[6].strip()
+                self.SPTempNight = lines[3].strip()
+                self.SPHumNight = lines[4].strip()
+                self.SPLightNight = lines[5].strip()
                 print("Success get last set point data")
             except:
                 print("Failed get last set point data")
