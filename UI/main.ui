@@ -450,15 +450,15 @@
      <widget class="QLabel" name="dayNightStartTimeTitle">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>50</y>
-        <width>301</width>
+        <x>250</x>
+        <y>40</y>
+        <width>271</width>
         <height>51</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>28</pointsize>
+        <pointsize>24</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -490,7 +490,7 @@
        <rect>
         <x>120</x>
         <y>210</y>
-        <width>61</width>
+        <width>51</width>
         <height>41</height>
        </rect>
       </property>
@@ -511,7 +511,7 @@
      <widget class="QLabel" name="startTimeNightUnit">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>470</x>
         <y>210</y>
         <width>121</width>
         <height>41</height>
@@ -531,7 +531,7 @@
      <widget class="QLabel" name="startTimeDayUnit">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>170</x>
         <y>210</y>
         <width>111</width>
         <height>41</height>
