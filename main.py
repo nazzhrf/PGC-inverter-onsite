@@ -64,12 +64,12 @@ class UI(QMainWindow):
                 print("Failed get last actual condition data")
 
         # set point parameter
-        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "27", "", ""
-        self.SPHum, self.SPHumDay, self.prevSPHumDay = "70", "", ""
-        self.SPLight, self.SPLightDay, self.prevSPLightDay = "4000", "", ""
-        self.SPTempNight, self.prevSPTempNight = "", ""
-        self.SPHumNight, self.prevSPHumNight = "", ""
-        self.SPLightNight, self.prevSPLightNight = "", ""
+        self.SPTemp, self.SPTempDay, self.prevSPTempDay = "27", "27", "27"
+        self.SPHum, self.SPHumDay, self.prevSPHumDay = "70", "70", "70"
+        self.SPLight, self.SPLightDay, self.prevSPLightDay = "4000", "4000", "4000"
+        self.SPTempNight, self.prevSPTempNight = "23", "23"
+        self.SPHumNight, self.prevSPHumNight = "90", "90"
+        self.SPLightNight, self.prevSPLightNight = "0", "0"
 
         # try get last set point data
         self.lastSPDataFilename = "Actual/Last_SP_Data.csv"
@@ -78,18 +78,38 @@ class UI(QMainWindow):
                 with open(self.lastSPDataFilename, "r") as file:
                     lines = file.readlines()
                 self.SPTempDay = lines[0].strip()
+                self.prevSPTempDay = self.SPTempDay
                 self.SPHumDay = lines[1].strip()
+                self.prevSPHumDay = self.SPHumDay
                 self.SPLightDay = lines[2].strip()
+                self.prevSPLightDay = self.SPLightDay
                 self.SPTempNight = lines[3].strip()
+                self.prevSPTempNight = self.SPTempNight
                 self.SPHumNight = lines[4].strip()
+                self.prevSPHumNight = self.SPHumNight
                 self.SPLightNight = lines[5].strip()
+                self.prevSPLightNight = self.SPLightNight
                 print("Success get last set point data")
             except:
                 print("Failed get last set point data")
 
         # day or night parameter
-        self.startDay = "6"
-        self.startNight = "18"
+        self.startDay, tempStartDay = "6", "6"
+        self.startNight, tempStartNight = "8", "8"
+
+        # try get last day night start time data
+        self.lastDayNightDataFilename = "Actual/Last_DayNight_Data.csv"
+        if (os.path.exists(self.lastDayNightDataFilename) == True):
+            try:
+                with open(self.lastDayNightDataFilename, "r") as file:
+                    lines = file.readlines()
+                self.startDay = lines[0].strip()
+                self.tempStartDay = self.startDay
+                self.startNight = lines[1].strip()
+                self.tempStartNight = self.startNight
+                print("Success get last day night start time data")
+            except:
+                print("Failed get last day night start time data")
 
         # set point limiter
         self.upLimitSPTemp = 40
@@ -120,10 +140,12 @@ class UI(QMainWindow):
         self.tempPage = self.findChild(QWidget, "tempPage")
         self.humPage = self.findChild(QWidget, "humPage")
         self.lightPage = self.findChild(QWidget, "lightPage")
+        self.dayNightPage = self.findChild(QWidget, "dayNightPage")
         
         # parent element
         self.fullscreenButton = self.findChild(QPushButton, "fullscreenButton")
         self.shutdownButton = self.findChild(QPushButton, "shutdown")
+        self.toDayNightPageButton = self.findChild(QPushButton, "dayNightSetting")
         self.actualTime = self.findChild(QLabel, "actualTime")
         self.actualDay = self.findChild(QLabel, "actualDay")
         self.actualDate = self.findChild(QLabel, "actualDate")
@@ -210,6 +232,25 @@ class UI(QMainWindow):
         self.commaButtonLight = self.findChild(QPushButton, "buttonCommaLight")
         self.backFromLight = self.findChild(QPushButton, "goDashboardFromLight")
 
+        # day night start time setting page
+        self.startTimeDay = self.findChild(QLineEdit, "startTimeDay")
+        self.startTimeNight = self.findChild(QLineEdit, "startTimeNight")
+        self.dayButton = self.findChild(QCheckBox, "startDayOnOff")
+        self.nightButton = self.findChild(QCheckBox, "startNightOnOff")
+        self.setStartTimeButton = self.findChild(QPushButton, "setStartTime")
+        self.oneButtonStartTime = self.findChild(QPushButton, "buttonOneStartTime")
+        self.twoButtonStartTime = self.findChild(QPushButton, "buttonTwoStartTime")
+        self.threeButtonStartTime = self.findChild(QPushButton, "buttonThreeStartTime")
+        self.fourButtonStartTime = self.findChild(QPushButton, "buttonFourStartTime")
+        self.fiveButtonStartTime = self.findChild(QPushButton, "buttonFiveStartTime")
+        self.sixButtonStartTime = self.findChild(QPushButton, "buttonSixStartTime")
+        self.sevenButtonStartTime = self.findChild(QPushButton, "buttonSevenStartTime")
+        self.eightButtonStartTime = self.findChild(QPushButton, "buttonEightStartTime")
+        self.nineButtonStartTime = self.findChild(QPushButton, "buttonNineStartTime")
+        self.zeroButtonStartTime = self.findChild(QPushButton, "buttonZeroStartTime")
+        self.delButtonStartTime = self.findChild(QPushButton, "buttonDelStartTime")
+        self.backFromDayNight = self.findChild(QPushButton, "goDashboardFromDayNight")
+
         # initial display
         self.showMaximized()
         self.stackedWidget.setCurrentWidget(self.dashboardPage)
@@ -262,6 +303,8 @@ class UI(QMainWindow):
         self.setpointHumNight.setText(self.SPHumNight)
         self.setpointLightDay.setText(self.SPLightDay)
         self.setpointLightNight.setText(self.SPLightNight)
+        self.startTimeDay.setText(self.startDay)
+        self.startTimeNight.setText(self.startNight)
         
         # behaviour on central widget
         self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
@@ -277,6 +320,7 @@ class UI(QMainWindow):
         self.toTempPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.tempPage))
         self.toHumPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.humPage))
         self.toLightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.lightPage))
+        self.toDayNightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.dayNightPage))
         
         # behaviour on temp page
         self.manualTempButton.stateChanged.connect(lambda: self.manualButton_clicked(self.manualTempButton))
@@ -338,6 +382,23 @@ class UI(QMainWindow):
         self.delButtonLight.clicked.connect(lambda:self.delButton_clicked("Light"))
         self.commaButtonLight.clicked.connect(lambda:self.digitButton_clicked('.', "Light"))
         self.backFromLight.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
+
+        # behaviour on day night start time setting page
+        self.dayButton.stateChanged.connect(lambda:self.dayNightStartTimeCheckbox_clicked("Day"))
+        self.nightButton.stateChanged.connect(lambda:self.dayNightStartTimeCheckbox_clicked("Night"))
+        self.setStartTimeButton.clicked.connect(lambda:self.setDayNightButton_clicked())
+        self.oneButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('1', "DayNight"))
+        self.twoButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('2', "DayNight"))
+        self.threeButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('3', "DayNight"))
+        self.fourButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('4', "DayNight"))
+        self.fiveButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('5', "DayNight"))
+        self.sixButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('6', "DayNight"))
+        self.sevenButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('7', "DayNight"))
+        self.eightButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('8', "DayNight"))
+        self.nineButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('9', "DayNight"))
+        self.zeroButtonStartTime.clicked.connect(lambda:self.digitButton_clicked('0', "DayNight"))
+        self.delButtonStartTime.clicked.connect(lambda:self.delButton_clicked("DayNight"))
+        self.backFromDayNight.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         # check user behaviour
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
@@ -569,6 +630,19 @@ class UI(QMainWindow):
                     self.dayLightButton.setDisabled(True)
                 elif (self.nightLightButton.isChecked() == False):
                     self.dayLightButton.setDisabled(False)
+    
+    # function if day or night start time set checkbox is clicked
+    def dayNightStartTimeCheckbox_clicked(self, weather_type):
+        if weather_type == "Day":
+            if self.dayButton.isChecked():
+                self.nightButton.setDisabled(True)
+            else:
+                self.nightButton.setDisabled(False)
+        else:
+            if self.nightButton.isChecked():
+                self.dayButton.setDisabled(True)
+            else:
+                self.dayButton.setDisabled(False)
 
     # function if set optimum button is clicked
     def setButton_clicked(self, setpoint_type):
@@ -608,6 +682,18 @@ class UI(QMainWindow):
                 self.sendDataCloud()
                 self.sendDataMCU()
                 self.saveSPDataToLocalFile()
+
+    # function when set day night start time button is clicked
+    def setDayNightButton_clicked(self):
+        if ((float(self.tempStartDay) > float(self.tempStartNight)) or (float(self.tempStartDay) < 0) or (float(self.tempStartNight) < 0) or (float(self.tempStartDay) > 24) or (float(self.tempStartNight) > 24)):
+            self.tempStartDay = self.startDay
+            self.tempStartNight = self.startNight
+            self.startTimeDay.setText(self.startDay)
+            self.startTimeNight.setText(self.startNight)
+        else:
+            self.startDay = self.tempStartDay
+            self.startNight = self.tempStartNight
+            self.saveDayNightDataToLocalFile()
     
     # function if set actuator state is clicked
     def setActuatorButton_clicked(self, actuator_type):
@@ -656,6 +742,13 @@ class UI(QMainWindow):
             elif self.nightLightButton.isChecked():
                 self.SPLightNight += digit
                 self.setpointLightNight.setText(self.SPLightNight)
+        elif setpoint_type == "DayNight":
+            if self.dayButton.isChecked():
+                self.tempStartDay += digit
+                self.startTimeDay.setText(self.tempStartDay)
+            elif self.nightButton.isChecked():
+                self.tempStartNight += digit
+                self.startTimeNight.setText(self.tempStartNight)
     
     # function if button delete for optimum value is clicked
     def delButton_clicked(self, setpoint_type):
@@ -680,6 +773,13 @@ class UI(QMainWindow):
             elif self.nightLightButton.isChecked():
                 self.setpointLightNight.setText(self.SPLightNight[:-1])
                 self.SPLightNight = self.setpointLightNight.text()
+        elif setpoint_type == "DayNight":
+            if self.dayButton.isChecked():
+                self.startTimeDay.setText(self.tempStartDay[:-1])
+                self.tempStartDay = self.startTimeDay.text()
+            elif self.nightButton.isChecked():
+                self.startTimeNight.setText(self.tempStartNight[:-1])
+                self.tempStartNight = self.startTimeNight.text()
 
     # update actual data display
     def updateActualDataDisplay(self):
@@ -783,6 +883,16 @@ class UI(QMainWindow):
             print("Set point data saved to local file (" + self.lastSPDataFilename + ")")
         except:
             print("Failed save set point data to local file as excel")
+
+    # function for save last set day night start timer
+    def saveDayNightDataToLocalFile(self):
+        try:
+            data_local = str(self.startDay) + "\n" + str(self.startNight)
+            with open(self.lastDayNightDataFilename, "w") as f:
+                f.write(data_local)
+            print("Day night start time data saved to local file (" + self.lastDayNightDataFilename + ")")
+        except:
+            print("Failed save day night start time data to local file as excel")
     
     # function for checking duration from last touch
     def checkLastTouch(self):
