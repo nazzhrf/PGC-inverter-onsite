@@ -16,8 +16,8 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 class UI(QMainWindow):
     def __init__(self):
         # variable for chamber identifier or device related
+        self.deviceKey = ""
         self.deviceId = "3"
-        self.deviceKey = "e8866d201336427ac4057dafb408eaea6bf2f574fb553809da0fa0abe659eea09a5daf2a8c115525f8b115f8add7d7aca7bbb864c3d21f"
         self.portUART = '/dev/ttyAMA0'
         self.isThreeCameras = True
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
