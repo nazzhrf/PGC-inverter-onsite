@@ -414,7 +414,7 @@ class UI(QMainWindow):
             timer.start(interval)
             return timer
         self.sendDataCloudTimer = createQTimer(self.sendDataCloud, 10010) # send data to cloud scheduling
-        self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 1750000) # send data to DB in cloud scheduling
+        self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 120000) # send data to DB in cloud scheduling
         self.saveDataToLocalFileTimer = createQTimer(self.saveDataToLocalFile, 120000) # save data to local file scheduling
         self.updateTimeTimer = createQTimer(self.updateTime, 500) # update time scheduling
         self.updateActualDataDisplayTimer = createQTimer(self.updateActualDataDisplay, 10000) # update actual data display scheduling
