@@ -15,6 +15,7 @@ self.deviceId = ""
 self.deviceKey = ""
 self.portUART = ""
 self.isThreeCameras = True/False
+self.isLandscape = True/False
 ```
 
 Adjust camera device on main.py using value from get_camera.py:

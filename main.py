@@ -20,6 +20,7 @@ class UI(QMainWindow):
         self.deviceId = "3"
         self.portUART = '/dev/ttyAMA0'
         self.isThreeCameras = True
+        self.isLandscape = True
         self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
         self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
         self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
@@ -35,7 +36,10 @@ class UI(QMainWindow):
 
         # initiate GUI
         super(UI, self).__init__()
-        uic.loadUi("UI/main.ui", self)
+        if (self.isLandscape == True) :
+            uic.loadUi("UI/main-landscape.ui", self)
+        else :
+            uic.loadUi("UI/main.ui", self)
 
         # hardware parameter
         self.mode = "auto"
