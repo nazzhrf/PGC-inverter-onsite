@@ -24,6 +24,7 @@ def scheduler_main():
         current_time = time.localtime()
         current_hour = current_time.tm_hour
         current_minute = current_time.tm_min
+        current_day = current_time.tm_mday
         # restart main program every hour
         if (current_hour != prev_hour):
             if main_process is not None:
@@ -34,6 +35,9 @@ def scheduler_main():
             main_process = run_main()
             print("Main program restarted")
             prev_hour = current_hour
+        # reboot device every month
+        if current_day == 1 and current_hour == 0 and current_minute == 1:
+            subprocess.run(['sudo', 'reboot'])
         time.sleep(30)  # Sleep for 30 seconds before checking again
 
 if __name__ == "__main__":
