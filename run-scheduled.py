@@ -19,14 +19,14 @@ def get_pid_by_command(command):
 # manage run main program, restart program, and reboot schedule
 def scheduler_main():
     main_process = run_main()
-    prev_hour = (time.localtime()).tm_hour  # Initialize the previous hour
+    prev_day = (time.localtime()).tm_mday  # Initialize the previous day
     while True:
         current_time = time.localtime()
         current_hour = current_time.tm_hour
         current_minute = current_time.tm_min
         current_day = current_time.tm_mday
         # restart main program every hour
-        if (current_hour != prev_hour):
+        if (current_day != prev_day):
             if main_process is not None:
                 pid = get_pid_by_command('python3')
                 subprocess.run(["kill", "-9", str(pid)])
@@ -34,7 +34,7 @@ def scheduler_main():
             time.sleep(0.5)
             main_process = run_main()
             print("Main program restarted")
-            prev_hour = current_hour
+            prev_day = current_day
         # reboot device every month
         if current_day == 1 and current_hour == 0 and current_minute == 1:
             subprocess.run(['sudo', 'reboot'])

@@ -16,14 +16,14 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 class UI(QMainWindow):
     def __init__(self):
         # variable for chamber identifier or device related
+        self.deviceId = "1"
         self.deviceKey = ""
-        self.deviceId = "3"
         self.portUART = '/dev/ttyAMA0'
-        self.isThreeCameras = True
-        self.isLandscape = True
-        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
-        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
-        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
+        self.isThreeCameras = False
+        self.isLandscape = False
+        self.topCameraDevice = ''
+        self.bottomCameraDevice = ''
+        self.userCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.2.3):'
         self.topRightCameraDevice = ''
         self.bottomRightCameraDevice = ''
         
@@ -874,6 +874,7 @@ class UI(QMainWindow):
             data_local = str(self.actTemp) + "\n" + str(self.actHum) + "\n" + str(self.actLight) + "\n" + str(self.mode) + "\n" + str(self.manHeater) + "\n" + str(self.manComp) + "\n" + str(self.manHum) + "\n" + str(self.manLight)
             with open(self.lastActualDataFilename, "w") as f:
                 f.write(data_local)
+            print(data_local)
             print("Actual condition data saved to local file (" + self.lastActualDataFilename + ")")
         except:
             print("Failed save actual condition data to local file as excel")
@@ -1045,7 +1046,7 @@ class UI(QMainWindow):
             self.serial.open(QtCore.QIODevice.ReadWrite)
             while self.serial.canReadLine():
                 buffer = self.serial.readLine().data().decode(errors='ignore')
-                print(buffer)
+                print(f"Received data from MCU: {buffer}")
                 try:
                     data = json.loads(buffer.encode().decode())
                     tempTemp = data.get("actTemp")
@@ -1059,8 +1060,9 @@ class UI(QMainWindow):
                     self.subActualLight.setText(self.actLight)
                     self.pwmHeater = data.get("pwmHeater")
                     self.saveActualDataToLocalFile()
+                    print("Successfully receive data from MCU and save to Local File")
                 except json.JSONDecodeError:
-                    pass
+                    print("Data received from MCU but not saved to variable and Local File")
         except:
             print("Failed receiving data from MCU")
 
