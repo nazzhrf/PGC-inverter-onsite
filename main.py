@@ -16,16 +16,16 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 class UI(QMainWindow):
     def __init__(self):
         # variable for chamber identifier or device related
-        self.deviceId = "1"
-        self.deviceKey = ""
+        self.deviceKey = "b07e1bd766911299f941a0d1f1b1f6a8a602e22a15ce0ce834378579fd0c3ef789b1a8a54c3879d134ad8ffb9cf805527bb5abf355ab1e"
+        self.deviceId = "12"
         self.portUART = '/dev/ttyAMA0'
         self.isThreeCameras = False
-        self.isLandscape = False
-        self.topCameraDevice = ''
-        self.bottomCameraDevice = ''
-        self.userCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.2.3):'
-        self.topRightCameraDevice = ''
-        self.bottomRightCameraDevice = ''
+        self.isLandscape = True
+        self.topCameraDevice = 'Laptop_Integrated_Webcam_E4HD:  (usb-0000:01:00.0-1.2.1):'
+        self.bottomCameraDevice = 'Laptop_Integrated_Webcam_HD: In (usb-0000:01:00.0-1.2.4):'
+        self.userCameraDevice = 'USB Camera: USB 2.0 UVC HD Webc (usb-0000:01:00.0-1.1):'
+        self.topRightCameraDevice ='Laptop_Integrated_Webcam_HD: In (usb-0000:01:00.0-1.2.2):'
+        self.bottomRightCameraDevice = 'Integrated Camera: Integrated C (usb-0000:01:00.0-1.2.3):'
         
         # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'
@@ -1050,12 +1050,15 @@ class UI(QMainWindow):
                 try:
                     data = json.loads(buffer.encode().decode())
                     tempTemp = data.get("actTemp")
+                    tempHum = data.get("actHum")
+                    tempLight = data.get("actLight")
+                    checkTemp = float(tempTemp)
+                    checkHum = float(tempHum)
+                    checkLight = float(tempLight)
                     self.actTemp = tempTemp[0:len(tempTemp)-1]
                     self.subActualTemp.setText(self.actTemp)
-                    tempHum = data.get("actHum")
                     self.actHum = tempHum[0:len(tempHum)-3]
                     self.subActualHum.setText(self.actHum)
-                    tempLight = data.get("actLight")
                     self.actLight = tempLight[0:len(tempLight)-3]
                     self.subActualLight.setText(self.actLight)
                     self.pwmHeater = data.get("pwmHeater")
