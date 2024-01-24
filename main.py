@@ -43,7 +43,7 @@ class UI(QMainWindow):
 
         # hardware parameter
         self.mode = "auto"
-        self.pwmHeater, self.pwmFan, self.manLight = 0, 0, 0
+        self.manLight = 0, 0, 0
         self.manHeater, self.manComp, self.manHum = False, False, False
 
         # set actual condition parameter
@@ -1055,13 +1055,12 @@ class UI(QMainWindow):
                     checkTemp = float(tempTemp)
                     checkHum = float(tempHum)
                     checkLight = float(tempLight)
-                    self.actTemp = tempTemp[0:len(tempTemp)-1]
+                    self.actTemp = str(round(float(tempTemp), 1))
                     self.subActualTemp.setText(self.actTemp)
-                    self.actHum = tempHum[0:len(tempHum)-3]
+                    self.actHum = str(int(float(tempHum)))
                     self.subActualHum.setText(self.actHum)
-                    self.actLight = tempLight[0:len(tempLight)-3]
+                    self.actLight = str(int(float(tempLight)))
                     self.subActualLight.setText(self.actLight)
-                    self.pwmHeater = data.get("pwmHeater")
                     self.saveActualDataToLocalFile()
                     print("Successfully receive data from MCU and save to Local File")
                 except json.JSONDecodeError:
