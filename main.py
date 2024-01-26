@@ -16,16 +16,16 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 class UI(QMainWindow):
     def __init__(self):
         # variable for chamber identifier or device related
-        self.deviceKey = "b07e1bd766911299f941a0d1f1b1f6a8a602e22a15ce0ce834378579fd0c3ef789b1a8a54c3879d134ad8ffb9cf805527bb5abf355ab1e"
-        self.deviceId = "12"
+        self.deviceKey = "b20115e315475412c61ae695f518d791d0a9c92cc71425bcff62ce6132c4ab4879886736a742337bbacfb67727208b3d10e1f779ce8dff"
+        self.deviceId = "1"
         self.portUART = '/dev/ttyAMA0'
         self.isThreeCameras = False
         self.isLandscape = True
-        self.topCameraDevice = 'Laptop_Integrated_Webcam_E4HD:  (usb-0000:01:00.0-1.2.1):'
-        self.bottomCameraDevice = 'Laptop_Integrated_Webcam_HD: In (usb-0000:01:00.0-1.2.4):'
-        self.userCameraDevice = 'USB Camera: USB 2.0 UVC HD Webc (usb-0000:01:00.0-1.1):'
-        self.topRightCameraDevice ='Laptop_Integrated_Webcam_HD: In (usb-0000:01:00.0-1.2.2):'
-        self.bottomRightCameraDevice = 'Integrated Camera: Integrated C (usb-0000:01:00.0-1.2.3):'
+        self.topCameraDevice = 'HX-USB Camera: HX-USB Camera (usb-0000:01:00.0-1.2.2):'
+        self.bottomCameraDevice = 'USB_2.0_Webcam: USB_2.0_Webcam (usb-0000:01:00.0-1.2.4):'
+        self.userCameraDevice = 'HP Webcam: HP Webcam (usb-0000:01:00.0-1.2.3):'
+        self.topRightCameraDevice = ''
+        self.bottomRightCameraDevice = ''
         
         # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'
@@ -45,6 +45,7 @@ class UI(QMainWindow):
         self.mode = "auto"
         self.manLight = 0, 0, 0
         self.manHeater, self.manComp, self.manHum = False, False, False
+        self.waterStatus = "1"
 
         # set actual condition parameter
         self.actTemp, self.actHum, self.actLight = "", "", ""
@@ -940,7 +941,8 @@ class UI(QMainWindow):
                     "SPTemp" : self.SPTemp,
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
-                    "gateway_temp": f"{cpu_temp:.2f}"
+                    "gateway_temp": f"{cpu_temp:.2f}",
+                    "water_status" : self.waterStatus,
                 }
                 header = {
                     'Content-Type': 'application/json',
@@ -969,6 +971,7 @@ class UI(QMainWindow):
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
                     "gateway_temp": f"{cpu_temp:.2f}",
+                    "water_status" : self.waterStatus,
                 }
                 header = {
                     'Content-Type': 'application/json',
@@ -1052,12 +1055,15 @@ class UI(QMainWindow):
                     tempTemp = data.get("actTemp")
                     tempHum = data.get("actHum")
                     tempLight = data.get("actLight")
+                    tempWaterStatus = data.get("actWater")
                     self.actTemp = str(round(float(tempTemp), 1))
                     self.subActualTemp.setText(self.actTemp)
                     self.actHum = str(int(float(tempHum)))
                     self.subActualHum.setText(self.actHum)
                     self.actLight = str(int(float(tempLight)))
                     self.subActualLight.setText(self.actLight)
+                    if (tempWaterStatus != None):
+                        self.waterStatus = str(int(tempWaterStatus))
                     self.saveActualDataToLocalFile()
                     print("Successfully receive data from MCU and save to Local File")
                 except json.JSONDecodeError:
