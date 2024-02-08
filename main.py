@@ -43,7 +43,7 @@ class UI(QMainWindow):
 
         # hardware parameter
         self.mode = "auto"
-        self.manLight = 0, 0, 0
+        self.manLight = 0
         self.manHeater, self.manComp, self.manHum = False, False, False
         self.waterStatus = "1"
 
