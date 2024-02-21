@@ -3,7 +3,7 @@ import time
 
 # execute main program
 def run_main():
-    return subprocess.Popen(['/usr/bin/python3', '/home/pi/main.py']) #run on GUI
+    return subprocess.Popen(['/usr/bin/python3', '/home/pi/.main.py']) #run on GUI
 
 # get latest python3 execution task
 def get_pid_by_command(command):
@@ -25,7 +25,7 @@ def scheduler_main():
         current_hour = current_time.tm_hour
         current_minute = current_time.tm_min
         current_day = current_time.tm_mday
-        # restart main program every hour
+        # restart main program every day
         if (current_day != prev_day):
             if main_process is not None:
                 pid = get_pid_by_command('python3')
