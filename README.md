@@ -2,13 +2,13 @@
 
 Documentation [here](https://docs.google.com/document/d/14_6l-3nRShH518GohGLufQKyqBomQMMn8HKurVXmP8Q/edit?usp=sharing)
 
-Place this project on this directory:
+- Place this project on this directory:
 
 ```
 /home/pi
 ```
 
-Create .params-local.json file and adjust these variable to setup device:
+- Create .params-local.json file and adjust these variable to setup device:
 
 ```
 self.deviceId = ""
@@ -28,16 +28,18 @@ self.bottomRightCameraDevice = ""
 self.userCameraDevice = ""
 ```
 
-Run .run-scheduled.py to perform auto-restart program hourly functionality:
-
-```
-/usr/bin/python3 home/pi/run-scheduled.py
-```
-
-Use sample_image to create default image file on /.Image directory
+- Use sample_image to create default image file on /.Image directory
 
 ```
 top_chamber{deviceId}.png
 .
 .
+```
+
+- Add /.Data directory folder
+
+- Run .run-scheduled.py to perform auto-restart program hourly functionality:
+
+```
+/usr/bin/python3 home/pi/run-scheduled.py
 ```
