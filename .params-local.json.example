@@ -1,0 +1,12 @@
+{
+    "deviceId": "0",
+    "deviceKey": "exampleDeviceKey",
+    "portUART": "/dev/Port",
+    "isThreeCameras": false,
+    "isLandscape": false,
+    "topCameraDevice": "Camera (usb-0000:00:00.0-0.0.0):",
+    "bottomCameraDevice": "Camera (usb-0000:00:00.0-0.0.0):",
+    "userCameraDevice": "Camera (usb-0000:00:00.0-0.0.0):",
+    "topRightCameraDevice": "Camera (usb-0000:00:00.0-0.0.0):",
+    "bottomRightCameraDevice": "Camera (usb-0000:00:00.0-0.0.0):"
+}

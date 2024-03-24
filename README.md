@@ -8,7 +8,7 @@ Place this project on this directory:
 /home/pi
 ```
 
-Adjust these variable on main.py to setup device:
+Create .params-local.json file and adjust these variable to setup device:
 
 ```
 self.deviceId = ""
@@ -18,7 +18,7 @@ self.isThreeCameras = True/False
 self.isLandscape = True/False
 ```
 
-Adjust camera device on main.py using value from get_camera.py:
+Also adjust camera device on .params-local.json using value from .get_camera.py:
 
 ```
 self.topCameraDevice = ""
@@ -28,8 +28,16 @@ self.bottomRightCameraDevice = ""
 self.userCameraDevice = ""
 ```
 
-Run run-scheduled.py to perform auto-restart program hourly functionality:
+Run .run-scheduled.py to perform auto-restart program hourly functionality:
 
 ```
 /usr/bin/python3 home/pi/run-scheduled.py
+```
+
+Use sample_image to create default image file on /.Image directory
+
+```
+top_chamber{deviceId}.png
+.
+.
 ```

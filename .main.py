@@ -15,17 +15,20 @@ os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
 class UI(QMainWindow):
     def __init__(self):
-        # variable for chamber identifier or device related
-        self.deviceId = "9"
-        self.deviceKey = "b56cf1a698019bb1551874dddae5e2ce40f300fb3062ec1c753db7e087b9fcbd43a6d5c5be191941d6b75f2f3babad56609d0ac2bc5aae"
-        self.portUART = '/dev/ttyAMA0'
-        self.isThreeCameras = False
-        self.isLandscape = False
-        self.topCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.2.1):'
-        self.bottomCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.2.2):'
-        self.userCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.1):'
-        self.topRightCameraDevice = 'Integrated Camera: Integrated C (usb-0000:01:00.0-1.2.4):'
-        self.bottomRightCameraDevice = 'Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.2.3):'
+        # read variable for chamber identifier or device from .params-local.json
+        params_local_path = ".params-local.json"
+        with open(params_local_path, 'r') as file:
+            params_local = json.load(file)
+        self.deviceId = params_local["deviceId"]
+        self.deviceKey = params_local["deviceKey"]
+        self.portUART = params_local["portUART"]
+        self.isThreeCameras = params_local["isThreeCameras"]
+        self.isLandscape = params_local["isLandscape"]
+        self.topCameraDevice = params_local["topCameraDevice"]
+        self.bottomCameraDevice = params_local["bottomCameraDevice"]
+        self.userCameraDevice = params_local["userCameraDevice"]
+        self.topRightCameraDevice = params_local["topRightCameraDevice"]
+        self.bottomRightCameraDevice = params_local["bottomRightCameraDevice"]
         
         # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'

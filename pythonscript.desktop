@@ -1,4 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Main
-Exec=/usr/bin/python3 /home/pi/.run-scheduled.py
