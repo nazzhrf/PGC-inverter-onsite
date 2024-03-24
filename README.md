@@ -38,6 +38,17 @@ top_chamber{deviceId}.png
 
 - Add /.Data directory folder
 
+- Adjust /.Actual/Last_SP_Data.csv if you want directly change set point
+
+```
+{SPTempDay}
+{SPHumDay}
+{SPLightDay}
+{SPTempNight}
+{SPHumNight}
+{SPLightNight}
+```
+
 - Run .run-scheduled.py to perform auto-restart program hourly functionality:
 
 ```
