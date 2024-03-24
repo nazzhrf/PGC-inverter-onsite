@@ -11,21 +11,21 @@ Documentation [here](https://docs.google.com/document/d/14_6l-3nRShH518GohGLufQK
 - Create .params-local.json file and adjust these variable to setup device:
 
 ```
-self.deviceId = ""
-self.deviceKey = ""
-self.portUART = ""
-self.isThreeCameras = True/False
-self.isLandscape = True/False
+deviceId = ""
+deviceKey = ""
+portUART = ""
+isThreeCameras = true/false
+isLandscape = true/false
 ```
 
 Also adjust camera device on .params-local.json using value from .get_camera.py:
 
 ```
-self.topCameraDevice = ""
-self.topRightCameraDevice = ""
-self.bottomCameraDevice = ""
-self.bottomRightCameraDevice = ""
-self.userCameraDevice = ""
+topCameraDevice = ""
+topRightCameraDevice = ""
+bottomCameraDevice = ""
+bottomRightCameraDevice = ""
+userCameraDevice = ""
 ```
 
 - Use sample_image to create default image file on /.Image directory
