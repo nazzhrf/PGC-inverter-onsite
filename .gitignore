@@ -2,3 +2,4 @@
 .params-local.json
 /.Image
 /.Data
+/.Actual/Last_SP_Data.csv
