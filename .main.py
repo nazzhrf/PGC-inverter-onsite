@@ -315,7 +315,7 @@ class UI(QMainWindow):
         self.startTimeNight.setText(self.startNight)
         
         # behaviour on central widget
-        self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
+        #self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
         self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
         # if device has 5 cameras
