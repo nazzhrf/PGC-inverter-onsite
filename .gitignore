@@ -1,5 +1,12 @@
-.DS_Store
-.params-local.json
-/.Image
-/.Data
-/.Actual/Last_SP_Data.csv
+*
+!/.Actual/Last_Actual_Data.csv
+!/.Actual/Last_DayNight_Data.csv
+!/.Test
+!/.UI
+!.get_camera.py
+!.gitignore
+!.main.py
+!.params-local-example.json
+!.README.md
+!.run-scheduled.py
+!.sampe_image.png
