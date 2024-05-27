@@ -13,36 +13,59 @@ import sseclient, sys, time, json, requests, cv2, os, subprocess
 # comment this if make script error
 os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
 
+# functions for get params
+def load_params(prefix_path):
+    params_local_path = prefix_path + ".params-local.json"
+    with open(params_local_path, 'r') as file:
+        params = json.load(file)
+    return params
+
+# define devices, prefix path, and get params local from .params-local.json
+prefixPath = ""
+device = "Raspberry"
+try:
+    params_local = load_params(prefixPath)
+except (FileNotFoundError, json.JSONDecodeError):
+    prefixPath = "/home/sgc/pi/"
+    device = "Beelink"
+    params_local = load_params(prefixPath)
+
+# set device variable from json params local
+deviceId = params_local["deviceId"]
+deviceKey = params_local["deviceKey"]
+portUART = params_local["portUART"]
+isThreeCameras = params_local["isThreeCameras"]
+isLandscape = params_local["isLandscape"]
+topCameraDevice = params_local["topCameraDevice"]
+bottomCameraDevice = params_local["bottomCameraDevice"]
+userCameraDevice = params_local["userCameraDevice"]
+topRightCameraDevice = params_local["topRightCameraDevice"]
+bottomRightCameraDevice = params_local["bottomRightCameraDevice"]
+
+# conditional library import and setup based on device type
+if device == "Beelink":
+    import numpy as np
+    sys.path.insert(0, r"./.local/lib/python3.10/site-packages")
+    black = np.load(prefixPath + "outfile.npy")
+
 class UI(QMainWindow):
     def __init__(self):
-        # read variable for chamber identifier or device from .params-local.json
-        params_local_path = ".params-local.json"
-        with open(params_local_path, 'r') as file:
-            params_local = json.load(file)
-        self.deviceId = params_local["deviceId"]
-        self.deviceKey = params_local["deviceKey"]
-        self.portUART = params_local["portUART"]
-        self.isThreeCameras = params_local["isThreeCameras"]
-        self.isLandscape = params_local["isLandscape"]
-        self.topCameraDevice = params_local["topCameraDevice"]
-        self.bottomCameraDevice = params_local["bottomCameraDevice"]
-        self.userCameraDevice = params_local["userCameraDevice"]
-        self.topRightCameraDevice = params_local["topRightCameraDevice"]
-        self.bottomRightCameraDevice = params_local["bottomRightCameraDevice"]
-        
         # variable for server related
         self.baseUrl = 'https://api.smartfarm.id'
-        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + self.deviceId + '?device_key=' + self.deviceKey
-        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + self.deviceId
+        self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + deviceId + '?device_key=' + deviceKey
+        self.urlPostLiveCond = self.baseUrl + '/condition/data/' + deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
 
         # initiate GUI
         super(UI, self).__init__()
-        if (self.isLandscape == True) :
-            uic.loadUi(".UI/main-landscape.ui", self)
+        if (device == "Beelink") :
+            uic.loadUi(prefixPath + ".UI/main-landscape-high.ui", self)
         else :
-            uic.loadUi(".UI/main.ui", self)
+            if (isLandscape == True) :
+                uic.loadUi(prefixPath + ".UI/main-landscape.ui", self)
+            else :
+                uic.loadUi(prefixPath + ".UI/main.ui", self)
 
         # hardware parameter
         self.mode = "auto"
@@ -54,7 +77,7 @@ class UI(QMainWindow):
         self.actTemp, self.actHum, self.actLight = "", "", ""
 
         # try get last actual data
-        self.lastActualDataFilename = ".Actual/Last_Actual_Data.csv"
+        self.lastActualDataFilename = prefixPath + ".Actual/Last_Actual_Data.csv"
         if (os.path.exists(self.lastActualDataFilename) == True):
             try:
                 with open(self.lastActualDataFilename, "r") as file:
@@ -80,7 +103,7 @@ class UI(QMainWindow):
         self.SPLightNight, self.prevSPLightNight = "0", "0"
 
         # try get last set point data
-        self.lastSPDataFilename = ".Actual/Last_SP_Data.csv"
+        self.lastSPDataFilename = prefixPath + ".Actual/Last_SP_Data.csv"
         if (os.path.exists(self.lastSPDataFilename) == True):
             try:
                 with open(self.lastSPDataFilename, "r") as file:
@@ -106,7 +129,7 @@ class UI(QMainWindow):
         self.startNight, tempStartNight = "8", "8"
 
         # try get last day night start time data
-        self.lastDayNightDataFilename = ".Actual/Last_DayNight_Data.csv"
+        self.lastDayNightDataFilename = prefixPath + ".Actual/Last_DayNight_Data.csv"
         if (os.path.exists(self.lastDayNightDataFilename) == True):
             try:
                 with open(self.lastDayNightDataFilename, "r") as file:
@@ -131,11 +154,11 @@ class UI(QMainWindow):
         self.lastMinuteTouch = (time.localtime()).tm_min
 
         # variable for photo
-        self.pathTopPhoto = '..Image/top_chamber' + self.deviceId + '.png'
-        self.pathBottomPhoto = '.Image/bottom_chamber' + self.deviceId + '.png'
-        self.pathUserPhoto = '.Image/user_chamber' + self.deviceId + '.png'
-        self.pathTopRightPhoto = '.Image/topRight_chamber' + self.deviceId + '.png'
-        self.pathBottomRightPhoto = '.Image/bottomRight_chamber' + self.deviceId + '.png'
+        self.pathTopPhoto = prefixPath + '.Image/top_chamber' + deviceId + '.png'
+        self.pathBottomPhoto = prefixPath + '.Image/bottom_chamber' + deviceId + '.png'
+        self.pathUserPhoto = prefixPath + '.Image/user_chamber' + deviceId + '.png'
+        self.pathTopRightPhoto = prefixPath + '.Image/topRight_chamber' + deviceId + '.png'
+        self.pathBottomRightPhoto = prefixPath + '.Image/bottomRight_chamber' + deviceId + '.png'
         self.currentPhoto = self.pathTopPhoto
         self.intervalSendUserPhoto = 1
         
@@ -316,12 +339,12 @@ class UI(QMainWindow):
         
         # behaviour on central widget
         #self.fullscreenButton.clicked.connect(lambda:self.fullscreenButton_clicked())
-        self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top"))
-        self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
+        self.takePhoto.clicked.connect(lambda:self.sendPhoto(topCameraDevice, self.pathTopPhoto, "Top"))
+        self.takePhoto.clicked.connect(lambda:self.sendPhoto(bottomCameraDevice, self.pathBottomPhoto, "Bottom"))
         # if device has 5 cameras
-        if not self.isThreeCameras:
-            self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right"))
-            self.takePhoto.clicked.connect(lambda:self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right"))
+        if not isThreeCameras:
+            self.takePhoto.clicked.connect(lambda:self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right"))
+            self.takePhoto.clicked.connect(lambda:self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right"))
         
         # behaviour on dashboard page
         self.shutdownButton.clicked.connect(lambda:self.shutdownButton_clicked())
@@ -432,7 +455,7 @@ class UI(QMainWindow):
         
         # wired serial to hardware
         try:
-            self.serial = QtSerialPort.QSerialPort(self.portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
+            self.serial = QtSerialPort.QSerialPort(portUART, baudRate=QtSerialPort.QSerialPort.Baud9600, readyRead=self.receive)
         except:
             print("Serial UART port not available")
 
@@ -441,11 +464,11 @@ class UI(QMainWindow):
 
         # take photo when program start and on day
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
-            self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
-            self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
-            if not self.isThreeCameras:
-                self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
-                self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+            self.sendPhoto(topCameraDevice, self.pathTopPhoto, "Top")
+            self.sendPhoto(bottomCameraDevice, self.pathBottomPhoto, "Bottom")
+            if not isThreeCameras:
+                self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
+                self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
             
     # create sse connection
     def subscribeSSE(self):
@@ -490,12 +513,12 @@ class UI(QMainWindow):
         print("Receive Set Point Data from Cloud!")
         try:
             if ("take_photos" in data_json):
-                self.sendPhoto(self.topCameraDevice, self.pathTopPhoto, "Top")
-                self.sendPhoto(self.bottomCameraDevice, self.pathBottomPhoto, "Bottom")
-                self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
-                if not self.isThreeCameras:
-                    self.sendPhoto(self.topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
-                    self.sendPhoto(self.bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+                self.sendPhoto(topCameraDevice, self.pathTopPhoto, "Top")
+                self.sendPhoto(bottomCameraDevice, self.pathBottomPhoto, "Bottom")
+                self.sendPhoto(userCameraDevice, self.pathUserPhoto, "User")
+                if not isThreeCameras:
+                    self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
+                    self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -555,7 +578,10 @@ class UI(QMainWindow):
     
     # function for shutdown raspberry
     def shutdownButton_clicked(self):
-        os.system("sudo shutdown -h now")
+        if (device == "Beelink") :
+            os.system("shutdown -h now")
+        else :
+            os.system("sudo shutdown -h now")
 
     # function to handle manual checkbox button
     def manualButton_clicked(self, button):
@@ -825,7 +851,7 @@ class UI(QMainWindow):
     # function for updating photo on dashboard
     def updatePhoto(self):
         if (self.currentPhoto == self.pathTopPhoto):
-            if self.isThreeCameras:
+            if isThreeCameras:
                 self.currentPhoto = self.pathBottomPhoto
                 self.actualPosition.setText("Bottom")
             else:
@@ -835,7 +861,7 @@ class UI(QMainWindow):
             self.currentPhoto = self.pathBottomPhoto
             self.actualPosition.setText("Bottom")
         elif (self.currentPhoto == self.pathBottomPhoto):
-            if self.isThreeCameras:
+            if isThreeCameras:
                 self.currentPhoto = self.pathTopPhoto
                 self.actualPosition.setText("Top")
             else:
@@ -860,7 +886,7 @@ class UI(QMainWindow):
             cpu_temp = self.get_cpu_temperature()
             data_local = str(time.localtime().tm_hour) + ":" + str(time.localtime().tm_min) + ":" + str(time.localtime().tm_sec) + "_" + str(time.localtime().tm_mday) + "/" + str(time.localtime().tm_mon) + "/" + str(time.localtime().tm_year) + "," + str(self.mode) + "," + str(self.SPTemp) + "," + str(self.SPHum) + "," + str(self.SPLight) + "," + str(self.actTemp) + "," + str(self.actHum) + "," + str(self.actLight) + "," + str(self.manHeater) + "," + str(self.manComp) + "," + str(self.manLight) + "," + str(self.manHum) + "," + f"{cpu_temp:.2f}" + "\n"
             header = "timestamp,mode,SPTemp,SPHum,SPLight,actTemp,actHum,actLight,manHeater,manComp,manLight,manHum,cpuTemp" + "\n"
-            dbFilename = ".Data/Data " + str(time.localtime().tm_mon) + "_" + str(time.localtime().tm_year) + ".csv"
+            dbFilename = prefixPath + ".Data/Data " + str(time.localtime().tm_mon) + "_" + str(time.localtime().tm_year) + ".csv"
             if (os.path.exists(dbFilename) == True):
                 f = open(dbFilename, "a")
                 f.write(data_local)
@@ -910,7 +936,7 @@ class UI(QMainWindow):
         if (differenceTouchTime < 0):
             differenceTouchTime = differenceTouchTime + 60
         if (differenceTouchTime >= self.intervalSendUserPhoto):
-            self.sendPhoto(self.userCameraDevice, self.pathUserPhoto, "User")
+            self.sendPhoto(userCameraDevice, self.pathUserPhoto, "User")
             print("New User Detected, Photo User sent to Cloud")
         self.lastMinuteTouch = currentTouch 
 
@@ -936,7 +962,7 @@ class UI(QMainWindow):
                     self.SPLight = self.SPLightNight
                 cpu_temp = self.get_cpu_temperature()
                 data_json ={
-                    "device_id" : self.deviceId,
+                    "device_id" : deviceId,
                     "mode" : self.mode,
                     "temperature": float(self.actTemp),
                     "humidity": float(self.actHum),
@@ -949,7 +975,7 @@ class UI(QMainWindow):
                 }
                 header = {
                     'Content-Type': 'application/json',
-                    'device_key': self.deviceKey,
+                    'device_key': deviceKey,
                 }
                 print(data_json)
                 response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json), timeout=10)
@@ -966,7 +992,7 @@ class UI(QMainWindow):
             try:
                 cpu_temp = self.get_cpu_temperature()
                 data = {
-                    "device_id" : int(self.deviceId),
+                    "device_id" : int(deviceId),
                     "temperature": float(self.actTemp),
                     "humidity": float(self.actHum),
                     "intensity": float(self.actLight),
@@ -978,7 +1004,7 @@ class UI(QMainWindow):
                 }
                 header = {
                     'Content-Type': 'application/json',
-                    'device_key': self.deviceKey,
+                    'device_key': deviceKey,
                 }
                 print(data)
                 response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data), timeout=10)
@@ -1028,15 +1054,20 @@ class UI(QMainWindow):
             cam = cv2.VideoCapture(int(indexVideo))
             if cam.isOpened():
                 ret, image = cam.read()
+                if (device == "Beelink") :
+                    compare = np.array_equal(black, np.array(image))            
+                    while compare==True:            
+                        ret, image = cam.read()            
+                        compare = np.array_equal(black, np.array(image))
                 if ret:
                     cv2.imwrite(file_path, image)
                     print(f"{photo_type} Image Captured and Saved")
                 cam.release()
             try:
                 files = {'files': open(file_path, 'rb')}
-                values = {'device_id': int(self.deviceId)}
+                values = {'device_id': int(deviceId)}
                 header = {
-                    'device_key': self.deviceKey,
+                    'device_key': deviceKey,
                 }
                 response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
                 print(f"Successfully sent {photo_type} Photo")
