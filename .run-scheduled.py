@@ -1,12 +1,16 @@
 import subprocess
 import time
+import os
 
 # execute main program
 def run_main():
+    prefixPath = "/home/pi"
     try:
-        return subprocess.Popen(['/usr/bin/python3', '/home/sgc/pi/.main.py'])
-    except:
-        return subprocess.Popen(['/usr/bin/python3', '/home/pi/.main.py'])
+        if not os.path.isfile(os.path.join(prefixPath, ".main.py")):
+            raise FileNotFoundError
+    except FileNotFoundError:
+        prefixPath = "/home/sgc/pi"
+    return subprocess.Popen(['/usr/bin/python3', os.path.join(prefixPath, ".main.py")])
 
 # get latest python3 execution task
 def get_pid_by_command(command):
