@@ -4,7 +4,7 @@ import time
 # execute main program
 def run_main():
     try:
-        return subprocess.Popen(['/usr/bin/python3', '/home/sgc/pi/main.py'])
+        return subprocess.Popen(['/usr/bin/python3', '/home/sgc/pi/.main.py'])
     except:
         return subprocess.Popen(['/usr/bin/python3', '/home/pi/.main.py'])
 
