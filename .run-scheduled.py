@@ -3,7 +3,10 @@ import time
 
 # execute main program
 def run_main():
-    return subprocess.Popen(['/usr/bin/python3', '/home/pi/.main.py']) #run on GUI
+    try:
+        return subprocess.Popen(['/usr/bin/python3', '/home/sgc/pi/main.py'])
+    except:
+        return subprocess.Popen(['/usr/bin/python3', '/home/pi/.main.py'])
 
 # get latest python3 execution task
 def get_pid_by_command(command):
