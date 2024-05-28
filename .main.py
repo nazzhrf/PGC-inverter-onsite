@@ -46,7 +46,7 @@ bottomRightCameraDevice = params_local["bottomRightCameraDevice"]
 if device == "Beelink":
     import numpy as np
     sys.path.insert(0, r"./.local/lib/python3.10/site-packages")
-    black = np.load(prefixPath + "outfile.npy")
+    black = np.load(prefixPath + ".outfile.npy")
 
 class UI(QMainWindow):
     def __init__(self):
