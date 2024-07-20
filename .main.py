@@ -515,9 +515,9 @@ class UI(QMainWindow):
     
     # function for create callback payload
     def data_callback(msg):
-    return {
-        "messages": msg
-    }
+        return {
+            "messages": msg
+        }
 
     # function to parse live data from cloud
     def readLiveSetPointFromCloud(self, data_json):
