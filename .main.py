@@ -54,8 +54,13 @@ class UI(QMainWindow):
         self.baseUrl = 'https://api.smartfarm.id'
         self.urlGetLiveSetpoint = self.baseUrl + '/condition/getsetpoint/' + deviceId + '?device_key=' + deviceKey
         self.urlPostLiveCond = self.baseUrl + '/condition/data/' + deviceId
+        self.urlPostLiveCallback = self.baseUrl + '/condition/events-callback/' + deviceId
         self.urlPostCondToDB = self.baseUrl + '/condition/create'
         self.urlPostPhoto = self.baseUrl + '/file/kamera'
+        self.requestHeader = {
+            'Content-Type': 'application/json',
+            'device_key': deviceKey,
+        }
 
         # initiate GUI
         super(UI, self).__init__()
@@ -548,6 +553,7 @@ class UI(QMainWindow):
                         self.prevSPLightNight = self.SPLightNight
                         self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
+            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_json), timeout=10)
         except:
             print("Error on reading live data from Cloud")
 
@@ -973,12 +979,8 @@ class UI(QMainWindow):
                     "gateway_temp": f"{cpu_temp:.2f}",
                     "water_status" : self.waterStatus,
                 }
-                header = {
-                    'Content-Type': 'application/json',
-                    'device_key': deviceKey,
-                }
                 print(data_json)
-                response = requests.request("POST", self.urlPostLiveCond, headers=header, data=json.dumps(data_json), timeout=10)
+                response = requests.request("POST", self.urlPostLiveCond, headers=self.requestHeader, data=json.dumps(data_json), timeout=10)
                 print("Live Data sent to Cloud")
             except (requests.ConnectionError, requests.Timeout) as exception:
                 pass
@@ -1002,12 +1004,8 @@ class UI(QMainWindow):
                     "gateway_temp": f"{cpu_temp:.2f}",
                     "water_status" : self.waterStatus,
                 }
-                header = {
-                    'Content-Type': 'application/json',
-                    'device_key': deviceKey,
-                }
                 print(data)
-                response = requests.request("POST", self.urlPostCondToDB, headers=header, data=json.dumps(data), timeout=10)
+                response = requests.request("POST", self.urlPostCondToDB, headers=self.requestHeader, data=json.dumps(data), timeout=10)
                 print("Data sent to Cloud Database")
             except (requests.ConnectionError, requests.Timeout) as exception:
                 pass
