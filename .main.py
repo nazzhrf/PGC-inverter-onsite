@@ -524,6 +524,9 @@ class UI(QMainWindow):
                 if not isThreeCameras:
                     self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                     self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+                data_callback = {
+                    "take_photos" : data_json.get("take_photos")
+                }
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -553,7 +556,13 @@ class UI(QMainWindow):
                         self.prevSPLightNight = self.SPLightNight
                         self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
-            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_json), timeout=10)
+                data_callback = {
+                    "mode" : data_json.get("mode"),
+                    "temperature": data_json.get("temperature"),
+                    "humidity": data_json.get("humidity"),
+                    "intensity": data_json.get("intensity")
+                }
+            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
         except:
             print("Error on reading live data from Cloud")
 
