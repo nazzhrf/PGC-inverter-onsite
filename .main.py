@@ -525,7 +525,7 @@ class UI(QMainWindow):
                     self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                     self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
                 data_callback = {
-                    "message" = "Camera command received"
+                    "message": "Camera command received"
                 }
             else: 
                 if ("temperature" in data_json):
@@ -557,7 +557,7 @@ class UI(QMainWindow):
                         self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
                 data_callback = {
-                    "message" = "Camera command received"
+                    "message": "Camera command received"
                 }
             response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
         except:
