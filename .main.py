@@ -62,6 +62,10 @@ class UI(QMainWindow):
             'device_key': deviceKey,
         }
 
+        # variable for managing callback
+        self.receiveSetPoint = 0
+        self.receiveCameraCommand = 0
+
         # initiate GUI
         super(UI, self).__init__()
         if (device == "Beelink") :
@@ -450,6 +454,7 @@ class UI(QMainWindow):
             timer.start(interval)
             return timer
         self.sendDataCloudTimer = createQTimer(self.sendDataCloud, 10010) # send data to cloud scheduling
+        self.sendCallbackTimer = createQTimer(self.sendCallbackCloud, 1005) # send callback to cloud scheduling
         self.sendDataToDBcloudTimer = createQTimer(self.sendDataToDBcloud, 120000) # send data to DB in cloud scheduling
         self.saveDataToLocalFileTimer = createQTimer(self.saveDataToLocalFile, 120000) # save data to local file scheduling
         self.updateTimeTimer = createQTimer(self.updateTime, 500) # update time scheduling
@@ -524,11 +529,7 @@ class UI(QMainWindow):
                 if not isThreeCameras:
                     self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                     self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
-                # data_callback = {
-                #     "message": "Camera command received"
-                # }
-                # response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
-                # self.refreshSSEConnection()
+                self.receiveCameraCommand = 1
             elif ("temperature" in data_json) and ("humidity" in data_json) and ("intensity" in data_json):
                 if (data_json.get("mode") == "Day"):
                     self.SPTempDay = str(data_json.get("temperature"))
@@ -551,11 +552,7 @@ class UI(QMainWindow):
                     self.prevSPLightNight = self.SPLightNight
                     self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
-                # data_callback = {
-                #     "message": "Setpoint settings received"
-                # }
-                # response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
-                # self.refreshSSEConnection()
+                self.receiveSetPoint = 1
         except:
             print("Error on reading live data from Cloud")
 
@@ -989,6 +986,25 @@ class UI(QMainWindow):
                 print("Failed sent Live Data to Cloud")
         else:
             print("Skip send live data to cloud since any var with null value")
+    
+    # send callback to cloud
+    def sendCallbackCloud(self) :
+        if (self.receiveCameraCommand == 1) or (self.receiveSetPoint == 1):
+            try:
+                if (self.receiveSetPoint == 1):
+                    msg = "Setpoint settings received"
+                else:
+                    msg = "Camera command received"
+                data_callback = {
+                    "message": msg
+                }
+                response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
+                print("Any callback sent to Cloud")
+            except (requests.ConnectionError, requests.Timeout) as exception:
+                pass
+                print("Failed sent callback to Cloud")
+        else:
+            print("No callback that needs to sent")
 
     # send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
