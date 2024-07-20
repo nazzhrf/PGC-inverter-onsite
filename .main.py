@@ -528,34 +528,27 @@ class UI(QMainWindow):
                     "message": "Camera command received"
                 }
                 response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
-            else: 
-                if ("temperature" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPTempDay = str(data_json.get("temperature"))
-                        self.prevSPTempDay = self.SPTempDay
-                        self.setpointTempDay.setText(self.SPTempDay)
-                    else:
-                        self.SPTempNight = str(data_json.get("temperature"))
-                        self.prevSPTempNight = self.SPTempNight
-                        self.setpointTempNight.setText(self.SPTempNight)
-                if ("humidity" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPHumDay = str(data_json.get("humidity"))
-                        self.prevSPHumDay = self.SPHumDay
-                        self.setpointHumDay.setText(self.SPHumDay)
-                    else:
-                        self.SPHumNight = str(data_json.get("humidity"))
-                        self.prevSPHumNight = self.SPHumNight
-                        self.setpointHumNight.setText(self.SPHumNight)
-                if ("intensity" in data_json):
-                    if (data_json.get("mode") == "Day"):
-                        self.SPLightDay = str(data_json.get("intensity"))
-                        self.prevSPLightDay = self.SPLightDay
-                        self.setpointLightDay.setText(self.SPLightDay)
-                    else:
-                        self.SPLightNight = str(data_json.get("intensity"))
-                        self.prevSPLightNight = self.SPLightNight
-                        self.setpointLightNight.setText(self.SPLightNight)
+            elif ("temperature" in data_json) and ("humidity" in data_json) and ("intensity" in data_json):
+                if (data_json.get("mode") == "Day"):
+                    self.SPTempDay = str(data_json.get("temperature"))
+                    self.prevSPTempDay = self.SPTempDay
+                    self.setpointTempDay.setText(self.SPTempDay)
+                    self.SPHumDay = str(data_json.get("humidity"))
+                    self.prevSPHumDay = self.SPHumDay
+                    self.setpointHumDay.setText(self.SPHumDay)
+                    self.SPLightDay = str(data_json.get("intensity"))
+                    self.prevSPLightDay = self.SPLightDay
+                    self.setpointLightDay.setText(self.SPLightDay)
+                else:
+                    self.SPTempNight = str(data_json.get("temperature"))
+                    self.prevSPTempNight = self.SPTempNight
+                    self.setpointTempNight.setText(self.SPTempNight)
+                    self.SPHumNight = str(data_json.get("humidity"))
+                    self.prevSPHumNight = self.SPHumNight
+                    self.setpointHumNight.setText(self.SPHumNight)
+                    self.SPLightNight = str(data_json.get("intensity"))
+                    self.prevSPLightNight = self.SPLightNight
+                    self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
                 data_callback = {
                     "message": "Setpoint settings received"
