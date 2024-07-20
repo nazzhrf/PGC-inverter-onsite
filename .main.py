@@ -528,6 +528,7 @@ class UI(QMainWindow):
                     "message": "Camera command received"
                 }
                 response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
+                self.refreshSSEConnection()
             elif ("temperature" in data_json) and ("humidity" in data_json) and ("intensity" in data_json):
                 if (data_json.get("mode") == "Day"):
                     self.SPTempDay = str(data_json.get("temperature"))
@@ -554,6 +555,7 @@ class UI(QMainWindow):
                     "message": "Setpoint settings received"
                 }
                 response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
+                self.refreshSSEConnection()
         except:
             print("Error on reading live data from Cloud")
 
