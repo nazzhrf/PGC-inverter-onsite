@@ -61,9 +61,6 @@ class UI(QMainWindow):
             'Content-Type': 'application/json',
             'device_key': deviceKey,
         }
-        self.data_callback = {
-            "message" : "Settings received"
-        }
 
         # initiate GUI
         super(UI, self).__init__()
