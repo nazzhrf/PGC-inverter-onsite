@@ -984,8 +984,6 @@ class UI(QMainWindow):
             except (requests.ConnectionError, requests.Timeout) as exception:
                 pass
                 print("Failed sent Live Data to Cloud")
-        else:
-            print("Skip send live data to cloud since any var with null value")
     
     # send callback to cloud
     def sendCallbackCloud(self) :
@@ -993,8 +991,10 @@ class UI(QMainWindow):
             try:
                 if (self.receiveSetPoint == 1):
                     msg = "Setpoint settings received"
+                    self.receiveSetPoint = 0
                 else:
                     msg = "Camera command received"
+                    self.receiveCameraCommand = 0
                 data_callback = {
                     "message": msg
                 }
@@ -1003,8 +1003,6 @@ class UI(QMainWindow):
             except (requests.ConnectionError, requests.Timeout) as exception:
                 pass
                 print("Failed sent callback to Cloud")
-        else:
-            print("No callback that needs to sent")
 
     # send current live data in hardware to be saved in DB cloud
     def sendDataToDBcloud(self) :
@@ -1028,8 +1026,6 @@ class UI(QMainWindow):
             except (requests.ConnectionError, requests.Timeout) as exception:
                 pass
                 print("Send data to database cloud failed")
-        else:
-            print("Skip send data to database since any var with null value")
 
     # function for sending data to hardware
     def sendDataMCU(self):
