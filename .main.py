@@ -527,6 +527,7 @@ class UI(QMainWindow):
                 data_callback = {
                     "message": "Camera command received"
                 }
+                response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -557,9 +558,9 @@ class UI(QMainWindow):
                         self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
                 data_callback = {
-                    "message": "Camera command received"
+                    "message": "Setpoint settings received"
                 }
-            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
+                response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
         except:
             print("Error on reading live data from Cloud")
 
