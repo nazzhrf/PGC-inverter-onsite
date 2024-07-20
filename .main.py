@@ -513,12 +513,6 @@ class UI(QMainWindow):
         except:
             print("Failed Receiving Data from SSE")
     
-    # function for create callback payload
-    def data_callback(msg):
-        return {
-            "messages": msg
-        }
-
     # function to parse live data from cloud
     def readLiveSetPointFromCloud(self, data_json):
         print("Receive Set Point Data from Cloud!")
@@ -530,7 +524,9 @@ class UI(QMainWindow):
                 if not isThreeCameras:
                     self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                     self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
-                callbackPayload = self.data_callback("Camera command received")
+                data_callback = {
+                    "message" = "Camera command received"
+                }
             else: 
                 if ("temperature" in data_json):
                     if (data_json.get("mode") == "Day"):
@@ -560,8 +556,10 @@ class UI(QMainWindow):
                         self.prevSPLightNight = self.SPLightNight
                         self.setpointLightNight.setText(self.SPLightNight)
                 self.saveSPDataToLocalFile()
-                callbackPayload = self.data_callback("Setpoint settings received")
-            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(self.callbackPayload), timeout=10)
+                data_callback = {
+                    "message" = "Camera command received"
+                }
+            response = requests.request("POST", self.urlPostLiveCallback, headers=self.requestHeader, data=json.dumps(data_callback), timeout=10)
         except:
             print("Error on reading live data from Cloud")
 
