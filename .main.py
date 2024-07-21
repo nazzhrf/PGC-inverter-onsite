@@ -152,11 +152,11 @@ class UI(QMainWindow):
                 print("Failed get last day night start time data")
 
         # set point limiter
-        self.upLimitSPTemp = 40
+        self.upLimitSPTemp = 100
         self.bottomLimitSPTemp = 0
         self.upLimitSPHum = 90
-        self.bottomLimitSPHum = 40
-        self.upLimitSPLight = 15000
+        self.bottomLimitSPHum = 30
+        self.upLimitSPLight = 30000
         self.bottomLimitSPLight = 0
         
         # variable for any onsite user touch the screen
