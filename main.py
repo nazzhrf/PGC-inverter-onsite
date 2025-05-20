@@ -24,12 +24,12 @@ import sseclient, sys, time, json, requests, cv2, os, subprocess
 
 # functions for get params
 def load_params(prefix_path):
-    params_local_path = prefix_path + ".params-local.json"
+    params_local_path = prefix_path + "params-local.json"
     with open(params_local_path, 'r') as file:
         params = json.load(file)
     return params
 
-# define devices, prefix path, and get params local from .params-local.json
+# define devices, prefix path, and get params local from params-local.json
 prefixPath = ""
 device = "Raspberry"
 try:
