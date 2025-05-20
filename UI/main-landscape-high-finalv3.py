@@ -9,6 +9,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QPushButton, QDateEdit, QSpinBox, QListWidgetItem, QTableWidgetItem, QLabel, QMessageBox, QHeaderView
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+import requests
+import base64
 
 
 class Ui_MainWindow(object):
@@ -1893,6 +1898,7 @@ class Ui_MainWindow(object):
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.severityLog.clicked.connect(self.showSeverityPage)
+        self.severityHandler = SeverityPageHandler(self)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2030,6 +2036,109 @@ class Ui_MainWindow(object):
 
     def showSeverityPage(self):
         self.stackedWidget.setCurrentWidget(self.severityPage)
+
+class SeverityPageHandler:
+    def __init__(self, ui):
+        self.ui = ui
+        self.ui.submitDateTime.clicked.connect(self.handle_submit)
+        self.ui.dateAndTimeList.itemClicked.connect(self.handle_date_or_time_click)
+        self.load_initial_data()
+
+    def handle_submit(self):
+        date = self.ui.dateEdit.date().toString("yyyy/MM")
+        week = self.ui.weekEdit.value()
+        full_date = self.ui.dateEdit_2.date().toString("yyyy/MM/dd")
+
+        has_year_month = self.ui.dateEdit.date().isValid()
+        has_date = self.ui.dateEdit_2.date().isValid()
+
+        payload = {}
+        if has_date and not has_year_month:
+            payload = {"tanggal": full_date.replace("/", "-")}
+        elif has_year_month and not has_date and (week >= 1 and week <= 4):
+            payload = {"tahun": date.split("/")[0], "bulan": date.split("/")[1], "minggu": str(week)}
+        elif has_year_month and not has_date and week == 0:
+            payload = {"tahun": date.split("/")[0], "bulan": date.split("/")[1]}
+        else:
+            QMessageBox.warning(None, "Input Error", "Gunakan salah satu kombinasi: (1) tahun+bulan, (2) tahun+bulan+minggu, (3) tanggal")
+            return
+
+        self.send_filter_directories(payload)
+
+    def load_initial_data(self):
+        self.send_filter_directories({})
+        self.populate_severity_table({})
+
+    def send_filter_directories(self, payload):
+        try:
+            response = requests.post("https://api-classify.smartfarm.id/filter-directories", json=payload)
+            data = response.json()
+            directories = data.get("matched_directories", [])
+            self.populate_date_list(directories)
+        except Exception as e:
+            print("Error in filter-directories:", e)
+
+    def populate_date_list(self, directories):
+        self.ui.dateAndTimeList.clear()
+        date_map = {}
+        for dir_str in directories:
+            date, time = dir_str.split("_")
+            if date not in date_map:
+                date_map[date] = []
+            date_map[date].append(time.replace("-", ":"))
+
+        for date, times in sorted(date_map.items()):
+            date_item = QListWidgetItem(date)
+            self.ui.dateAndTimeList.addItem(date_item)
+            for t in times:
+                time_item = QListWidgetItem("   " + t)
+                self.ui.dateAndTimeList.addItem(time_item)
+
+    def handle_date_or_time_click(self, item):
+        text = item.text().strip()
+        if len(text) == 8 and ":" in text:
+            index = self.ui.dateAndTimeList.row(item)
+            date_item = self.ui.dateAndTimeList.item(index - 1)
+            date_str = date_item.text().strip()
+            self.query_data_by_date_time(date_str, text)
+
+    def query_data_by_date_time(self, date, time):
+        payload = {"tanggal": date, "waktu": time}
+        self.populate_severity_table(payload)
+
+    def populate_severity_table(self, payload):
+        try:
+            response = requests.post("https://api-classify.smartfarm.id/get-data", json=payload)
+            data = response.json()
+            table = self.ui.severityTable
+            table.setRowCount(len(data))
+            table.setColumnCount(8)
+            table.setHorizontalHeaderLabels(["Image", "Preview", "Tanggal", "Waktu", "Pred 1", "Pred 2", "Pred 3", "Delete"])
+            table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
+            for row, item in enumerate(data):
+                table.setItem(row, 0, QTableWidgetItem(item["image"]))
+                image_label = QLabel()
+                image_data = item["image_data"].split(",")[1]
+                pixmap = QPixmap()
+                pixmap.loadFromData(base64.b64decode(image_data))
+                image_label.setPixmap(pixmap.scaled(60, 60, Qt.KeepAspectRatio))
+                table.setCellWidget(row, 1, image_label)
+                table.setItem(row, 2, QTableWidgetItem(item["tanggal"]))
+                table.setItem(row, 3, QTableWidgetItem(item["waktu"]))
+                table.setItem(row, 4, QTableWidgetItem(item["pred_class_1"]))
+                table.setItem(row, 5, QTableWidgetItem(item["pred_class_2"]))
+                table.setItem(row, 6, QTableWidgetItem(item["pred_class_3"]))
+
+                delete_button = QPushButton("Delete")
+                delete_button.clicked.connect(lambda _, r=row: self.delete_row(r))
+                table.setCellWidget(row, 7, delete_button)
+
+        except Exception as e:
+            print("Error in get-data:", e)
+
+    def delete_row(self, row):
+        self.ui.severityTable.removeRow(row)
 
 
 if __name__ == "__main__":
