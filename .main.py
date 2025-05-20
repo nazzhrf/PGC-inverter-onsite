@@ -6,12 +6,21 @@ Thesis by Muhammad Arbi Minanda (23220344)
 
 # libraries
 from PyQt5 import QtCore, QtSerialPort, QtGui, uic
-from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog
+from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 import sseclient, sys, time, json, requests, cv2, os, subprocess
 
 # comment this if make script error
-os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
+#os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
+
+# Untuk real hardware
+# import firebase
+# import arduino
+# import client
+# import LCD
+
+# Untuk testing dummy
+# from dummy import firebase, arduino, client, LCD
 
 # functions for get params
 def load_params(prefix_path):
@@ -69,12 +78,12 @@ class UI(QMainWindow):
         # initiate GUI
         super(UI, self).__init__()
         if (device == "Beelink") :
-            uic.loadUi(prefixPath + ".UI/main-landscape-high.ui", self)
+            uic.loadUi(prefixPath + ".UI/main-landscape-high-final.ui", self)
         else :
             if (isLandscape == True) :
-                uic.loadUi(prefixPath + ".UI/main-landscape.ui", self)
+                uic.loadUi(prefixPath + ".UI/main-landscape-high-final.ui", self)
             else :
-                uic.loadUi(prefixPath + ".UI/main.ui", self)
+                uic.loadUi(prefixPath + ".UI/main-landscape-high-final.ui", self)
 
         # hardware parameter
         self.mode = "auto"
@@ -201,6 +210,8 @@ class UI(QMainWindow):
         self.cameraHome = self.findChild(QLabel, "cameraHome")
         self.actualPosition = self.findChild(QLabel, "actPosition")
         self.takePhoto = self.findChild(QPushButton, "takePhoto")
+        self.camFrame = self.findChild(QFrame, "camFrame")
+        self.dashboardFrame = self.findChild(QFrame, "dashboardFrame")
 
         # temp page element
         self.subActualTemp = self.findChild(QLabel, "subActualTempVal")
@@ -225,8 +236,10 @@ class UI(QMainWindow):
         self.delButtonTemp = self.findChild(QPushButton, "buttonDelTemp")
         self.commaButtonTemp = self.findChild(QPushButton, "buttonCommaTemp")
         self.backFromTemp = self.findChild(QPushButton, "goDashboardFromTemp")
+        self.tempFrame = self.findChild(QFrame, "tempFrame")
         
         # hum page element
+        self.Humframe = self.findChild(QWidget, "Humframe")
         self.subActualHum = self.findChild(QLabel, "subActualHumVal")
         self.manualHumButton = self.findChild(QCheckBox, "manualHumCheckBox")
         self.humidifierButton = self.findChild(QCheckBox, "humOnOff")
@@ -271,6 +284,8 @@ class UI(QMainWindow):
         self.delButtonLight = self.findChild(QPushButton, "buttonDelLight")
         self.commaButtonLight = self.findChild(QPushButton, "buttonCommaLight")
         self.backFromLight = self.findChild(QPushButton, "goDashboardFromLight")
+        self.lightFrame = self.findChild(QFrame, "lightFrame")
+        
 
         # day night start time setting page
         self.startTimeDay = self.findChild(QLineEdit, "startTimeDay")
@@ -290,6 +305,11 @@ class UI(QMainWindow):
         self.zeroButtonStartTime = self.findChild(QPushButton, "buttonZeroStartTime")
         self.delButtonStartTime = self.findChild(QPushButton, "buttonDelStartTime")
         self.backFromDayNight = self.findChild(QPushButton, "goDashboardFromDayNight")
+        self.dayNightFrame = self.findChild(QFrame, "dayNightFrame")
+
+        #severity page element
+        self.severityTable = self.findChild(QTableWidget, "severityTable")
+        self.severityFrame = self.findChild(QFrame, "severityFrame")
 
         # initial display
         self.showMaximized()
@@ -1059,34 +1079,22 @@ class UI(QMainWindow):
     # function for sending photo to cloud
     def sendPhoto(self, camera_device, file_path, photo_type):
         try:
-            df2 = subprocess.check_output("v4l2-ctl --list-devices", shell=True)
-            df2Byte = df2.decode('utf8').split('\n')
-            indexCam = df2Byte.index(camera_device)
-            indexVideo = df2Byte[indexCam + 1][-1]
-            cam = cv2.VideoCapture(int(indexVideo))
-            if cam.isOpened():
-                ret, image = cam.read()
-                if (device == "Beelink") :
-                    compare = np.array_equal(black, np.array(image))            
-                    while compare==True:            
-                        ret, image = cam.read()            
-                        compare = np.array_equal(black, np.array(image))
-                if ret:
-                    cv2.imwrite(file_path, image)
-                    print(f"{photo_type} Image Captured and Saved")
-                cam.release()
-            try:
-                files = {'files': open(file_path, 'rb')}
-                values = {'device_id': int(deviceId)}
-                header = {
-                    'device_key': deviceKey,
-                }
-                response = requests.post(self.urlPostPhoto, headers=header, files=files, data=values, timeout=10)
-                print(f"Successfully sent {photo_type} Photo")
-            except:
-                print(f"Failed sent {photo_type} Photo")
-        except:
-            print(f"{photo_type} Camera not found")
+            # Gunakan gambar dummy lokal sebagai pengganti capture kamera
+            dummy_image_path = 'dummy_images/tray.jpg'  # Ganti sesuai lokasi file dummy kamu
+            if os.path.exists(dummy_image_path):
+                image = cv2.imread(dummy_image_path)
+                cv2.imwrite(file_path, image)
+                print(f"[DUMMY] {photo_type} Dummy Image copied to {file_path}")
+            else:
+                print(f"[DUMMY] Dummy image not found at {dummy_image_path}")
+                return
+
+            # Simulasikan pengiriman ke cloud (tidak sungguhan kirim)
+            print(f"[DUMMY] Successfully 'sent' {photo_type} Photo to cloud (simulated)")
+        
+        except Exception as e:
+            print(f"[DUMMY] Error in sendPhoto (dummy mode): {e}")
+
     
     # function for receiving serial message from mcu
     @QtCore.pyqtSlot()
@@ -1122,3 +1130,6 @@ QApplication.setStyle("fussion")
 app = QApplication(sys.argv)
 UIWindow = UI()
 app.exec_()
+
+
+
