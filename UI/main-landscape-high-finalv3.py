@@ -1679,9 +1679,6 @@ class Ui_MainWindow(object):
 "    background-color: rgb(176, 176, 255);\n"
 "}")
         self.submitDateTime.setObjectName("submitDateTime")
-        self.dateAndTimeList = QtWidgets.QWidget(self.severityPage)
-        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 320, 261, 151))
-        self.dateAndTimeList.setObjectName("dateAndTimeList")
         self.dashboardTitle_4 = QtWidgets.QLabel(self.severityPage)
         self.dashboardTitle_4.setGeometry(QtCore.QRect(70, 40, 151, 21))
         font = QtGui.QFont()
@@ -1792,6 +1789,9 @@ class Ui_MainWindow(object):
         self.dateEdit_2.setMaximumDateTime(QtCore.QDateTime(QtCore.QDate(9999, 12, 30), QtCore.QTime(23, 59, 59)))
         self.dateEdit_2.setCalendarPopup(True)
         self.dateEdit_2.setObjectName("dateEdit_2")
+        self.dateAndTimeList = QtWidgets.QListWidget(self.severityPage)
+        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 320, 261, 151))
+        self.dateAndTimeList.setObjectName("dateAndTimeList")
         self.stackedWidget.addWidget(self.severityPage)
         self.actualTime = QtWidgets.QLabel(self.centralwidget)
         self.actualTime.setGeometry(QtCore.QRect(620, 20, 161, 71))
@@ -1892,7 +1892,6 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        self.severityLog.clicked.connect(self.showSeverityPage)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2027,9 +2026,6 @@ class Ui_MainWindow(object):
         self.actualTime.setText(_translate("MainWindow", "00:00"))
         self.actualDate.setText(_translate("MainWindow", "Ddddddddd,  00/00/0000"))
         self.actualMode.setText(_translate("MainWindow", "Current Mode: Mmmmmm"))
-
-    def showSeverityPage(self):
-        self.stackedWidget.setCurrentWidget(self.severityPage)
 
 
 if __name__ == "__main__":

@@ -4105,16 +4105,6 @@ QPushButton:pressed {
        <string>Submit</string>
       </property>
      </widget>
-     <widget class="QWidget" name="dateAndTimeList" native="true">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>320</y>
-        <width>261</width>
-        <height>151</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QLabel" name="dashboardTitle_4">
       <property name="geometry">
        <rect>
@@ -4347,6 +4337,16 @@ QPushButton:pressed {
       </property>
       <property name="calendarPopup">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="dateAndTimeList">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>320</y>
+        <width>261</width>
+        <height>151</height>
+       </rect>
       </property>
      </widget>
     </widget>
