@@ -2,3 +2,5 @@ PyQt5
 opencv-python
 requests
 sseclient
+pyqt5-dev-tools
+pyqt5-tools
