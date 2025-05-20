@@ -23,22 +23,25 @@ def handle_submit_date(ui, initial=False):
         week = ui.yearMonthLine_2.text().strip()
         ymd = ui.yearMonthLine_3.text().strip()
 
-        if ymd and not ym and not week:
-            try:
-                QtCore.QDate.fromString(ymd, "yyyy/MM/dd")  # Validate
+        filled_ymd = bool(ymd)
+        filled_ym = bool(ym)
+        filled_week = bool(week)
+
+        if filled_ymd and not filled_ym and not filled_week:
+            if QtCore.QDate.fromString(ymd, "yyyy/MM/dd").isValid():
                 json_data = {"tanggal": ymd.replace('/', '-')}
-            except:
+            else:
                 show_message("Format tanggal yyyy/MM/dd salah")
                 return
-        elif ym and not ymd:
+        elif filled_ym and not filled_ymd:
             ym_parts = ym.split('/')
             if len(ym_parts) == 2:
                 json_data = {"tahun": ym_parts[0], "bulan": str(int(ym_parts[1]))}
-                if week:
-                    if week in ['1','2','3','4']:
+                if filled_week:
+                    if week in ['1', '2', '3', '4']:
                         json_data["minggu"] = week
                     else:
-                        show_message("Minggu harus antara 1-4")
+                        show_message("Minggu harus antara 1 sampai 4")
                         return
             else:
                 show_message("Gunakan format yyyy/MM untuk tahun dan bulan")
