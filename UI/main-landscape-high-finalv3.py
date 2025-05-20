@@ -9,12 +9,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QPushButton, QDateEdit, QSpinBox, QListWidgetItem, QTableWidgetItem, QLabel, QMessageBox, QHeaderView,  QComboBox, QCalendarWidget
-from PyQt5.QtCore import Qt, QDate
-from PyQt5.QtGui import QPixmap
-import requests
-import base64
-import json
 
 
 class Ui_MainWindow(object):
@@ -1577,12 +1571,12 @@ class Ui_MainWindow(object):
         self.severityPage = QtWidgets.QWidget()
         self.severityPage.setObjectName("severityPage")
         self.severityTable = QtWidgets.QTableWidget(self.severityPage)
-        self.severityTable.setGeometry(QtCore.QRect(330, 90, 521, 461))
+        self.severityTable.setGeometry(QtCore.QRect(330, 90, 521, 471))
         self.severityTable.setRowCount(60)
         self.severityTable.setColumnCount(8)
         self.severityTable.setObjectName("severityTable")
         self.trayCamera = QtWidgets.QLabel(self.severityPage)
-        self.trayCamera.setGeometry(QtCore.QRect(900, 140, 301, 411))
+        self.trayCamera.setGeometry(QtCore.QRect(900, 140, 301, 421))
         self.trayCamera.setStyleSheet("background-color:white;")
         self.trayCamera.setText("")
         self.trayCamera.setObjectName("trayCamera")
@@ -1593,11 +1587,11 @@ class Ui_MainWindow(object):
         self.logLogo.setScaledContents(True)
         self.logLogo.setObjectName("logLogo")
         self.chooseYearMonth = QtWidgets.QLabel(self.severityPage)
-        self.chooseYearMonth.setGeometry(QtCore.QRect(20, 90, 91, 41))
+        self.chooseYearMonth.setGeometry(QtCore.QRect(20, 90, 121, 41))
         font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
         self.chooseYearMonth.setFont(font)
         self.chooseYearMonth.setStyleSheet("#chooseYearMonth {\n"
 "    border: 2px solid #4CAF50;\n"
@@ -1609,31 +1603,12 @@ class Ui_MainWindow(object):
 "")
         self.chooseYearMonth.setWordWrap(True)
         self.chooseYearMonth.setObjectName("chooseYearMonth")
-        self.dateEdit = QtWidgets.QDateEdit(self.severityPage)
-        self.dateEdit.setGeometry(QtCore.QRect(150, 90, 131, 41))
-        font = QtGui.QFont()
-        font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dateEdit.setFont(font)
-        self.dateEdit.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox {\n"
-"    border: 2px solid #2E8B57;\n"
-"    border-radius: 6px;\n"
-"    padding: 4px;\n"
-"    background-color: #ffffff;\n"
-"    color: #333333;\n"
-"    font-size: 14px;\n"
-"    border-color: rgb(123, 128, 137);\n"
-"}")
-        self.dateEdit.setMaximumDateTime(QtCore.QDateTime(QtCore.QDate(9999, 12, 30), QtCore.QTime(23, 59, 59)))
-        self.dateEdit.setCalendarPopup(True)
-        self.dateEdit.setObjectName("dateEdit")
         self.chooseWeek = QtWidgets.QLabel(self.severityPage)
-        self.chooseWeek.setGeometry(QtCore.QRect(20, 150, 91, 41))
+        self.chooseWeek.setGeometry(QtCore.QRect(20, 150, 121, 41))
         font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
         self.chooseWeek.setFont(font)
         self.chooseWeek.setStyleSheet("#chooseYearMonth, #chooseWeek, #chooseDate {\n"
 "    border: 2px solid #4CAF50;\n"
@@ -1645,25 +1620,6 @@ class Ui_MainWindow(object):
 "")
         self.chooseWeek.setWordWrap(True)
         self.chooseWeek.setObjectName("chooseWeek")
-        self.weekEdit = QtWidgets.QSpinBox(self.severityPage)
-        self.weekEdit.setGeometry(QtCore.QRect(150, 150, 131, 41))
-        font = QtGui.QFont()
-        font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
-        self.weekEdit.setFont(font)
-        self.weekEdit.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox {\n"
-"    border: 2px solid #2E8B57;\n"
-"    border-radius: 6px;\n"
-"    padding: 4px;\n"
-"    background-color: #ffffff;\n"
-"    color: #333333;\n"
-"    font-size: 14px;\n"
-"    border-color: rgb(123, 128, 137);\n"
-"}")
-        self.weekEdit.setMinimum(1)
-        self.weekEdit.setMaximum(4)
-        self.weekEdit.setObjectName("weekEdit")
         self.submitDateTime = QtWidgets.QPushButton(self.severityPage)
         self.submitDateTime.setGeometry(QtCore.QRect(20, 270, 261, 31))
         self.submitDateTime.setStyleSheet("QPushButton {\n"
@@ -1760,11 +1716,11 @@ class Ui_MainWindow(object):
         self.goDashboardFromDayNight_3.setIconSize(QtCore.QSize(40, 40))
         self.goDashboardFromDayNight_3.setObjectName("goDashboardFromDayNight_3")
         self.chooseDate = QtWidgets.QLabel(self.severityPage)
-        self.chooseDate.setGeometry(QtCore.QRect(20, 210, 91, 41))
+        self.chooseDate.setGeometry(QtCore.QRect(20, 210, 121, 41))
         font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
         self.chooseDate.setFont(font)
         self.chooseDate.setStyleSheet("#chooseYearMonth, #chooseWeek, #chooseDate {\n"
 "    border: 2px solid #4CAF50;\n"
@@ -1776,15 +1732,13 @@ class Ui_MainWindow(object):
 "")
         self.chooseDate.setWordWrap(True)
         self.chooseDate.setObjectName("chooseDate")
-        self.dateEdit_2 = QtWidgets.QDateEdit(self.severityPage)
-        self.dateEdit_2.setGeometry(QtCore.QRect(150, 210, 131, 41))
-        font = QtGui.QFont()
-        font.setPointSize(-1)
-        font.setBold(True)
-        font.setWeight(75)
-        self.dateEdit_2.setFont(font)
-        self.dateEdit_2.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox {\n"
-"    border: 2px solid #2E8B57;\n"
+        self.dateAndTimeList = QtWidgets.QListWidget(self.severityPage)
+        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 320, 261, 151))
+        self.dateAndTimeList.setObjectName("dateAndTimeList")
+        self.yearMonthLine = QtWidgets.QLineEdit(self.severityPage)
+        self.yearMonthLine.setGeometry(QtCore.QRect(170, 90, 111, 41))
+        self.yearMonthLine.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine {\n"
+"    border: 20px solid #2E8B57;\n"
 "    border-radius: 6px;\n"
 "    padding: 4px;\n"
 "    background-color: #ffffff;\n"
@@ -1792,12 +1746,32 @@ class Ui_MainWindow(object):
 "    font-size: 14px;\n"
 "    border-color: rgb(123, 128, 137);\n"
 "}")
-        self.dateEdit_2.setMaximumDateTime(QtCore.QDateTime(QtCore.QDate(9999, 12, 30), QtCore.QTime(23, 59, 59)))
-        self.dateEdit_2.setCalendarPopup(True)
-        self.dateEdit_2.setObjectName("dateEdit_2")
-        self.dateAndTimeList = QtWidgets.QListWidget(self.severityPage)
-        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 320, 261, 151))
-        self.dateAndTimeList.setObjectName("dateAndTimeList")
+        self.yearMonthLine.setText("")
+        self.yearMonthLine.setObjectName("yearMonthLine")
+        self.yearMonthLine_2 = QtWidgets.QLineEdit(self.severityPage)
+        self.yearMonthLine_2.setGeometry(QtCore.QRect(170, 150, 111, 41))
+        self.yearMonthLine_2.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine, yearMonthLine_2 {\n"
+"    border: 20px solid #2E8B57;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    background-color: #ffffff;\n"
+"    color: #333333;\n"
+"    font-size: 14px;\n"
+"    border-color: rgb(123, 128, 137);\n"
+"}")
+        self.yearMonthLine_2.setObjectName("yearMonthLine_2")
+        self.yearMonthLine_3 = QtWidgets.QLineEdit(self.severityPage)
+        self.yearMonthLine_3.setGeometry(QtCore.QRect(170, 210, 111, 41))
+        self.yearMonthLine_3.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine, yearMonthLine_2 {\n"
+"    border: 20px solid #2E8B57;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    background-color: #ffffff;\n"
+"    color: #333333;\n"
+"    font-size: 14px;\n"
+"    border-color: rgb(123, 128, 137);\n"
+"}")
+        self.yearMonthLine_3.setObjectName("yearMonthLine_3")
         self.stackedWidget.addWidget(self.severityPage)
         self.actualTime = QtWidgets.QLabel(self.centralwidget)
         self.actualTime.setGeometry(QtCore.QRect(620, 20, 161, 71))
@@ -1899,7 +1873,6 @@ class Ui_MainWindow(object):
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.severityLog.clicked.connect(self.showSeverityPage)
-        self.severityHandler = SeverityPageHandler(self)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2020,184 +1993,22 @@ class Ui_MainWindow(object):
         self.buttonThreeLight.setText(_translate("MainWindow", "3"))
         self.maxTitle.setText(_translate("MainWindow", "Max"))
         self.minTitle.setText(_translate("MainWindow", "Min"))
-        self.chooseYearMonth.setText(_translate("MainWindow", "Year"))
-        self.dateEdit.setDisplayFormat(_translate("MainWindow", "yyyy/MM"))
-        self.chooseWeek.setText(_translate("MainWindow", "Week"))
+        self.chooseYearMonth.setText(_translate("MainWindow", "Tahun/Bulan"))
+        self.chooseWeek.setText(_translate("MainWindow", "MInggu ke-"))
         self.submitDateTime.setText(_translate("MainWindow", "Submit"))
         self.dashboardTitle_4.setText(_translate("MainWindow", "Choose Time"))
         self.dashboardTitle_5.setText(_translate("MainWindow", "Severity Level Log"))
         self.dateTimeEdit.setDisplayFormat(_translate("MainWindow", "yyyy/MM/dd HH:mm:ss"))
         self.dashboardTitle_6.setText(_translate("MainWindow", "Tray View"))
         self.submitDateTime_2.setText(_translate("MainWindow", "Submit"))
-        self.chooseDate.setText(_translate("MainWindow", "Date"))
-        self.dateEdit_2.setDisplayFormat(_translate("MainWindow", "yyyy/MM/dd"))
+        self.chooseDate.setText(_translate("MainWindow", "Tahun/Bulan/Hari"))
         self.actualTime.setText(_translate("MainWindow", "00:00"))
         self.actualDate.setText(_translate("MainWindow", "Ddddddddd,  00/00/0000"))
         self.actualMode.setText(_translate("MainWindow", "Current Mode: Mmmmmm"))
-
+        
     def showSeverityPage(self):
         self.stackedWidget.setCurrentWidget(self.severityPage)
 
-
-class SeverityPageHandler:
-    def __init__(self, ui):
-        self.ui = ui
-        self.current_date = None  # Simpan tanggal aktif
-        self.ui.submitDateTime.clicked.connect(self.handle_submit)
-        self.ui.dateAndTimeList.itemClicked.connect(self.handle_date_or_time_click)
-        self.load_initial_data()
-
-    def handle_submit(self):
-        date = self.ui.dateEdit.date().toString("yyyy/MM")
-        week = self.ui.weekEdit.value()
-        full_date = self.ui.dateEdit_2.date().toString("yyyy/MM/dd")
-
-        has_year_month = self.ui.dateEdit.date().isValid()
-        has_date = self.ui.dateEdit_2.date().isValid()
-
-        payload = {}
-        if has_date and not has_year_month:
-            payload = {"tanggal": full_date.replace("/", "-")}
-        elif has_year_month and not has_date and (week >= 1 and week <= 4):
-            payload = {"tahun": date.split("/")[0], "bulan": date.split("/")[1], "minggu": str(week)}
-        elif has_year_month and not has_date and week == 0:
-            payload = {"tahun": date.split("/")[0], "bulan": date.split("/")[1]}
-        else:
-            QMessageBox.warning(None, "Input Error", "Gunakan salah satu kombinasi: (1) tahun+bulan, (2) tahun+bulan+minggu, (3) tanggal")
-            return
-
-        self.send_filter_directories(payload)
-
-    def load_initial_data(self):
-        self.send_filter_directories({})
-        self.populate_severity_table({})
-
-    def send_filter_directories(self, payload):
-        try:
-            response = requests.post("https://api-classify.smartfarm.id/filter-directories", json=payload)
-            data = response.json()
-            directories = data.get("matched_directories", [])
-            self.populate_date_list(directories)
-        except Exception as e:
-            print("Error in filter-directories:", e)
-
-    def populate_date_list(self, directories):
-        self.ui.dateAndTimeList.clear()
-        date_map = {}
-        for dir_str in directories:
-            date, time = dir_str.split("_")
-            if date not in date_map:
-                date_map[date] = []
-            date_map[date].append(time.replace("-", ":"))
-
-        for date, times in sorted(date_map.items()):
-            # Tambah item tanggal dengan role "date"
-            date_item = QListWidgetItem(date)
-            date_item.setData(Qt.UserRole, "date")
-            self.ui.dateAndTimeList.addItem(date_item)
-            for t in times:
-                # Tambah item waktu dengan role "time"
-                time_item = QListWidgetItem("   " + t)
-                time_item.setData(Qt.UserRole, "time")
-                self.ui.dateAndTimeList.addItem(time_item)
-
-        # Reset tanggal aktif karena list di-refresh
-        self.current_date = None
-
-    def handle_date_or_time_click(self, item):
-        text = item.text().strip()
-        role = item.data(Qt.UserRole)
-
-        if role == "date":
-            # Saat klik tanggal, simpan tanggal aktif
-            self.current_date = text
-        elif role == "time":
-            if self.current_date:
-                # Gunakan tanggal aktif saat klik waktu
-                self.query_data_by_date_time(self.current_date, text)
-            else:
-                # Jika belum ada tanggal aktif, bisa beri peringatan atau abaikan
-                print("Warning: Klik waktu tapi belum pilih tanggal")
-
-    def query_data_by_date_time(self, date, time):
-        payload = {"tanggal": date, "waktu": time}
-        self.populate_severity_table(payload)
-
-    def populate_severity_table(self, payload):
-        try:
-            print("📤 Sending JSON payload to /get-data:")
-            print(json.dumps(payload, indent=2))
-
-            response = requests.post("https://api-classify.smartfarm.id/get-data", json=payload)
-            data = response.json()
-            table = self.ui.severityTable
-            table.setRowCount(len(data))
-            table.setColumnCount(8)
-            table.setHorizontalHeaderLabels(["Image", "Preview", "Tanggal", "Waktu", "Pred 1", "Pred 2", "Pred 3", "Delete"])
-            table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-            for row, item in enumerate(data):
-                table.setItem(row, 0, QTableWidgetItem(item["image"]))
-                image_label = QLabel()
-                image_data = item["image_data"].split(",")[1]
-                pixmap = QPixmap()
-                pixmap.loadFromData(base64.b64decode(image_data))
-                image_label.setPixmap(pixmap.scaled(60, 60, Qt.KeepAspectRatio))
-                table.setCellWidget(row, 1, image_label)
-                table.setItem(row, 2, QTableWidgetItem(item["tanggal"]))
-                table.setItem(row, 3, QTableWidgetItem(item["waktu"]))
-                table.setItem(row, 4, QTableWidgetItem(item["pred_class_1"]))
-                table.setItem(row, 5, QTableWidgetItem(item["pred_class_2"]))
-                table.setItem(row, 6, QTableWidgetItem(item["pred_class_3"]))
-
-                delete_button = QPushButton("Delete")
-                delete_button.clicked.connect(lambda _, r=row: self.delete_row(r))
-                table.setCellWidget(row, 7, delete_button)
-
-        except Exception as e:
-            print("Error in get-data:", e)
-
-    def delete_row(self, row):
-        table = self.ui.severityTable
-
-        # Ambil data dari baris yang ingin dihapus
-        tanggal_item = table.item(row, 2)
-        waktu_item = table.item(row, 3)
-        image_item = table.item(row, 0)
-
-        if not tanggal_item or not waktu_item or not image_item:
-            QMessageBox.warning(None, "Error", "Data baris tidak lengkap, tidak bisa dihapus.")
-            return
-
-        tanggal = tanggal_item.text()
-        waktu = waktu_item.text()
-        image = image_item.text()
-
-        # Konfirmasi ke user
-        reply = QMessageBox.question(
-            None, "Konfirmasi Hapus",
-            f"Apakah Anda yakin ingin menghapus gambar '{image}' dengan tanggal {tanggal} dan waktu {waktu}?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
-
-        if reply == QMessageBox.Yes:
-            try:
-                payload = {"tanggal": tanggal, "waktu": waktu, "image": image}
-                response = requests.post("https://api-classify.smartfarm.id/delete", json=payload)
-                response_data = response.json()
-                message = response_data.get("message", "Tidak ada pesan dari server.")
-
-                QMessageBox.information(None, "Hapus Data", message)
-
-                # Jika server mengindikasikan sukses, hapus baris dari tabel
-                if response.status_code == 200:
-                    table.removeRow(row)
-                else:
-                    QMessageBox.warning(None, "Gagal", f"Gagal menghapus data: {message}")
-
-            except Exception as e:
-                QMessageBox.warning(None, "Error", f"Terjadi kesalahan saat menghapus data:\n{str(e)}")
 
 if __name__ == "__main__":
     import sys
