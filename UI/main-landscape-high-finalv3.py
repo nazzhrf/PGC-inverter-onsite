@@ -9,11 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QPushButton, QDateEdit, QSpinBox, QListWidgetItem, QTableWidgetItem, QLabel, QMessageBox, QHeaderView
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QPushButton, QDateEdit, QSpinBox, QListWidgetItem, QTableWidgetItem, QLabel, QMessageBox, QHeaderView,  QComboBox, QCalendarWidget
+from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QPixmap
 import requests
 import base64
+import json
 
 
 class Ui_MainWindow(object):
@@ -2037,9 +2038,11 @@ class Ui_MainWindow(object):
     def showSeverityPage(self):
         self.stackedWidget.setCurrentWidget(self.severityPage)
 
+
 class SeverityPageHandler:
     def __init__(self, ui):
         self.ui = ui
+        self.current_date = None  # Simpan tanggal aktif
         self.ui.submitDateTime.clicked.connect(self.handle_submit)
         self.ui.dateAndTimeList.itemClicked.connect(self.handle_date_or_time_click)
         self.load_initial_data()
@@ -2088,19 +2091,33 @@ class SeverityPageHandler:
             date_map[date].append(time.replace("-", ":"))
 
         for date, times in sorted(date_map.items()):
+            # Tambah item tanggal dengan role "date"
             date_item = QListWidgetItem(date)
+            date_item.setData(Qt.UserRole, "date")
             self.ui.dateAndTimeList.addItem(date_item)
             for t in times:
+                # Tambah item waktu dengan role "time"
                 time_item = QListWidgetItem("   " + t)
+                time_item.setData(Qt.UserRole, "time")
                 self.ui.dateAndTimeList.addItem(time_item)
+
+        # Reset tanggal aktif karena list di-refresh
+        self.current_date = None
 
     def handle_date_or_time_click(self, item):
         text = item.text().strip()
-        if len(text) == 8 and ":" in text:
-            index = self.ui.dateAndTimeList.row(item)
-            date_item = self.ui.dateAndTimeList.item(index - 1)
-            date_str = date_item.text().strip()
-            self.query_data_by_date_time(date_str, text)
+        role = item.data(Qt.UserRole)
+
+        if role == "date":
+            # Saat klik tanggal, simpan tanggal aktif
+            self.current_date = text
+        elif role == "time":
+            if self.current_date:
+                # Gunakan tanggal aktif saat klik waktu
+                self.query_data_by_date_time(self.current_date, text)
+            else:
+                # Jika belum ada tanggal aktif, bisa beri peringatan atau abaikan
+                print("Warning: Klik waktu tapi belum pilih tanggal")
 
     def query_data_by_date_time(self, date, time):
         payload = {"tanggal": date, "waktu": time}
@@ -2108,6 +2125,9 @@ class SeverityPageHandler:
 
     def populate_severity_table(self, payload):
         try:
+            print("📤 Sending JSON payload to /get-data:")
+            print(json.dumps(payload, indent=2))
+
             response = requests.post("https://api-classify.smartfarm.id/get-data", json=payload)
             data = response.json()
             table = self.ui.severityTable
@@ -2138,8 +2158,46 @@ class SeverityPageHandler:
             print("Error in get-data:", e)
 
     def delete_row(self, row):
-        self.ui.severityTable.removeRow(row)
+        table = self.ui.severityTable
 
+        # Ambil data dari baris yang ingin dihapus
+        tanggal_item = table.item(row, 2)
+        waktu_item = table.item(row, 3)
+        image_item = table.item(row, 0)
+
+        if not tanggal_item or not waktu_item or not image_item:
+            QMessageBox.warning(None, "Error", "Data baris tidak lengkap, tidak bisa dihapus.")
+            return
+
+        tanggal = tanggal_item.text()
+        waktu = waktu_item.text()
+        image = image_item.text()
+
+        # Konfirmasi ke user
+        reply = QMessageBox.question(
+            None, "Konfirmasi Hapus",
+            f"Apakah Anda yakin ingin menghapus gambar '{image}' dengan tanggal {tanggal} dan waktu {waktu}?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            try:
+                payload = {"tanggal": tanggal, "waktu": waktu, "image": image}
+                response = requests.post("https://api-classify.smartfarm.id/delete", json=payload)
+                response_data = response.json()
+                message = response_data.get("message", "Tidak ada pesan dari server.")
+
+                QMessageBox.information(None, "Hapus Data", message)
+
+                # Jika server mengindikasikan sukses, hapus baris dari tabel
+                if response.status_code == 200:
+                    table.removeRow(row)
+                else:
+                    QMessageBox.warning(None, "Gagal", f"Gagal menghapus data: {message}")
+
+            except Exception as e:
+                QMessageBox.warning(None, "Error", f"Terjadi kesalahan saat menghapus data:\n{str(e)}")
 
 if __name__ == "__main__":
     import sys
