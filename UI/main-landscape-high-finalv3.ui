@@ -207,9 +207,9 @@
      <widget class="QFrame" name="dashboardFrame">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>30</x>
         <y>30</y>
-        <width>511</width>
+        <width>491</width>
         <height>431</height>
        </rect>
       </property>
@@ -884,36 +884,6 @@ border-radius: 8px;
        <string>Chamber Preview</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="goDashboardFromLight_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>470</y>
-        <width>51</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>20</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>image-removebg-preview (2).png</normaloff>image-removebg-preview (2).png</iconset>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>40</width>
-        <height>40</height>
-       </size>
-      </property>
-     </widget>
      <zorder>dashboardFrame</zorder>
      <zorder>actPosition</zorder>
      <zorder>cameraHome</zorder>
@@ -922,7 +892,6 @@ border-radius: 8px;
      <zorder>viewTray</zorder>
      <zorder>camFrame</zorder>
      <zorder>dashboardTitle_3</zorder>
-     <zorder>goDashboardFromLight_2</zorder>
     </widget>
     <widget class="QWidget" name="dayNightPage">
      <widget class="QPushButton" name="goDashboardFromDayNight">
@@ -3850,10 +3819,10 @@ border-radius: 8px;
        </rect>
       </property>
       <property name="rowCount">
-       <number>18</number>
+       <number>60</number>
       </property>
       <property name="columnCount">
-       <number>4</number>
+       <number>8</number>
       </property>
       <row/>
       <row/>
@@ -3873,6 +3842,52 @@ border-radius: 8px;
       <row/>
       <row/>
       <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
       <column/>
       <column/>
       <column/>
@@ -3949,7 +3964,7 @@ border-radius: 8px;
      <widget class="QDateEdit" name="dateEdit">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>150</x>
         <y>90</y>
         <width>131</width>
         <height>41</height>
@@ -4026,7 +4041,7 @@ border-radius: 8px;
      <widget class="QSpinBox" name="weekEdit">
       <property name="geometry">
        <rect>
-        <x>140</x>
+        <x>150</x>
         <y>150</y>
         <width>131</width>
         <height>41</height>
@@ -4096,17 +4111,17 @@ QPushButton:pressed {
         <x>20</x>
         <y>260</y>
         <width>261</width>
-        <height>291</height>
+        <height>211</height>
        </rect>
       </property>
      </widget>
      <widget class="QLabel" name="dashboardTitle_4">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>70</x>
         <y>40</y>
-        <width>201</width>
-        <height>31</height>
+        <width>151</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
@@ -4123,10 +4138,10 @@ QPushButton:pressed {
      <widget class="QLabel" name="dashboardTitle_5">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>500</x>
         <y>30</y>
-        <width>291</width>
-        <height>41</height>
+        <width>221</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -4177,10 +4192,10 @@ QPushButton:pressed {
      <widget class="QLabel" name="dashboardTitle_6">
       <property name="geometry">
        <rect>
-        <x>970</x>
+        <x>1000</x>
         <y>30</y>
-        <width>161</width>
-        <height>41</height>
+        <width>121</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -4227,6 +4242,36 @@ QPushButton:pressed {
        <string>Submit</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="goDashboardFromDayNight_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>490</y>
+        <width>60</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>image-removebg-preview (2).png</normaloff>image-removebg-preview (2).png</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>40</width>
+        <height>40</height>
+       </size>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="actualTime">
@@ -4252,7 +4297,7 @@ QPushButton:pressed {
    <widget class="QLabel" name="actualDate">
     <property name="geometry">
      <rect>
-      <x>530</x>
+      <x>510</x>
       <y>90</y>
       <width>371</width>
       <height>31</height>
@@ -4399,7 +4444,7 @@ QPushButton:pressed {
    <widget class="QLabel" name="actualMode">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>500</x>
       <y>120</y>
       <width>391</width>
       <height>41</height>
@@ -4424,7 +4469,7 @@ QPushButton:pressed {
      <x>0</x>
      <y>0</y>
      <width>1378</width>
-     <height>51</height>
+     <height>39</height>
     </rect>
    </property>
   </widget>
