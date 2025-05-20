@@ -1,0 +1,1555 @@
+<?xml version="1.0" ?>
+<ui version="4.0">
+  <widget class="QMainWindow" name="MainWindow">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1024</width>
+        <height>768</height>
+      </rect>
+    </property>
+    <widget class="QWidget" name="centralwidget">
+      <widget class="QWidget" name="logoSGC">
+        <property name="geometry">
+          <rect>
+            <x>23</x>
+            <y>8</y>
+            <width>186</width>
+            <height>117</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="stackedWidget">
+        <property name="geometry">
+          <rect>
+            <x>0</x>
+            <y>161</y>
+            <width>985</width>
+            <height>936</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actPosition">
+        <property name="geometry">
+          <rect>
+            <x>636</x>
+            <y>431</y>
+            <width>31</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="cameraHome">
+        <property name="geometry">
+          <rect>
+            <x>488</x>
+            <y>89</y>
+            <width>473</width>
+            <height>333</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="takePhoto">
+        <property name="geometry">
+          <rect>
+            <x>837</x>
+            <y>440</y>
+            <width>124</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="positionTitle">
+        <property name="geometry">
+          <rect>
+            <x>488</x>
+            <y>431</y>
+            <width>148</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="viewTray">
+        <property name="geometry">
+          <rect>
+            <x>698</x>
+            <y>440</y>
+            <width>124</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dashboardFrame">
+        <property name="geometry">
+          <rect>
+            <x>15</x>
+            <y>26</y>
+            <width>396</width>
+            <height>396</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="severityLog">
+        <property name="geometry">
+          <rect>
+            <x>23</x>
+            <y>323</y>
+            <width>124</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="frameHum">
+        <property name="geometry">
+          <rect>
+            <x>23</x>
+            <y>134</y>
+            <width>334</width>
+            <height>81</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualHumUnit">
+        <property name="geometry">
+          <rect>
+            <x>271</x>
+            <y>26</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualHumVal">
+        <property name="geometry">
+          <rect>
+            <x>193</x>
+            <y>26</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humTitle">
+        <property name="geometry">
+          <rect>
+            <x>85</x>
+            <y>30</y>
+            <width>101</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="label_3">
+        <property name="geometry">
+          <rect>
+            <x>46</x>
+            <y>0</y>
+            <width>23</width>
+            <height>26</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="toHumPage">
+        <property name="geometry">
+          <rect>
+            <x>7</x>
+            <y>8</y>
+            <width>55</width>
+            <height>63</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="frameLight">
+        <property name="geometry">
+          <rect>
+            <x>23</x>
+            <y>224</y>
+            <width>334</width>
+            <height>81</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualLightUnit">
+        <property name="geometry">
+          <rect>
+            <x>271</x>
+            <y>26</y>
+            <width>47</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightTitle">
+        <property name="geometry">
+          <rect>
+            <x>77</x>
+            <y>26</y>
+            <width>47</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="label_4">
+        <property name="geometry">
+          <rect>
+            <x>46</x>
+            <y>0</y>
+            <width>23</width>
+            <height>26</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="toLightPage">
+        <property name="geometry">
+          <rect>
+            <x>7</x>
+            <y>8</y>
+            <width>55</width>
+            <height>63</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualLightVal">
+        <property name="geometry">
+          <rect>
+            <x>193</x>
+            <y>26</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="frameTemp">
+        <property name="geometry">
+          <rect>
+            <x>23</x>
+            <y>44</y>
+            <width>334</width>
+            <height>81</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualTempUnit">
+        <property name="geometry">
+          <rect>
+            <x>271</x>
+            <y>26</y>
+            <width>55</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="toTempPage">
+        <property name="geometry">
+          <rect>
+            <x>7</x>
+            <y>8</y>
+            <width>55</width>
+            <height>63</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="label_2">
+        <property name="geometry">
+          <rect>
+            <x>46</x>
+            <y>0</y>
+            <width>23</width>
+            <height>26</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempTitle">
+        <property name="geometry">
+          <rect>
+            <x>69</x>
+            <y>30</y>
+            <width>117</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualTempVal">
+        <property name="geometry">
+          <rect>
+            <x>186</x>
+            <y>26</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dashboardTitle">
+        <property name="geometry">
+          <rect>
+            <x>131</x>
+            <y>8</y>
+            <width>117</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="camFrame">
+        <property name="geometry">
+          <rect>
+            <x>488</x>
+            <y>26</y>
+            <width>473</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dashboardTitle_3">
+        <property name="geometry">
+          <rect>
+            <x>504</x>
+            <y>35</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="goDashboardFromDayNight">
+        <property name="geometry">
+          <rect>
+            <x>38</x>
+            <y>35</y>
+            <width>46</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dayNightFrame">
+        <property name="geometry">
+          <rect>
+            <x>100</x>
+            <y>35</y>
+            <width>854</width>
+            <height>476</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonZeroStartTime">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSixStartTime">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startDayOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>98</y>
+            <width>148</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonThreeStartTime">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonNineStartTime">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startNightOnOff">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>98</y>
+            <width>163</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonDelStartTime">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startTimeNight">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>151</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startTimeNightUnit">
+        <property name="geometry">
+          <rect>
+            <x>395</x>
+            <y>152</y>
+            <width>148</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFourStartTime">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonTwoStartTime">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSevenStartTime">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFiveStartTime">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dayNightStartTimeTitle">
+        <property name="geometry">
+          <rect>
+            <x>7</x>
+            <y>8</y>
+            <width>241</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonEightStartTime">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="setStartTime">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>422</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startTimeDay">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>151</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="startTimeDayUnit">
+        <property name="geometry">
+          <rect>
+            <x>186</x>
+            <y>152</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonOneStartTime">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="label_5">
+        <property name="geometry">
+          <rect>
+            <x>248</x>
+            <y>13</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="goDashboardFromHum">
+        <property name="geometry">
+          <rect>
+            <x>38</x>
+            <y>35</y>
+            <width>46</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="Humframe">
+        <property name="geometry">
+          <rect>
+            <x>100</x>
+            <y>35</y>
+            <width>854</width>
+            <height>477</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subHumIcon">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>8</y>
+            <width>31</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="manualHumCheckBox">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>170</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humOnOff">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>107</y>
+            <width>117</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="setHum">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>422</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optHumTitle">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>80</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFiveHum">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonZeroHum">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonOneHum">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonTwoHum">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humNightOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>161</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualHumVal">
+        <property name="geometry">
+          <rect>
+            <x>434</x>
+            <y>10</y>
+            <width>70</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optHumUnit">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>116</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optHumUnit_2">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>161</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humSetPointNight">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>161</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSevenHum">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humSetPointDay">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>116</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonCommaHum">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSixHum">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="humDayOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>116</y>
+            <width>62</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonThreeHum">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonEightHum">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonDelHum">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFourHum">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualHumUnit">
+        <property name="geometry">
+          <rect>
+            <x>504</x>
+            <y>17</y>
+            <width>39</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subHumTitle">
+        <property name="geometry">
+          <rect>
+            <x>15</x>
+            <y>8</y>
+            <width>124</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonNineHum">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subHumTitle_2">
+        <property name="geometry">
+          <rect>
+            <x>318</x>
+            <y>10</y>
+            <width>117</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="goDashboardFromTemp">
+        <property name="geometry">
+          <rect>
+            <x>38</x>
+            <y>35</y>
+            <width>46</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempFrame">
+        <property name="geometry">
+          <rect>
+            <x>100</x>
+            <y>35</y>
+            <width>854</width>
+            <height>477</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="setTemp">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>422</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualTempVal">
+        <property name="geometry">
+          <rect>
+            <x>434</x>
+            <y>10</y>
+            <width>78</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempNightOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>161</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonDelTemp">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFiveTemp">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempSetPointDay">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>116</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualTempUnit">
+        <property name="geometry">
+          <rect>
+            <x>512</x>
+            <y>20</y>
+            <width>39</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonEightTemp">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="heaterOnOff">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>98</y>
+            <width>86</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonCommaTemp">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="coolerOnOff">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>134</y>
+            <width>86</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonThreeTemp">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="manualTempCheckBox">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>170</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optActualTempUnit_2">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>161</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFourTemp">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optTempTitle">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>80</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSixTemp">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonTwoTemp">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonOneTemp">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subTempIcon">
+        <property name="geometry">
+          <rect>
+            <x>173</x>
+            <y>14</y>
+            <width>31</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="label">
+        <property name="geometry">
+          <rect>
+            <x>15</x>
+            <y>8</y>
+            <width>155</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempSetPointNight">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>161</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonNineTemp">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="tempDayOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>116</y>
+            <width>55</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optActualTempUnit">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>116</y>
+            <width>55</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualTempTitle">
+        <property name="geometry">
+          <rect>
+            <x>318</x>
+            <y>9</y>
+            <width>117</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSevenTemp">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonZeroTemp">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="goDashboardFromLight">
+        <property name="geometry">
+          <rect>
+            <x>38</x>
+            <y>35</y>
+            <width>46</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightFrame">
+        <property name="geometry">
+          <rect>
+            <x>100</x>
+            <y>35</y>
+            <width>854</width>
+            <height>477</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="setLight">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>422</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualLightUnit">
+        <property name="geometry">
+          <rect>
+            <x>543</x>
+            <y>14</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFiveLight">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subLightIcon">
+        <property name="geometry">
+          <rect>
+            <x>100</x>
+            <y>8</y>
+            <width>39</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightSetPointNight">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>161</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSevenLight">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optActualLightUnit">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>116</y>
+            <width>47</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonDelLight">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subLightTitle">
+        <property name="geometry">
+          <rect>
+            <x>15</x>
+            <y>8</y>
+            <width>78</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonTwoLight">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonZeroLight">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonOneLight">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonFourLight">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lampSlider">
+        <property name="geometry">
+          <rect>
+            <x>504</x>
+            <y>134</y>
+            <width>241</width>
+            <height>35</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optLightTitle">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>80</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightSetPointDay">
+        <property name="geometry">
+          <rect>
+            <x>217</x>
+            <y>116</y>
+            <width>124</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightDayOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>116</y>
+            <width>55</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="manualLightCheckBox">
+        <property name="geometry">
+          <rect>
+            <x>504</x>
+            <y>98</y>
+            <width>109</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonNineLight">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="optActualLightUnit_2">
+        <property name="geometry">
+          <rect>
+            <x>349</x>
+            <y>161</y>
+            <width>47</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonSixLight">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>260</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonCommaLight">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>368</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonEightLight">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>314</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="subActualLightVal">
+        <property name="geometry">
+          <rect>
+            <x>434</x>
+            <y>10</y>
+            <width>109</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualLightTitle">
+        <property name="geometry">
+          <rect>
+            <x>318</x>
+            <y>9</y>
+            <width>117</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="lightNightOnOff">
+        <property name="geometry">
+          <rect>
+            <x>147</x>
+            <y>161</y>
+            <width>70</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="buttonThreeLight">
+        <property name="geometry">
+          <rect>
+            <x>566</x>
+            <y>206</y>
+            <width>148</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="maxTitle">
+        <property name="geometry">
+          <rect>
+            <x>705</x>
+            <y>170</y>
+            <width>39</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="minTitle">
+        <property name="geometry">
+          <rect>
+            <x>504</x>
+            <y>170</y>
+            <width>39</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="severityTable">
+        <property name="geometry">
+          <rect>
+            <x>108</x>
+            <y>125</y>
+            <width>326</width>
+            <height>414</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="trayCamera">
+        <property name="geometry">
+          <rect>
+            <x>480</x>
+            <y>125</y>
+            <width>473</width>
+            <height>378</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="goDashboardFromLight_2">
+        <property name="geometry">
+          <rect>
+            <x>38</x>
+            <y>35</y>
+            <width>46</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dashboardTitle_2">
+        <property name="geometry">
+          <rect>
+            <x>403</x>
+            <y>44</y>
+            <width>256</width>
+            <height>45</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="logLogo">
+        <property name="geometry">
+          <rect>
+            <x>356</x>
+            <y>53</y>
+            <width>39</width>
+            <height>36</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualTime">
+        <property name="geometry">
+          <rect>
+            <x>465</x>
+            <y>26</y>
+            <width>124</width>
+            <height>63</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualDate">
+        <property name="geometry">
+          <rect>
+            <x>403</x>
+            <y>89</y>
+            <width>225</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="fullscreenButton">
+        <property name="geometry">
+          <rect>
+            <x>830</x>
+            <y>26</y>
+            <width>39</width>
+            <height>53</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="shutdown">
+        <property name="geometry">
+          <rect>
+            <x>923</x>
+            <y>26</y>
+            <width>39</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="dayNightSetting">
+        <property name="geometry">
+          <rect>
+            <x>876</x>
+            <y>26</y>
+            <width>39</width>
+            <height>54</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="actualMode">
+        <property name="geometry">
+          <rect>
+            <x>395</x>
+            <y>125</y>
+            <width>241</width>
+            <height>27</height>
+          </rect>
+        </property>
+      </widget>
+      <widget class="QWidget" name="menubar">
+        <property name="geometry">
+          <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1024</width>
+            <height>38</height>
+          </rect>
+        </property>
+      </widget>
+    </widget>
+  </widget>
+</ui>

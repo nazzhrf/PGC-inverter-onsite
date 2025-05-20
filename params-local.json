@@ -1,0 +1,12 @@
+{
+    "deviceId": "13",
+    "deviceKey": "b62242c0c350116d3ce1c7a758a4c9eb47d189a9489ee217ed8453bee683405d6b79056046ae10ecdc91f9ce8cee1320b555e5f51d672e",
+    "portUART": "/dev/ttyAMA0",
+    "isThreeCameras": false,
+    "isLandscape": true,
+    "topCameraDevice": "HD WebCam: HD WebCam (usb-0000:01:00.0-1.1.1):",
+    "bottomCameraDevice": "Laptop_Integrated_Webcam_FHD:  (usb-0000:01:00.0-1.1.4):",
+    "userCameraDevice": "Integrated Camera: Integrated C (usb-0000:01:00.0-1.4):",
+    "topRightCameraDevice": "Integrated Camera: Integrated C (usb-0000:01:00.0-1.1.2):",
+    "bottomRightCameraDevice": "Lenovo EasyCamera: Lenovo EasyC (usb-0000:01:00.0-1.1.3):"
+}
