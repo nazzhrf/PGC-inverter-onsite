@@ -1629,7 +1629,7 @@ class Ui_MainWindow(object):
         font.setBold(True)
         font.setWeight(75)
         self.chooseWeek.setFont(font)
-        self.chooseWeek.setStyleSheet("#chooseYearMonth, #chooseWeek {\n"
+        self.chooseWeek.setStyleSheet("#chooseYearMonth, #chooseWeek, #chooseDate {\n"
 "    border: 2px solid #4CAF50;\n"
 "    border-radius: 1px;\n"
 "    padding: 2px;\n"
@@ -1659,7 +1659,7 @@ class Ui_MainWindow(object):
         self.weekEdit.setMaximum(4)
         self.weekEdit.setObjectName("weekEdit")
         self.submitDateTime = QtWidgets.QPushButton(self.severityPage)
-        self.submitDateTime.setGeometry(QtCore.QRect(20, 210, 261, 31))
+        self.submitDateTime.setGeometry(QtCore.QRect(20, 270, 261, 31))
         self.submitDateTime.setStyleSheet("QPushButton {\n"
 "    background-color: rgb(253, 253, 253);\n"
 "    border-color: #2E8B57; /* SeaGreen */\n"
@@ -1680,7 +1680,7 @@ class Ui_MainWindow(object):
 "}")
         self.submitDateTime.setObjectName("submitDateTime")
         self.dateAndTimeList = QtWidgets.QWidget(self.severityPage)
-        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 260, 261, 211))
+        self.dateAndTimeList.setGeometry(QtCore.QRect(20, 320, 261, 151))
         self.dateAndTimeList.setObjectName("dateAndTimeList")
         self.dashboardTitle_4 = QtWidgets.QLabel(self.severityPage)
         self.dashboardTitle_4.setGeometry(QtCore.QRect(70, 40, 151, 21))
@@ -1756,6 +1756,42 @@ class Ui_MainWindow(object):
         self.goDashboardFromDayNight_3.setIcon(icon6)
         self.goDashboardFromDayNight_3.setIconSize(QtCore.QSize(40, 40))
         self.goDashboardFromDayNight_3.setObjectName("goDashboardFromDayNight_3")
+        self.chooseDate = QtWidgets.QLabel(self.severityPage)
+        self.chooseDate.setGeometry(QtCore.QRect(20, 210, 91, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.chooseDate.setFont(font)
+        self.chooseDate.setStyleSheet("#chooseYearMonth, #chooseWeek, #chooseDate {\n"
+"    border: 2px solid #4CAF50;\n"
+"    border-radius: 1px;\n"
+"    padding: 2px;\n"
+"    background-color: rgb(255, 255, 255);\n"
+"    border-color: rgb(123, 128, 137);\n"
+"}\n"
+"")
+        self.chooseDate.setWordWrap(True)
+        self.chooseDate.setObjectName("chooseDate")
+        self.dateEdit_2 = QtWidgets.QDateEdit(self.severityPage)
+        self.dateEdit_2.setGeometry(QtCore.QRect(150, 210, 131, 41))
+        font = QtGui.QFont()
+        font.setPointSize(-1)
+        font.setBold(True)
+        font.setWeight(75)
+        self.dateEdit_2.setFont(font)
+        self.dateEdit_2.setStyleSheet("#QDateTimeEdit, QDateEdit, QSpinBox {\n"
+"    border: 2px solid #2E8B57;\n"
+"    border-radius: 6px;\n"
+"    padding: 4px;\n"
+"    background-color: #ffffff;\n"
+"    color: #333333;\n"
+"    font-size: 14px;\n"
+"    border-color: rgb(123, 128, 137);\n"
+"}")
+        self.dateEdit_2.setMaximumDateTime(QtCore.QDateTime(QtCore.QDate(9999, 12, 30), QtCore.QTime(23, 59, 59)))
+        self.dateEdit_2.setCalendarPopup(True)
+        self.dateEdit_2.setObjectName("dateEdit_2")
         self.stackedWidget.addWidget(self.severityPage)
         self.actualTime = QtWidgets.QLabel(self.centralwidget)
         self.actualTime.setGeometry(QtCore.QRect(620, 20, 161, 71))
@@ -1985,6 +2021,8 @@ class Ui_MainWindow(object):
         self.dateTimeEdit.setDisplayFormat(_translate("MainWindow", "yyyy/MM/dd HH:mm:ss"))
         self.dashboardTitle_6.setText(_translate("MainWindow", "Tray View"))
         self.submitDateTime_2.setText(_translate("MainWindow", "Submit"))
+        self.chooseDate.setText(_translate("MainWindow", "Date"))
+        self.dateEdit_2.setDisplayFormat(_translate("MainWindow", "yyyy/MM/dd"))
         self.actualTime.setText(_translate("MainWindow", "00:00"))
         self.actualDate.setText(_translate("MainWindow", "Ddddddddd,  00/00/0000"))
         self.actualMode.setText(_translate("MainWindow", "Current Mode: Mmmmmm"))
