@@ -1892,6 +1892,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.severityLog.clicked.connect(self.showSeverityPage)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2026,6 +2027,9 @@ class Ui_MainWindow(object):
         self.actualTime.setText(_translate("MainWindow", "00:00"))
         self.actualDate.setText(_translate("MainWindow", "Ddddddddd,  00/00/0000"))
         self.actualMode.setText(_translate("MainWindow", "Current Mode: Mmmmmm"))
+
+    def showSeverityPage(self):
+        self.stackedWidget.setCurrentWidget(self.severityPage)
 
 
 if __name__ == "__main__":
