@@ -53,7 +53,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="dashboardPage">
      <widget class="QLabel" name="actPosition">
@@ -4080,7 +4080,7 @@ QPushButton:pressed {
        <string>Submit</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="goDashboardFromDayNight_3">
+     <widget class="QPushButton" name="goDashboardFromSeverity">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -4416,7 +4416,7 @@ QPushButton:pressed {
      <x>0</x>
      <y>0</y>
      <width>1320</width>
-     <height>43</height>
+     <height>51</height>
     </rect>
    </property>
   </widget>

@@ -82,12 +82,12 @@ class UI(QMainWindow):
         # initiate GUI
         super(UI, self).__init__()
         if (device == "Beelink") :
-            uic.loadUi(prefixPath + ".UI/UIFINAL.ui", self)
+            uic.loadUi(prefixPath + ".UI/UIFINAL_2.ui", self)
         else :
             if (isLandscape == True) :
-                uic.loadUi(prefixPath + ".UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + ".UI/UIFINAL_2.ui", self)
             else :
-                uic.loadUi(prefixPath + ".UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + ".UI/UIFINAL_2.ui", self)
 
         # hardware parameter
         self.mode = "auto"
