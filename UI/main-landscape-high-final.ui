@@ -3753,17 +3753,17 @@ border-radius: 8px;
      <widget class="QTableWidget" name="severityTable">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>140</y>
-        <width>421</width>
-        <height>461</height>
+        <x>330</x>
+        <y>90</y>
+        <width>521</width>
+        <height>471</height>
        </rect>
       </property>
       <property name="rowCount">
-       <number>18</number>
+       <number>60</number>
       </property>
       <property name="columnCount">
-       <number>4</number>
+       <number>8</number>
       </property>
       <row/>
       <row/>
@@ -3783,6 +3783,52 @@ border-radius: 8px;
       <row/>
       <row/>
       <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
       <column/>
       <column/>
       <column/>
@@ -3791,9 +3837,9 @@ border-radius: 8px;
      <widget class="QLabel" name="trayCamera">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>900</x>
         <y>140</y>
-        <width>611</width>
+        <width>301</width>
         <height>421</height>
        </rect>
       </property>
@@ -3804,11 +3850,256 @@ border-radius: 8px;
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="goDashboardFromLight_2">
+     <widget class="QLabel" name="logLogo">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>460</x>
+        <y>60</y>
+        <width>51</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../../Users/VICTUS/Downloads/1960242.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="chooseYearMonth">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>121</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#chooseYearMonth {
+    border: 2px solid #4CAF50;
+    border-radius: 1px;
+    padding: 2px;
+	background-color: rgb(255, 255, 255);
+	border-color: rgb(123, 128, 137);
+}
+</string>
+      </property>
+      <property name="text">
+       <string>Tahun/Bulan</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="chooseWeek">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>121</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#chooseYearMonth, #chooseWeek, #chooseDate {
+    border: 2px solid #4CAF50;
+    border-radius: 1px;
+    padding: 2px;
+	background-color: rgb(255, 255, 255);
+	border-color: rgb(123, 128, 137);
+}
+</string>
+      </property>
+      <property name="text">
+       <string>MInggu ke-</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="submitDateTime">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>270</y>
+        <width>261</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	background-color: rgb(253, 253, 253);
+    border-color: #2E8B57; /* SeaGreen */
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+	border-color: rgb(85, 85, 255);
+	background-color: rgb(166, 205, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(176, 176, 255);
+}</string>
+      </property>
+      <property name="text">
+       <string>Submit</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="dashboardTitle_4">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
         <y>40</y>
+        <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Choose Time</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="dashboardTitle_5">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>30</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Severity Level Log</string>
+      </property>
+     </widget>
+     <widget class="QDateTimeEdit" name="dateTimeEdit">
+      <property name="geometry">
+       <rect>
+        <x>900</x>
+        <y>90</y>
+        <width>201</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#QDateTimeEdit, QDateEdit, QSpinBox {
+    border: 2px solid #2E8B57;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    border-color: rgb(123, 128, 137);
+}</string>
+      </property>
+      <property name="displayFormat">
+       <string>yyyy/MM/dd HH:mm:ss</string>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="dashboardTitle_6">
+      <property name="geometry">
+       <rect>
+        <x>1000</x>
+        <y>30</y>
+        <width>121</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tray View</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="submitDateTime_2">
+      <property name="geometry">
+       <rect>
+        <x>1120</x>
+        <y>90</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	background-color: rgb(253, 253, 253);
+    border-color: #2E8B57; /* SeaGreen */
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+}
+
+QPushButton:hover {
+	border-color: rgb(85, 85, 255);
+	background-color: rgb(166, 205, 255);
+}
+
+QPushButton:pressed {
+    background-color: rgb(176, 176, 255);
+}</string>
+      </property>
+      <property name="text">
+       <string>Submit</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="goDashboardFromDayNight_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>490</y>
         <width>60</width>
         <height>60</height>
        </rect>
@@ -3834,43 +4125,113 @@ border-radius: 8px;
        </size>
       </property>
      </widget>
-     <widget class="QLabel" name="dashboardTitle_2">
+     <widget class="QLabel" name="chooseDate">
       <property name="geometry">
        <rect>
-        <x>520</x>
-        <y>50</y>
-        <width>331</width>
-        <height>51</height>
+        <x>20</x>
+        <y>210</y>
+        <width>121</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>24</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
+      <property name="styleSheet">
+       <string notr="true">#chooseYearMonth, #chooseWeek, #chooseDate {
+    border: 2px solid #4CAF50;
+    border-radius: 1px;
+    padding: 2px;
+	background-color: rgb(255, 255, 255);
+	border-color: rgb(123, 128, 137);
+}
+</string>
+      </property>
       <property name="text">
-       <string>Severity Level Log</string>
+       <string>Tahun/Bulan/Hari</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="logLogo">
+     <widget class="QListWidget" name="dateAndTimeList">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>60</y>
-        <width>51</width>
+        <x>20</x>
+        <y>320</y>
+        <width>261</width>
+        <height>151</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="yearMonthLine">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>90</y>
+        <width>111</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine {
+    border: 20px solid #2E8B57;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    border-color: rgb(123, 128, 137);
+}</string>
       </property>
       <property name="text">
        <string/>
       </property>
-      <property name="pixmap">
-       <pixmap>C:/Users/VICTUS/Downloads/1960242.png</pixmap>
+     </widget>
+     <widget class="QLineEdit" name="yearMonthLine_2">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>150</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
       </property>
-      <property name="scaledContents">
-       <bool>true</bool>
+      <property name="styleSheet">
+       <string notr="true">#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine, yearMonthLine_2 {
+    border: 20px solid #2E8B57;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    border-color: rgb(123, 128, 137);
+}</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="yearMonthLine_3">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>210</y>
+        <width>111</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#QDateTimeEdit, QDateEdit, QSpinBox, yearMonthLine, yearMonthLine_2 {
+    border: 20px solid #2E8B57;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    border-color: rgb(123, 128, 137);
+}</string>
       </property>
      </widget>
     </widget>
