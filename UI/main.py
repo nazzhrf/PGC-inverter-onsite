@@ -9,6 +9,7 @@ from PyQt5 import QtCore, QtSerialPort, QtGui, uic ,QtWidgets
 from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 import sseclient, sys, time, json, requests, cv2, os, subprocess
+from severity_handler import init_severity_page
 
 # comment this if make script error
 #os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
@@ -480,7 +481,7 @@ class UI(QMainWindow):
         #behaviour on severityPage
         #self.toSeverityPage.clicked.connect(self.gotoSeverityPage)
         self.backFromSeverity.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
-    
+        init_severity_page(self)
         
         # check user behaviour
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
