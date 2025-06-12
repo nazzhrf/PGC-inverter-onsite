@@ -5,11 +5,14 @@ Thesis by Muhammad Arbi Minanda (23220344)
 """
 
 # libraries
-from PyQt5 import QtCore, QtSerialPort, QtGui, uic ,QtWidgets 
-from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget, QGridLayout
+from PyQt5 import QtCore, QtSerialPort, QtGui, uic ,QtWidgets
+from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget, QComboBox, QTableWidgetItem, QGridLayout, QSizePolicy, QVBoxLayout
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
+from PyQt5.QtCore import Qt
 import sseclient, sys, time, json, requests, cv2, os, subprocess
 from severity_handler import init_severity_page
+#from fileITY import apply_schedule, abort_cron_jobs, get_previous_schedule
+# from camera_scheduler import apply_schedule, abort_cron_jobs, get_previous_schedule
 
 
 # comment this if make script error
@@ -83,12 +86,12 @@ class UI(QMainWindow):
         # initiate GUI
         super(UI, self).__init__()
         if (device == "Beelink") :
-            uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+            uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
         else :
             if (isLandscape == True) :
-                uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
             else :
-                uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
 
         # hardware parameter
         self.mode = "auto"
@@ -196,6 +199,8 @@ class UI(QMainWindow):
         self.lightPage = self.findChild(QWidget, "lightPage")
         self.dayNightPage = self.findChild(QWidget, "dayNightPage")
         self.severityPage = self.findChild(QWidget, "severityPage")
+        self.settingsPage = self.findChild(QWidget, "settingsPage")
+
         
         # parent element
         self.fullscreenButton = self.findChild(QPushButton, "fullscreenButton")
@@ -219,6 +224,10 @@ class UI(QMainWindow):
         self.camFrame = self.findChild(QFrame, "camFrame")
         self.dashboardFrame = self.findChild(QFrame, "dashboardFrame")
         self.toSeverityPage = self.findChild(QPushButton, "toSeverityPage")
+        self.toMonitoringSettings = self.findChild(QPushButton, "toMonitoringSettings")
+        self.viewTray_R = self.findChild(QPushButton, "viewTray_R")
+        self.viewTray_L = self.findChild(QPushButton, "viewTray_L")
+
         if self.toSeverityPage is None:
             print("toSeverityPage not found in UI!")
         else:
@@ -322,13 +331,19 @@ class UI(QMainWindow):
         #severity page element
         self.severityTable = self.findChild(QTableWidget, "severityTable")
         self.trayCamera = self.findChild(QFrame, "trayCamera")
-        self.yearMonthLine = self.findChild(QtWidgets.QLineEdit, "yearMonthLine")
-        self.yearMonthLine_2 = self.findChild(QtWidgets.QLineEdit, "yearMonthLine_2")
-        self.yearMonthLine_3 = self.findChild(QtWidgets.QLineEdit, "yearMonthLine_3")
-        self.submitDateTime = self.findChild(QtWidgets.QPushButton, "submitDateTime")
-        self.submitDateTime_2 = self.findChild(QtWidgets.QPushButton, "submitDateTime_2")
-        self.dateAndTimeList = self.findChild(QtWidgets.QListWidget, "dateAndTimeList")
         self.backFromSeverity = self.findChild(QPushButton, "goDashboardFromSeverity")
+        
+        #settings page element
+        self.backFromSettings = self.findChild(QPushButton, "goDashboardFromSettings")
+        self.settingsFrame = self.findChild(QFrame, "settingsFrame")
+        self.selectInterval = self.findChild(QComboBox, "selectInterval")
+        self.previousInterval = self.findChild(QLabel, "previousInterval")
+        self.previousStartTime = self.findChild(QLabel, "previousStartTime")
+        self.startMonitoring = self.findChild(QPushButton, "startMonitoring")
+        self.selectHour = self.findChild(QComboBox, "selectHour")
+        self.selectM_1 = self.findChild(QComboBox, "selectM_1")
+        self.selectM_2 = self.findChild(QComboBox, "selectM_2")
+        self.abortMonitoring = self.findChild(QPushButton, "abortMonitoring")
 
         # initial display
         self.showMaximized()
@@ -402,8 +417,12 @@ class UI(QMainWindow):
         self.toHumPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.humPage))
         self.toLightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.lightPage))
         self.toDayNightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.dayNightPage)) 
+        self.toMonitoringSettings.clicked.connect(lambda:self.buttonToPage_clicked(self.settingsPage))
+        self.viewTray_L.clicked.connect(lambda: self.open_tray_preview("left"))
+        self.viewTray_R.clicked.connect(lambda: self.open_tray_preview("right"))
+
         #self.toSeverityPage.clicked.connect(lambda:[self.populate_severity_table(),self.buttonToPage_clicked(self.severityPage),self.gotoSeverityPage()])
-        self.viewTray.clicked.connect(self.showTrayImage)
+        #self.viewTray.clicked.connect(self.showTrayImage)
         
         # behaviour on temp page
         self.manualTempButton.stateChanged.connect(lambda: self.manualButton_clicked(self.manualTempButton))
@@ -490,6 +509,12 @@ class UI(QMainWindow):
         self.yearMonthLine.installEventFilter(self) # VIRTUAL KEYBOARD
         self.yearMonthLine_2.installEventFilter(self) # VIRTUAL KEYBOARD
         self.yearMonthLine_3.installEventFilter(self) # VIRTUAL KEYBOARD
+
+        #behaviour on settingsPage
+        self.backFromSettings.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
+        self.startMonitoring.clicked.connect(self.handle_start_monitoring)
+        self.abortMonitoring.clicked.connect(self.handle_abort_monitoring)
+
         
         # check user behaviour
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
@@ -499,6 +524,9 @@ class UI(QMainWindow):
         self.toLightPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toDayNightPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toSeverityPage.clicked.connect(lambda:self.checkLastTouch())
+        self.toMonitoringSettings.clicked.connect(lambda:self.checkLastTouch())
+
+        
 
         # function to create QT timer
         def createQTimer(slot, interval):
@@ -526,6 +554,16 @@ class UI(QMainWindow):
         self.subscribeSSE()
         self.keyboard_active = False # VIRTUAL KEYBOARD
 
+        try:
+            prev_interval, prev_start = get_previous_schedule()
+            self.previousInterval.setText(f"{prev_interval} Hours")
+            self.previousStartTime.setText(prev_start)
+        except:
+            self.previousInterval.setText("N/A")
+            self.previousStartTime.setText("N/A")
+
+
+
         # take photo when program start and on day
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
             self.sendPhoto(topCameraDevice, self.pathTopPhoto, "Top")
@@ -533,6 +571,7 @@ class UI(QMainWindow):
             if not isThreeCameras:
                 self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                 self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+
     
     def gotoSeverityPage(self):
         image_path = "dummy_images/chili_detection_order.jpg"
@@ -943,6 +982,13 @@ class UI(QMainWindow):
             self.cameraHome.setPixmap(pixmap)
             self.cameraHome.setScaledContents(True)
 
+    def open_tray_preview(self, camera):
+        self.trayPreview.start_stream(camera)
+        self.stackedWidget.setCurrentWidget(self.trayPreview)
+
+    def on_back(self):
+        self.stop_remote_camera_preview()
+        self.main_window.stackedWidget.setCurrentWidget(self.main_window.dashboardPage)
 
     # function for updating photo on dashboard
     def updatePhoto(self):
@@ -1066,7 +1112,7 @@ class UI(QMainWindow):
                     "SPTemp" : self.SPTemp,
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
-                    "gateway_temp": 0,
+                    "gateway_temp":0,
                     "water_status" : self.waterStatus,
                 }
                 print(data_json)
@@ -1108,7 +1154,7 @@ class UI(QMainWindow):
                     "SPTemp" : self.SPTemp,
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
-                    "gateway_temp": 0,
+                    "gateway_temp": f"{cpu_temp:.2f}",
                     "water_status" : self.waterStatus,
                 }
                 print(data)
@@ -1196,6 +1242,7 @@ class UI(QMainWindow):
         except:
             print("Failed receiving data from MCU")
 
+    
     # VIRTUAL KEYBOARD
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.FocusIn:
@@ -1205,8 +1252,70 @@ class UI(QMainWindow):
                     self.keyboard = VirtualKeyboard(source, self)
                     self.keyboard.show()
         return super().eventFilter(source, event)
+    
+    def apply_camera_schedule(self):
+        interval = int(self.selectInterval.currentText())
+        hour = int(self.selectHour.currentText())
+        minute = int(self.selectM_1.currentText()) * 10 + int(self.selectM_2.currentText())
 
-# EDIT
+        start_time = f"{hour:02d}:{minute:02d}"
+        schedule_data = {
+            "interval_hours": interval,
+            "start_time": start_time
+        }
+
+        try:
+            with open("camera_schedule.json", "w") as f:
+                json.dump(schedule_data, f, indent=2)
+
+            response = requests.post("https://api-classify.smartfarm.id/buffer-schedule", json=schedule_data)
+            if response.status_code == 200:
+                print("[INFO] Schedule uploaded.")
+            else:
+                print(f"[ERROR] Upload failed: {response.status_code}")
+            
+            self.previousInterval.setText(f"{interval} Hours")
+            self.previousStartTime.setText(start_time)
+
+            # Now add the actual crontab job
+            apply_schedule()
+
+        except Exception as e:
+            print(f"[ERROR] Failed to apply schedule: {e}")
+    
+    def handle_start_monitoring(self):
+        try:
+            interval = int(self.selectInterval.currentText())
+            hour = int(self.selectHour.currentText())
+            minute = int(self.selectM_1.currentText()) * 10 + int(self.selectM_2.currentText())
+
+            # Call the scheduling function
+            apply_schedule(interval, hour, minute)
+
+            # Update previous values shown in UI
+            self.previousInterval.setText(str(interval))
+            self.previousStartTime.setText(f"{hour:02d}:{minute:02d}")
+
+            print("[INFO] Monitoring started.")
+
+        except Exception as e:
+            print(f"[ERROR] Failed to start monitoring: {e}")
+
+    def handle_abort_monitoring(self):
+        try:
+            abort_cron_jobs()
+
+            # Reset previous values in UI
+            self.previousInterval.setText("0")
+            self.previousStartTime.setText("0")
+
+            print("[INFO] Monitoring aborted.")
+
+        except Exception as e:
+            print(f"[ERROR] Failed to abort monitoring: {e}")
+
+
+# VIRTUAL KEYBOARD
 class VirtualKeyboard(QWidget):
     def __init__(self, target_input, main_ui):
         super().__init__()
@@ -1221,9 +1330,6 @@ class VirtualKeyboard(QWidget):
         layout = QGridLayout()
         keys = [
             ['1','2','3','4','5','6','7','8','9','0'],
-            ['Q','W','E','R','T','Y','U','I','O','P'],
-            ['A','S','D','F','G','H','J','K','L'],
-            ['Z','X','C','V','B','N','M'],
             ['-', '/', '_', 'del', 'Space', 'OK'],
             ['←','→','↑','↓']  # baris tambahan
         ]
@@ -1265,8 +1371,8 @@ class VirtualKeyboard(QWidget):
         self.main_ui.keyboard_active = False
         self.target_input.clearFocus()
         event.accept()
-
-
+    
+    
 # initialize app
 QApplication.setStyle("fussion")
 app = QApplication(sys.argv)

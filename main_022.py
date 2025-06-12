@@ -5,11 +5,15 @@ Thesis by Muhammad Arbi Minanda (23220344)
 """
 
 # libraries
-from PyQt5 import QtCore, QtSerialPort, QtGui, uic ,QtWidgets 
-from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget, QGridLayout
+from PyQt5 import QtCore, QtSerialPort, QtGui, uic ,QtWidgets
+from PyQt5.QtWidgets import QApplication, QStackedWidget, QWidget, QMainWindow, QLabel, QPushButton, QSpinBox, QSlider, QCheckBox, QLineEdit, QFileDialog, QFrame, QTableWidget, QComboBox, QTableWidgetItem, QGridLayout, QSizePolicy, QVBoxLayout, QMessageBox
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
+from PyQt5.QtCore import Qt
 import sseclient, sys, time, json, requests, cv2, os, subprocess
 from severity_handler import init_severity_page
+#from fileITY import apply_schedule, abort_cron_jobs, get_previous_schedule
+# from camera_scheduler import apply_schedule, abort_cron_jobs, get_previous_schedule
+
 
 
 # comment this if make script error
@@ -38,7 +42,7 @@ device = "Raspberry"
 try:
     params_local = load_params(prefixPath)
 except (FileNotFoundError, json.JSONDecodeError):
-    prefixPath = "/home/sgc/pi/"
+    prefixPath = ""
     device = "Beelink"
     params_local = load_params(prefixPath)
 
@@ -59,6 +63,13 @@ if device == "Beelink":
     import numpy as np
     sys.path.insert(0, r"./.local/lib/python3.10/site-packages")
     black = np.load(prefixPath + "outfile.npy")
+    
+def show_message(msg):
+    QMessageBox.information(None, "Info", msg)
+
+def confirm_action(msg):
+    reply = QMessageBox.question(None, "Konfirmasi", msg, QMessageBox.Yes | QMessageBox.No)
+    return reply == QMessageBox.Yes
 
 class UI(QMainWindow):
 
@@ -83,12 +94,12 @@ class UI(QMainWindow):
         # initiate GUI
         super(UI, self).__init__()
         if (device == "Beelink") :
-            uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+            uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
         else :
             if (isLandscape == True) :
-                uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
             else :
-                uic.loadUi(prefixPath + "UI/UIFINAL.ui", self)
+                uic.loadUi(prefixPath + "UI/UIFINAL_2_scaled.ui", self)
 
         # hardware parameter
         self.mode = "auto"
@@ -196,6 +207,8 @@ class UI(QMainWindow):
         self.lightPage = self.findChild(QWidget, "lightPage")
         self.dayNightPage = self.findChild(QWidget, "dayNightPage")
         self.severityPage = self.findChild(QWidget, "severityPage")
+        self.settingsPage = self.findChild(QWidget, "settingsPage")
+
         
         # parent element
         self.fullscreenButton = self.findChild(QPushButton, "fullscreenButton")
@@ -219,6 +232,12 @@ class UI(QMainWindow):
         self.camFrame = self.findChild(QFrame, "camFrame")
         self.dashboardFrame = self.findChild(QFrame, "dashboardFrame")
         self.toSeverityPage = self.findChild(QPushButton, "toSeverityPage")
+        self.toMonitoringSettings = self.findChild(QPushButton, "toMonitoringSettings")
+        self.viewTray_R = self.findChild(QPushButton, "viewTray_R")
+        self.viewTray_L = self.findChild(QPushButton, "viewTray_L")
+        self.monitoringStatus = self.findChild(QLabel , "monitoringStatus")
+        self.actStatus = self.findChild(QLabel, "actStatus")
+
         if self.toSeverityPage is None:
             print("toSeverityPage not found in UI!")
         else:
@@ -322,13 +341,21 @@ class UI(QMainWindow):
         #severity page element
         self.severityTable = self.findChild(QTableWidget, "severityTable")
         self.trayCamera = self.findChild(QFrame, "trayCamera")
-        self.yearMonthLine = self.findChild(QtWidgets.QLineEdit, "yearMonthLine")
-        self.yearMonthLine_2 = self.findChild(QtWidgets.QLineEdit, "yearMonthLine_2")
-        self.yearMonthLine_3 = self.findChild(QtWidgets.QLineEdit, "yearMonthLine_3")
-        self.submitDateTime = self.findChild(QtWidgets.QPushButton, "submitDateTime")
-        self.submitDateTime_2 = self.findChild(QtWidgets.QPushButton, "submitDateTime_2")
-        self.dateAndTimeList = self.findChild(QtWidgets.QListWidget, "dateAndTimeList")
         self.backFromSeverity = self.findChild(QPushButton, "goDashboardFromSeverity")
+        self.trayCameraFS = self.findChild(QPushButton,"trayCameraFS")
+        
+        #settings page element
+        self.backFromSettings = self.findChild(QPushButton, "goDashboardFromSettings")
+        self.settingsFrame = self.findChild(QFrame, "settingsFrame")
+        self.selectInterval = self.findChild(QComboBox, "selectInterval")
+        self.previousInterval = self.findChild(QLabel, "previousInterval")
+        self.previousStartTime = self.findChild(QLabel, "previousStartTime")
+        self.startMonitoring = self.findChild(QPushButton, "startMonitoring")
+        self.selectHour = self.findChild(QComboBox, "selectHour")
+        self.selectM_1 = self.findChild(QComboBox, "selectM_1")
+        self.selectM_2 = self.findChild(QComboBox, "selectM_2")
+        self.abortMonitoring = self.findChild(QPushButton, "abortMonitoring")
+        self.updateMonitoring = self.findChild(QPushButton, "updateMonitoring")
 
         # initial display
         self.showMaximized()
@@ -336,46 +363,46 @@ class UI(QMainWindow):
         self.showFullScreen()
         self.fullscreenButton.setText("↙")
         self.actualPosition.setText("Top")
-        if (self.mode == "auto"):
-            self.heaterButton.setEnabled(False)
-            self.coolerButton.setEnabled(False)
-            self.humidifierButton.setEnabled(False)
-            self.lightSlider.setEnabled(False)
-            self.tempButton.setEnabled(True)
-            self.humButton.setEnabled(True)
-            self.lightButton.setEnabled(True)
-            self.manualTempButton.setChecked(False)
-            self.manualHumButton.setChecked(False)
-            self.manualLightButton.setChecked(False)
-            self.dayTempButton.setDisabled(False)
-            self.dayHumButton.setDisabled(False)
-            self.dayLightButton.setDisabled(False)
-            self.nightTempButton.setDisabled(False)
-            self.nightHumButton.setDisabled(False)
-            self.nightLightButton.setDisabled(False)
-            self.actualMode.setText("Current Mode: Auto")
-        else:
-            self.heaterButton.setEnabled(True)
-            self.coolerButton.setEnabled(True)
-            self.humidifierButton.setEnabled(True)
-            self.heaterButton.setChecked(self.manHeater)
-            self.coolerButton.setChecked(self.manComp)
-            self.humidifierButton.setChecked(self.manHum)
-            self.lightSlider.setEnabled(True)
-            self.lampSlider.setValue(self.manLight)
-            self.tempButton.setEnabled(False)
-            self.humButton.setEnabled(False)
-            self.lightButton.setEnabled(False)
-            self.manualTempButton.setChecked(True)
-            self.manualHumButton.setChecked(True)
-            self.manualLightButton.setChecked(True)
-            self.dayTempButton.setDisabled(True)
-            self.dayHumButton.setDisabled(True)
-            self.dayLightButton.setDisabled(True)
-            self.nightTempButton.setDisabled(True)
-            self.nightHumButton.setDisabled(True)
-            self.nightLightButton.setDisabled(True)
-            self.actualMode.setText("Current Mode: Manual")
+        # if (self.mode == "auto"):
+            #self.heaterButton.setEnabled(False)
+            #self.coolerButton.setEnabled(False)
+            #self.humidifierButton.setEnabled(False)
+            #self.lightSlider.setEnabled(False)
+            #self.tempButton.setEnabled(True)
+            #self.humButton.setEnabled(True)
+            #self.lightButton.setEnabled(True)
+            #self.manualTempButton.setChecked(False)
+            #self.manualHumButton.setChecked(False)
+            #self.manualLightButton.setChecked(False)
+            # self.dayTempButton.setDisabled(False)
+            # self.dayHumButton.setDisabled(False)
+            # self.dayLightButton.setDisabled(False)
+            # self.nightTempButton.setDisabled(False)
+            # self.nightHumButton.setDisabled(False)
+            # self.nightLightButton.setDisabled(False)
+            #self.actualMode.setText("Current Mode: Auto")
+        #else:
+            # self.heaterButton.setEnabled(True)
+            # self.coolerButton.setEnabled(True)
+            #self.humidifierButton.setEnabled(True)
+            # self.heaterButton.setChecked(self.manHeater)
+            # self.coolerButton.setChecked(self.manComp)
+            #self.humidifierButton.setChecked(self.manHum)
+            #self.lightSlider.setEnabled(True)
+            # self.lampSlider.setValue(self.manLight)
+            # self.tempButton.setEnabled(False)
+            # self.humButton.setEnabled(False)
+            # self.lightButton.setEnabled(False)
+            #self.manualTempButton.setChecked(True)
+            #self.manualHumButton.setChecked(True)
+            #self.manualLightButton.setChecked(True)
+            # self.dayTempButton.setDisabled(True)
+            # self.dayHumButton.setDisabled(True)
+            # self.dayLightButton.setDisabled(True)
+            # self.nightTempButton.setDisabled(True)
+            # self.nightHumButton.setDisabled(True)
+            # self.nightLightButton.setDisabled(True)
+            # self.actualMode.setText("Current Mode: Manual")
         self.setpointTempDay.setText(self.SPTempDay)
         self.setpointTempNight.setText(self.SPTempNight)
         self.setpointHumDay.setText(self.SPHumDay)
@@ -402,16 +429,20 @@ class UI(QMainWindow):
         self.toHumPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.humPage))
         self.toLightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.lightPage))
         self.toDayNightPageButton.clicked.connect(lambda:self.buttonToPage_clicked(self.dayNightPage)) 
+        self.toMonitoringSettings.clicked.connect(lambda:self.buttonToPage_clicked(self.settingsPage))
+        self.viewTray_L.clicked.connect(lambda: self.open_tray_preview("left"))
+        self.viewTray_R.clicked.connect(lambda: self.open_tray_preview("right"))
+
         #self.toSeverityPage.clicked.connect(lambda:[self.populate_severity_table(),self.buttonToPage_clicked(self.severityPage),self.gotoSeverityPage()])
-        self.viewTray.clicked.connect(self.showTrayImage)
+        #self.viewTray.clicked.connect(self.showTrayImage)
         
         # behaviour on temp page
-        self.manualTempButton.stateChanged.connect(lambda: self.manualButton_clicked(self.manualTempButton))
+        #self.manualTempButton.stateChanged.connect(lambda: self.manualButton_clicked(self.manualTempButton))
         self.dayTempButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Day", "Temp"))
         self.nightTempButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Night", "Temp"))
         self.tempButton.clicked.connect(lambda:self.setButton_clicked("Temp"))
-        self.heaterButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("heater"))
-        self.coolerButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("cooler"))
+        # self.heaterButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("heater"))
+        # self.coolerButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("cooler"))
         self.oneButtonTemp.clicked.connect(lambda:self.digitButton_clicked('1', "Temp"))
         self.twoButtonTemp.clicked.connect(lambda:self.digitButton_clicked('2', "Temp"))
         self.threeButtonTemp.clicked.connect(lambda:self.digitButton_clicked('3', "Temp"))
@@ -427,11 +458,11 @@ class UI(QMainWindow):
         self.backFromTemp.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         # behaviour on hum page
-        self.manualHumButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualHumButton))
+        #self.manualHumButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualHumButton))
         self.dayHumButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Day", "Hum"))
         self.nightHumButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Night", "Hum"))
         self.humButton.clicked.connect(lambda:self.setButton_clicked("Hum"))
-        self.humidifierButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("humidifier"))
+        #self.humidifierButton.stateChanged.connect(lambda:self.setActuatorButton_clicked("humidifier"))
         self.oneButtonHum.clicked.connect(lambda:self.digitButton_clicked('1', "Hum"))
         self.twoButtonHum.clicked.connect(lambda:self.digitButton_clicked('2', "Hum"))
         self.threeButtonHum.clicked.connect(lambda:self.digitButton_clicked('3', "Hum"))
@@ -447,11 +478,11 @@ class UI(QMainWindow):
         self.backFromHum.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
         
         # behaviour on light page
-        self.manualLightButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualLightButton))
+        #self.manualLightButton.stateChanged.connect(lambda:self.manualButton_clicked(self.manualLightButton))
         self.dayLightButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Day", "Light"))
         self.nightLightButton.stateChanged.connect(lambda:self.weatherSetPointButton_clicked("Night", "Light"))
         self.lightButton.clicked.connect(lambda:self.setButton_clicked("Light"))
-        self.lightSlider.sliderReleased.connect(lambda:self.lampSlider_released())
+        #self.lightSlider.sliderReleased.connect(lambda:self.lampSlider_released())
         self.oneButtonLight.clicked.connect(lambda:self.digitButton_clicked('1', "Light"))
         self.twoButtonLight.clicked.connect(lambda:self.digitButton_clicked('2', "Light"))
         self.threeButtonLight.clicked.connect(lambda:self.digitButton_clicked('3', "Light"))
@@ -490,6 +521,12 @@ class UI(QMainWindow):
         self.yearMonthLine.installEventFilter(self) # VIRTUAL KEYBOARD
         self.yearMonthLine_2.installEventFilter(self) # VIRTUAL KEYBOARD
         self.yearMonthLine_3.installEventFilter(self) # VIRTUAL KEYBOARD
+
+        #behaviour on settingsPage
+        self.backFromSettings.clicked.connect(lambda:self.buttonToPage_clicked(self.dashboardPage))
+        self.startMonitoring.clicked.connect(self.handle_start_monitoring)
+        self.abortMonitoring.clicked.connect(self.handle_abort_monitoring)
+
         
         # check user behaviour
         self.fullscreenButton.clicked.connect(lambda:self.checkLastTouch())
@@ -499,6 +536,9 @@ class UI(QMainWindow):
         self.toLightPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toDayNightPageButton.clicked.connect(lambda:self.checkLastTouch())
         self.toSeverityPage.clicked.connect(lambda:self.checkLastTouch())
+        self.toMonitoringSettings.clicked.connect(lambda:self.checkLastTouch())
+
+        
 
         # function to create QT timer
         def createQTimer(slot, interval):
@@ -526,6 +566,16 @@ class UI(QMainWindow):
         self.subscribeSSE()
         self.keyboard_active = False # VIRTUAL KEYBOARD
 
+        try:
+            prev_interval, prev_start = get_previous_schedule()
+            self.previousInterval.setText(f"{prev_interval} Hours")
+            self.previousStartTime.setText(prev_start)
+        except:
+            self.previousInterval.setText("N/A")
+            self.previousStartTime.setText("N/A")
+
+
+
         # take photo when program start and on day
         if ((time.localtime()).tm_hour >= int(self.startDay)) and ((time.localtime()).tm_hour < int(self.startNight)):
             self.sendPhoto(topCameraDevice, self.pathTopPhoto, "Top")
@@ -533,6 +583,7 @@ class UI(QMainWindow):
             if not isThreeCameras:
                 self.sendPhoto(topRightCameraDevice, self.pathTopRightPhoto, "Top Right")
                 self.sendPhoto(bottomRightCameraDevice, self.pathBottomRightPhoto, "Bottom Right")
+
     
     def gotoSeverityPage(self):
         image_path = "dummy_images/chili_detection_order.jpg"
@@ -817,11 +868,21 @@ class UI(QMainWindow):
             self.startNight = self.tempStartNight
             self.saveDayNightDataToLocalFile()
     
+
     # function if set actuator state is clicked
     def setActuatorButton_clicked(self, actuator_type):
+        #dummy 
+        dummy_temp = 26.5
+        dummy_hum = 72
+        print("setActuatorButton_clicked called with:", actuator_type)
+        print("subActualTemp:", self.subActualTemp)
+        print("actualTemp:", self.actualTemp)
         if actuator_type == "heater":
             if self.heaterButton.isChecked():
                 self.manHeater = True
+                self.actTemp = dummy_temp
+                self.subActualTemp.setText(self.actTemp)
+                self.actualTemp.setText(self.actTemp)
             else:
                 self.manHeater = False
         elif actuator_type == "cooler":
@@ -832,13 +893,20 @@ class UI(QMainWindow):
         elif actuator_type == "humidifier":
             if self.humidifierButton.isChecked():
                 self.manHum = True
+                self.actHum = dummy_hum
+                self.subActualHum.setText(self.actHum)
+                self.actualHum.setText(self.actHum)
             else:
                 self.manHum = False
         self.sendDataMCU()
 
     # function if lamp slider is released
     def lampSlider_released(self):
-        self.manLight = self.lampSlider.value()/4
+        dummy_light = 4500
+        self.manLight = self.lampSlider.value()/4     
+        self.actLight = dummy_light
+        self.subActualLight.setText(self.actLight)
+        self.actualLight.setText(self.actLight)
         self.sendDataMCU()
     
     # function if button digit for optimum value is clicked
@@ -943,6 +1011,13 @@ class UI(QMainWindow):
             self.cameraHome.setPixmap(pixmap)
             self.cameraHome.setScaledContents(True)
 
+    def open_tray_preview(self, camera):
+        self.trayPreview.start_stream(camera)
+        self.stackedWidget.setCurrentWidget(self.trayPreview)
+
+    def on_back(self):
+        self.stop_remote_camera_preview()
+        self.main_window.stackedWidget.setCurrentWidget(self.main_window.dashboardPage)
 
     # function for updating photo on dashboard
     def updatePhoto(self):
@@ -1066,7 +1141,7 @@ class UI(QMainWindow):
                     "SPTemp" : self.SPTemp,
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
-                    "gateway_temp": 0,
+                    "gateway_temp":0,
                     "water_status" : self.waterStatus,
                 }
                 print(data_json)
@@ -1108,7 +1183,7 @@ class UI(QMainWindow):
                     "SPTemp" : self.SPTemp,
                     "SPHum" : self.SPHum,
                     "SPLight" : self.SPLight,
-                    "gateway_temp": 0,
+                    "gateway_temp": f"{cpu_temp:.2f}",
                     "water_status" : self.waterStatus,
                 }
                 print(data)
@@ -1196,6 +1271,7 @@ class UI(QMainWindow):
         except:
             print("Failed receiving data from MCU")
 
+    
     # VIRTUAL KEYBOARD
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.FocusIn:
@@ -1205,34 +1281,120 @@ class UI(QMainWindow):
                     self.keyboard = VirtualKeyboard(source, self)
                     self.keyboard.show()
         return super().eventFilter(source, event)
+    
+    def apply_camera_schedule(self):
+        interval = int(self.selectInterval.currentText())
+        hour = int(self.selectHour.currentText())
+        minute = int(self.selectM_1.currentText()) * 10 + int(self.selectM_2.currentText())
 
-# EDIT
+        start_time = f"{hour:02d}:{minute:02d}"
+        schedule_data = {
+            "interval_hours": interval,
+            "start_time": start_time
+        }
+
+        try:
+            with open("camera_schedule.json", "w") as f:
+                json.dump(schedule_data, f, indent=2)
+
+            response = requests.post("https://api-classify.smartfarm.id/buffer-schedule", json=schedule_data)
+            if response.status_code == 200:
+                print("[INFO] Schedule uploaded.")
+            else:
+                print(f"[ERROR] Upload failed: {response.status_code}")
+            
+            self.previousInterval.setText(f"{interval} Hours")
+            self.previousStartTime.setText(start_time)
+
+            # Now add the actual crontab job
+            apply_schedule()
+
+        except Exception as e:
+            print(f"[ERROR] Failed to apply schedule: {e}")
+
+    
+    def handle_start_monitoring(self):
+        try:
+            if not confirm_action("Apakah Anda yakin ingin memulai monitoring?"):
+                return  # batal
+
+            interval = int(self.selectInterval.currentText())
+            hour = int(self.selectHour.currentText())
+            minute = int(self.selectM_1.currentText()) * 10 + int(self.selectM_2.currentText())
+
+            apply_schedule(interval, hour, minute)
+
+            self.previousInterval.setText(str(interval))
+            self.previousStartTime.setText(f"{hour:02d}:{minute:02d}")
+
+            show_message("Monitoring telah dimulai.")
+
+            print("[INFO] Monitoring started.")
+        except Exception as e:
+            show_message(f"Terjadi kesalahan saat memulai monitoring: {e}")
+            print(f"[ERROR] Failed to start monitoring: {e}")
+
+    def handle_abort_monitoring(self):
+        try:
+            if not confirm_action("Apakah Anda yakin ingin membatalkan monitoring?"):
+                return  # batal
+
+            abort_cron_jobs()
+
+            self.previousInterval.setText("0")
+            self.previousStartTime.setText("0")
+
+            show_message("Monitoring telah dibatalkan.")
+
+            print("[INFO] Monitoring aborted.")
+        except Exception as e:
+            show_message(f"Terjadi kesalahan saat membatalkan monitoring: {e}")
+            print(f"[ERROR] Failed to abort monitoring: {e}")
+
+# VIRTUAL KEYBOARD
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
+from PyQt5 import QtCore
+
 class VirtualKeyboard(QWidget):
     def __init__(self, target_input, main_ui):
         super().__init__()
         self.target_input = target_input
-        self.main_ui = main_ui  # referensi ke UI utama
+        self.main_ui = main_ui
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Keyboard")
-        self.setFixedSize(400, 200)
+        self.setWindowTitle("Numeric Keyboard")
+        self.setFixedSize(500, 300)  # Suitable for 1024x600 screen
         self.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
+
         layout = QGridLayout()
+
+        # 3x4 layout
         keys = [
-            ['1','2','3','4','5','6','7','8','9','0'],
-            ['Q','W','E','R','T','Y','U','I','O','P'],
-            ['A','S','D','F','G','H','J','K','L'],
-            ['Z','X','C','V','B','N','M'],
-            ['-', '/', '_', 'del', 'Space', 'OK'],
-            ['←','→','↑','↓']  # baris tambahan
+             ['1', '2', '3', '/'],
+            ['4', '5', '6', '-'],
+            ['7', '8', '9', '←'],
+            ['OK', '0', '.', ' ']
         ]
 
         for row_idx, row in enumerate(keys):
             for col_idx, key in enumerate(row):
                 btn = QPushButton(key)
-                btn.setFixedHeight(40)
-                btn.setStyleSheet("font-size: 16px;")
+                btn.setFixedSize(100, 60)
+                btn.setStyleSheet("""
+                    QPushButton {
+                        font-size: 20px;
+                        background-color: #ffffff;
+                        border: 2px solid #aaaaaa;
+                        border-radius: 8px;
+                    }
+                    QPushButton:hover {
+                        background-color: #e0f7fa;
+                    }
+                    QPushButton:pressed {
+                        background-color: #b2ebf2;
+                    }
+                """)
                 btn.clicked.connect(self.on_button_clicked)
                 layout.addWidget(btn, row_idx, col_idx)
 
@@ -1242,22 +1404,12 @@ class VirtualKeyboard(QWidget):
         key = self.sender().text()
         current = self.target_input.text()
 
-        if key == 'del':
+        if key == '←':
             self.target_input.setText(current[:-1])
-        elif key == 'Space':
-            self.target_input.setText(current + ' ')
         elif key == 'OK':
             self.main_ui.keyboard_active = False
             self.target_input.clearFocus()
             self.hide()
-        elif key == '←':
-            self.target_input.cursorBackward(False, 1)
-        elif key == '→':
-            self.target_input.cursorForward(False, 1)
-        elif key == '↑':
-            self.target_input.cursorUp(False, 1)
-        elif key == '↓':
-            self.target_input.cursorDown(False, 1)
         else:
             self.target_input.setText(current + key)
 
@@ -1266,6 +1418,10 @@ class VirtualKeyboard(QWidget):
         self.target_input.clearFocus()
         event.accept()
 
+    
+
+    
+    
 
 # initialize app
 QApplication.setStyle("fussion")
